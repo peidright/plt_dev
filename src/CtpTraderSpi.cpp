@@ -92,7 +92,7 @@ void CtpTraderSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
   strcpy(req.InstrumentID, instId);//为空表示查询所有合约
-	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
+	int ret = this->api->ReqQryInstrument(&req, ++requestId);
 	cerr<<" 请求 | 发送合约查询..."<<((ret == 0)?"成功":"失败")<<endl;
 }
 
@@ -114,7 +114,7 @@ void CtpTraderSpi::ReqQryTradingAccount()
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, appId);
 	strcpy(req.InvestorID, userId);
-	int ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
+	int ret = this->api->ReqQryTradingAccount(&req, ++requestId);
 	cerr<<" 请求 | 发送资金查询..."<<((ret == 0)?"成功":"失败")<<endl;
 
 }
@@ -144,7 +144,7 @@ void CtpTraderSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
 	strcpy(req.BrokerID, appId);
 	strcpy(req.InvestorID, userId);
 	strcpy(req.InstrumentID, instId);	
-	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
+	int ret = this->api->ReqQryInvestorPosition(&req, ++requestId);
 	cerr<<" 请求 | 发送持仓查询..."<<((ret == 0)?"成功":"失败")<<endl;
 }
 
@@ -198,7 +198,7 @@ void CtpTraderSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 	req.IsAutoSuspend = 0;  //自动挂起标志:否	
 	req.UserForceClose = 0;   //用户强评标志:否
 
-	int ret = pUserApi->ReqOrderInsert(&req, ++requestId);
+	int ret = this->api->ReqOrderInsert(&req, ++requestId);
 	cerr<<" 请求 | 发送报单..."<<((ret == 0)?"成功":"失败")<< endl;
 }
 
@@ -230,7 +230,7 @@ void CtpTraderSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
   strcpy(req.OrderSysID, orderList[i]->OrderSysID);
 	req.ActionFlag = THOST_FTDC_AF_Delete;  //操作标志 
 
-	int ret = pUserApi->ReqOrderAction(&req, ++requestId);
+	int ret = this->api->ReqOrderAction(&req, ++requestId);
 	cerr<< " 请求 | 发送撤单..." <<((ret == 0)?"成功":"失败") << endl;
 }
 
@@ -336,6 +336,7 @@ void CtpTraderSpi::PrintTrades(){
   }
   sem.sem_v();
 }
+/*
 char MapDirection(char src, bool toOrig=true){
   if(toOrig){
     if('b'==src||'B'==src){src='0';}else if('s'==src||'S'==src){src='1';}
@@ -357,3 +358,4 @@ char MapOffset(char src, bool toOrig=true){
   return src;
 }
 
+*/

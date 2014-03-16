@@ -53,11 +53,11 @@ datalocal::datalocal()
 	ret=sqlite3_exec(this->db,"insert into contractschema values('rm1401','rm')",callback,NULL,&error);
 	assert(ret== SQLITE_OK);
 
-	vector<map<string,string>> result;
+	vector<map<string,string> > result;
 	this->exe_cmd("select contract,ctype from contractschema", result);
 
 	/*create all table*/
-	for (vector<map<string,string>>::iterator it=result.begin();it!=result.end();it++) {
+	for (vector<map<string,string> >::iterator it=result.begin();it!=result.end();it++) {
 		char sqlbuf[256];
 		memset(sqlbuf,0x0,256);
 		cout<<"sql1:begin"<<endl;
@@ -110,13 +110,13 @@ void datalocal:: get_product_list(vector<string> &product_list)
 void datalocal::init_product_list(vector<string> product_list)
 {
 	//*check if exist product_list,if not exist,delete*//
-	vector<map<string,string>> rows;
+	vector<map<string,string> > rows;
 	this->exe_cmd("select name from sqlite_master where type='table'",rows);
 }
 
 void datalocal::init_product(string product)
 {
-	vector<map<string,string>> rows;
+	vector<map<string,string> > rows;
 	this->exe_cmd("select name from sqlite_master where type='table'",rows);
 	this->exe_cmd("create table instrument(day integer, seconds integer, \
 		           closeprice integer,openprice  interger,uprice integer,lprice integer,\
@@ -129,7 +129,7 @@ void datalocal::init_product(string product)
 	
 }
 
-void datalocal::exe_cmd(string cmd, vector<map<string,string>> &rows)
+void datalocal::exe_cmd(string cmd, vector<map<string,string> > &rows)
 {
 	int ret;
 	char                  *error = 0;

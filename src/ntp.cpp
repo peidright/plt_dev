@@ -15,36 +15,11 @@ SOCKET s;  // socket
 time_t tmit;   // the time -- This is a time_t sort of
 //msg.status=(0<<6)|(3<<3)|MODE_CLIENT;
 
-//=====================================================================================
-//THIS IS WHAT IS MISSING MAJORILY  
-//=====================================================================================
-        //Initialise the winsock stack
-        WSADATA wsaData;
-        BYTE wsMajorVersion = 1;
-        BYTE wsMinorVersion = 1;
-        WORD wVersionRequested = MAKEWORD(wsMinorVersion, wsMajorVersion);   
-        if (WSAStartup(wVersionRequested, &wsaData) != 0) 
-        {
-            _tprintf(_T("Failed to load winsock stack\n"));
-            WSACleanup();
-            return;
-        }
-        if (LOBYTE(wsaData.wVersion) != wsMajorVersion || HIBYTE(wsaData.wVersion) != wsMinorVersion)
-        {
-            _tprintf(_T("Winsock stack does not support version which this program requires\n"));
-            WSACleanup();
-            return;
-        }
-//=====================================================================================
-
-
-
 //use Socket;
 //
 //#we use the system call to open a UDP socket
 //socket(SOCKET, PF_INET, SOCK_DGRAM, getprotobyname("udp")) or die "socket: $!";
 proto=getprotobyname("udp");
-int err = GetLastError();
 s=socket(PF_INET, SOCK_DGRAM, proto->p_proto);
 if(s) {
     perror("asd");

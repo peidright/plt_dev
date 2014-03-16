@@ -1,5 +1,5 @@
 #include "CtpQuoter.h"
-#include "Trader.h"
+#include "trader.h"
 #include <deque>
 CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
 {

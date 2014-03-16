@@ -1,5 +1,5 @@
 #include "CtpTrader.h"
-#include "Trader.h"
+#include "trader.h"
 
 CtpTrader::CtpTrader(Trader *trader)
 {

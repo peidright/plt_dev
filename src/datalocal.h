@@ -13,7 +13,7 @@ public:
 	void store_instant_info(string product);
 	void init_product_list(vector<string> product_list);
     void init_product(string product);
-	void exe_cmd(string cmd, vector<map<string,string>> &rows);
+	void exe_cmd(string cmd, vector<map<string,string> > &rows);
 	void exe_cmd(string cmd);
 	sqlite3 *db;
 };

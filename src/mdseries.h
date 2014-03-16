@@ -45,7 +45,7 @@ public:
 	/*每个md一个线程*/
 	map<string, md*> mds;
 	/*todo 读写锁*/
-	int md(string contract,int period, int bar);
+	int mmd(string contract,int period, int bar);
 	int regmd_period(string contract,period_type ptype, int period);
 	int regmd(string contract);
 	int update(string contract, float v, int t1, int t2);

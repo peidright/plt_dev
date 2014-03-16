@@ -4,20 +4,20 @@
 #include <algorithm>
 #include <vector>
 #include "sqlite3.h"
-#include "../CtpTrader.h"
-#include "../CtpQuoter.h"
-#include "../config.h"
-#include "../trader.h"
-#include "../datalocal.h"
-#include "../ntp.h"
-#include "../luajit_support.h"
+#include "CtpTrader.h"
+#include "CtpQuoter.h"
+#include "config.h"
+#include "trader.h"
+#include "datalocal.h"
+#include "ntp.h"
+#include "luajit_support.h"
 #include <boost/regex.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <iostream>
 #include <iterator>
 #include <algorithm>
-#include "../mdseries.h"
-#include "../boosthelp.h"
+#include "mdseries.h"
+#include "boosthelp.h"
 using namespace std;
 
 //请求编号
@@ -112,7 +112,7 @@ int main(int argc, char * argv[]){
 	//return 0;
 	cout<<"ddd1"<<endl;
 	datalocal *dl=new datalocal();
-	vector<map<string,string>> rows;
+	vector<map<string,string> > rows;
 	cout<<"ddd2"<<endl;
 	dl->exe_cmd("select name from sqlite_master where type='table'",rows);
 	getchar();

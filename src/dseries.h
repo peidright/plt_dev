@@ -36,7 +36,7 @@ public:
 	period_type ptype;
 	dseries();
 	dseries(updatecb cb) {this->cb = cb;};
-	dseries::dseries(const dseries &);
+	dseries(const dseries &);
 
 	int update_ms(float v, int sec, int msec);
 	int update_meh(float v, int sec, int msec,period_type ptype, int period);

@@ -10,7 +10,7 @@
 #include "ThostFtdcTraderApi.h"
 
 //#include "CtpQuote.h"
-#include "../boosthelp.h"
+#include "boosthelp.h"
 
 
 enum msgtype {

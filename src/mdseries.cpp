@@ -188,7 +188,7 @@ int md::update_timer()
 };
 
 
-int mdservice::md(string contract,int period, int bar){
+int mdservice::mmd(string contract,int period, int bar){
 
 	return 0;
 };

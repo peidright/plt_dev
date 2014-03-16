@@ -1,9 +1,12 @@
 #include <stdio.h>
-//#include <sys/types.h>
-//#include <sys/socket.h>
-//#include <netinet/in.h>
-//#include <arpa/inet.h>
-//#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <stdint.h>
+
+/*
 #include <time.h>
 #include <string.h>
 #include <winsock2.h>
@@ -11,12 +14,13 @@
 #include <tchar.h>
 
 #pragma comment(lib, "Ws2_32.lib")
+*/
 
 #define	JAN_1970	2208988800UL	/* 1970 - 1900 in seconds */
 
 struct l_fixedpt {		/* 64-bit fixed-point */
-	UINT32	int_part;
-	UINT32	fraction;
+	uint32_t	int_part;
+	uint32_t	fraction;
 };
 
 struct s_fixedpt {		/* 32-bit fixed-point */
@@ -31,7 +35,7 @@ struct ntpdata {		/* NTP header */
   int				precision:8;
   struct s_fixedpt	distance;
   struct s_fixedpt	dispersion;
-  UINT32			refid;
+  uint32_t			refid;
   struct l_fixedpt	reftime;
   struct l_fixedpt	org;
   struct l_fixedpt	rec;
