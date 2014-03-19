@@ -3,6 +3,8 @@
 #include <boost/signal.hpp>
 #include <time.h>
 #include <stdio.h>
+#include <boost/functional/hash.hpp>
+using namespace std;
 boost::interprocess::interprocess_semaphore g_iosem(0);
 
 template<typename funT, typename paramT>
@@ -48,4 +50,10 @@ void test1()
 	boost::thread_group tg;
 	tg.add_thread(new boost::thread(worker,"dddd"));
 	//tg.add_thread(boost::thread(adapter<workfunc,std::string>(worker,"dddd")));
+}
+
+int my_hash(string str) {
+	 boost::hash<std::string> string_hash;
+	 cerr<<"string hash"<<string_hash(str)<<" str is:"<< str<<std::endl;
+	 return string_hash(str)%8;	
 }

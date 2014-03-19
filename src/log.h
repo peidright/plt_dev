@@ -20,5 +20,5 @@ using namespace std;
 	BOOST_LOG_TRIVIAL(warning) 
 #define LOG_FATAL(fatal)\
 	BOOST_LOG_TRIVIAL(fatal) 
-
+extern void log_init();
 #endif

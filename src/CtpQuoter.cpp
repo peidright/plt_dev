@@ -85,6 +85,29 @@ void CtpQuoter::start()
 	getchar();
 }
 
+void CtpQuoter::post_msg(msg_t *msg, string contract)
+{
+	/*lock
+	*/
+	int i=my_hash(contract);
+	
+again:
+	boost::unique_lock<boost::timed_mutex> lk(*(this->qmutex_map[my_hash(contract)]),boost::chrono::milliseconds(1));
+	if(lk) {
+		this->mqueue_map[my_hash(contract)].push_back(*msg);
+		this->qsem_map[my_hash(contract)]->post();
+		printf("post msg\n");	
+		lk.unlock();
+	}else {
+		/*
+		   do some warnning
+		*/
+
+		goto again;
+	}
+}
+
+
 void CtpQuoter::post_msg(msg_t *msg)
 {
 	/*lock
@@ -231,6 +254,7 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 		2. send signal to stragte
 		3. copy data to io thread to permnate
 	*/
+	cerr<<"in DepthMarketProcess"<<std::endl;
 	QOnRtnDepthMarketData_t *mdata=(QOnRtnDepthMarketData_t*)msg.data;
 	assert(msg.type==QOnRtnDepthMarketData);
 	int msec=mdata->pDepthMarketData.UpdateMillisec;

@@ -53,6 +53,7 @@ public:
 	int  init(mdservice *mds);
 	void start();
 	void post_msg(msg_t *msg);
+	void post_msg(msg_t *msg, string contract);
 	void quote_stm(msg_t &msg);
 	int SubscribeMarketData();
 	int DepthMarketProcess(msg_t &msg);

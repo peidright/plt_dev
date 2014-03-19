@@ -228,6 +228,23 @@ void dump_depthmarketdata(CThostFtdcDepthMarketDataField *dmd)
 
 void CtpQuoteSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	cout<<"md subscribe market cu1401 successed"<<endl;
-	dump_depthmarketdata(pDepthMarketData);
+	string contract;
+/*
+QOnRtnDepthMarketData,
+typedef struct {
+	CThostFtdcDepthMarketDataField pDepthMarketData;
+}QOnRtnDepthMarketData_t;
+*/
+	cout<<"Depth market Data post msg"<<endl;
+	//dump_depthmarketdata(pDepthMarketData);
+	msg_t *msg=new(msg_t);
+	QOnRtnDepthMarketData_t  *data=new(QOnRtnDepthMarketData_t);
+
+	memcpy(&data->pDepthMarketData,pDepthMarketData,sizeof(CThostFtdcDepthMarketDataField));
+	msg->len=sizeof(QOnRtnDepthMarketData_t);
+	msg->data=(void*)data;
+	msg->type=QOnRtnDepthMarketData;
+	contract=pDepthMarketData->InstrumentID;
+	this->ctpquoter->post_msg(msg,contract);
 }
+

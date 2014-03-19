@@ -201,6 +201,7 @@ int mdservice::update(string contract, float v, int t1, int t2){
 	int ret;
 	if(this->mds.find(contract)==this->mds.end()) {
 		/*!!!!*/
+		cerr<<"find not contract: "<<contract<<std::endl;
 		return -1;
 	}
 	cerr<<"mdservice update contract: "<<contract<<std::endl;
@@ -219,6 +220,8 @@ int mdservice::regmd(string contract){
 		/*log it, the contract has existed*/
 		return -1;
 	}
+	cerr<<"reg md :"<<contract<<std::endl;
+	//assert(0);
 
 	class md *pmd= new class md();
 	this->mds[contract]=pmd;

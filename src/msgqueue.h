@@ -52,9 +52,8 @@ enum msgtype {
 	QOnHeartBeatWarning,
 	QOnRspError,
 	QReqSubscribeMarketData,
-    QOnRspSubMarketData,
+    	QOnRspSubMarketData,
 	QOnRspUnSubMarketData,
-	
 	QReqUserLogin,
 	QOnRspUserLogin,
 	QOnRspUserLogout,

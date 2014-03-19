@@ -18,6 +18,8 @@
 #include <algorithm>
 #include "mdseries.h"
 #include "boosthelp.h"
+#include "log.h"
+
 using namespace std;
 
 //请求编号
@@ -52,14 +54,12 @@ int  ctp_work()
 		/*
 		创建线程，专门处理行情的消息
 		*/
-		/*
-		g_ctp_quoter->mds->regmd("m1409");
-
+		g_ctp_quoter->init(g_mdservice);
+		g_ctp_quoter->mds->regmd("cu1406");
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
-		}*/
+		}
 
-		g_ctp_quoter->init(g_mdservice);
 		g_quote_tg.add_thread(new boost::thread(quote_loop,g_ctp_quoter));
 		printf("mdsed\n");
 		printf("inited\n");
@@ -76,11 +76,10 @@ int  ctp_work()
 		printf("started!!!!\n");
 
 		/*
-		创建线程，专门处理交易的信息
+		*/
 		for (i=0;i<CTP_WORK_THREAD_NUM;i++){
 			g_trade_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}
-		*/
 
 		/*
 		创建线程，专门负责将行情信息，刷进sqlite
@@ -103,6 +102,8 @@ int  ctp_work()
 
 
 int main(int argc, char * argv[]){
+	log_init();
+
 	test1();
 	getchar();
 	std::string line;
