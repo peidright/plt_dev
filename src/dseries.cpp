@@ -52,9 +52,10 @@ int dseries::dump()
 {
 	/*
 	*/
-	LOG_DEBUG<<"price¿"<<this->data[this->cidx]<< "time: "<<this->tsec[this->cidx]<<std::endl;
+	LOG_DEBUG<<"price:"<<this->data[this->cidx]<< " time: "<<this->tsec[this->cidx]<<std::endl;
 	return 0;
 }
+
 int dseries::update_ms(float v, int sec, int msec){
 		/*
 		  1.
