@@ -83,8 +83,11 @@ protected:
 class CtpQuoteSpi:public CThostFtdcMdSpi
 {
 	public:
+	CThostFtdcMdApi *api;
+
 	int login_status;
 	int requestId;
+	string test;
 	CtpQuoter* ctpquoter;
 
 	//Quoter *quoter;
@@ -129,7 +132,7 @@ class CtpQuoteSpi:public CThostFtdcMdSpi
 	int  ReqUserLogin(TThostFtdcBrokerIDType	appId,
 		TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd);
 private:
-	CThostFtdcMdApi *api;
+	//CThostFtdcMdApi *api;
 };
 
 

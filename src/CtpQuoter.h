@@ -37,7 +37,7 @@ public:
 	
 
 	boost::interprocess::interprocess_semaphore qsem;
-    boost::timed_mutex qmutex;
+    	boost::timed_mutex qmutex;
 	
 	map<int, boost::timed_mutex *> qmutex_map;
 	map<int, boost::interprocess::interprocess_semaphore* > qsem_map;
@@ -61,5 +61,6 @@ public:
 };
 
 void DepthMarketProcess(CtpQuoter *ctpquoter, int key);
+void quote_loop(CtpQuoter *ctpquoter);
 
 #endif

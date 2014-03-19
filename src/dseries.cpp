@@ -18,34 +18,74 @@ int get_period_slot(int sec,int msec, period_type ptype,int period){
 	return sec / factor;
 }
 
-dseries::dseries(){cidx=0;};
+dseries::dseries(){
+	/*
+	static const int MAX_DSERIES_SIZE=10000;
+	float data[MAX_DSERIES_SIZE];
+	int   tsec[MAX_DSERIES_SIZE];
+	int   tmsec[MAX_DSERIES_SIZE];
+	timed_mutex dmutex;
+	typedef int (*updatecb)(float ,int,int);
+	updatecb cb;
+	int eidx;
+	int bidx;
+	int cidx;
+	int esec,emsec;
+    	int csec,cmsec;
+	int bsec,bmsec;
+	period_type ptype;
+	*/
+	eidx=0;
+	bidx=0;
+	cidx=0;
+	esec=0;
+	emsec=0;
+	csec=0;
+	cmsec=0;
+	bsec=0;
+	bmsec=0;
+};
 
 dseries::dseries(const dseries &){};
 
+int dseries::dump()
+{
+	/*
+	*/
+	LOG_DEBUG<<"price¿"<<this->data[this->cidx]<< "time: "<<this->tsec[this->cidx]<<std::endl;
+	return 0;
+}
 int dseries::update_ms(float v, int sec, int msec){
 		/*
 		  1.
 		  2.
 		*/
 	again:
-		boost::unique_lock<boost::timed_mutex> lk(this->dmutex,boost::chrono::milliseconds(1));
+		boost::unique_lock<boost::timed_mutex> lk(this->dmutex,boost::chrono::milliseconds(10));
 		if(lk) {
 			if( (sec > this->csec) || 
 				(sec== this->csec && (msec >this->cmsec))
 				) {
-			        /*ÐèÒª¸üÐÂ,ÕâÀï²»È·ÈÏÊÇ·ñ±£Ö¤ÏÈºóË³Ðò.ÔÝÊ±°´Ë³ÐòµÄ´¦Àí¡£ºöÂÔ²»°´Ë³ÐòµÄ°ü¶ªÆú.
-				   */
+					/*update ms data, not make sure the order. if the data is older,just dropit.
+					  there may has a problem
+					*/
 					this->tmsec[this->cidx]=msec;
 					this->tsec[this->cidx]=sec;
 					this->data[this->cidx]=v;
 					this->cidx++;
 					this->csec=sec;
 					this->cmsec=msec;
+					
 			}else {
 				/*todo warning, drop old message*/
+				cerr<<"dseries update_ms drop old message"<<std::endl;
 			}
+			lk.unlock();
+			this->dump();
 		}else {
 			/*warnring*/
+			cerr<<"dseries update_ms lock err,again" <<std::endl;
+			sleep(1);
 			goto again;
 		}
 		return 0;

@@ -130,10 +130,15 @@ int md::update(float v, int t1, int t2) {
 		  3.更新 x周期线。
 		  每次更新，都反馈是否要更新下次线的四个值。
 		*/
+		cerr<<"ds update ms"<<std::endl;
 		int status=this->ds.update_ms(v,t1,t2);
 		if(status <0) {
 			/**/
 		}else {
+#if 1
+			cerr<<"update ms finished, return first"<<std::endl;
+			return 0;
+#endif
 			/*
 			*/
 			float o,c,h,l;int e1,e2;
@@ -198,8 +203,9 @@ int mdservice::update(string contract, float v, int t1, int t2){
 		/*!!!!*/
 		return -1;
 	}
+	cerr<<"mdservice update contract: "<<contract<<std::endl;
 	ret= this->mds[contract]->update(v,t1,t2);
-	
+	assert(ret==0);
 	return ret;
 };
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <assert.h>
 using namespace std;
+boost::thread_group t_group;
+
  CtpQuote::CtpQuote(string username,string password, string quote_addr)
 {
 	/*
@@ -12,6 +14,19 @@ using namespace std;
 	md->RegisterFront("tcp://ctpmn1-front1.citicsf.com:51213");
 	md->Init();
 	*/
+}
+
+
+void quote_test(CtpQuoteSpi *ctpquotespi)
+{
+	cerr<<"quote_test"<<std::endl;
+	cerr<<ctpquotespi->test<<std::endl;
+	CThostFtdcReqUserLoginField f;
+	memset(&f, 0, sizeof(f));
+	strcpy(f.BrokerID, "1017");
+	strcpy(f.UserID, "00000071");
+	strcpy(f.Password, "123456");
+	ctpquotespi->api->ReqUserLogin(&f, 1);
 }
 
 
@@ -65,38 +80,52 @@ int CtpQuoteApi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount)
 
 void CtpQuoteSpi::OnFrontConnected()
 {
-	/*
+#if 1
+	printf("spi on connected\n");
+	this->test="dddd";
+	t_group.add_thread(new boost::thread(quote_test,this));
+	return;
 	CThostFtdcReqUserLoginField f;
 	memset(&f, 0, sizeof(f));
 	strcpy(f.BrokerID, "1017");
 	strcpy(f.UserID, "00000071");
 	strcpy(f.Password, "123456");
-	md->ReqUserLogin(&f, ++nReq);
-	*/
+	this->api->ReqUserLogin(&f, 1);
+#else
 	msg_t *msg=new(msg_t);
-	msg->len=0;
+	msg->len=sizeof(QOnFrontConnected_t);
 	msg->data=new(QOnFrontConnected_t);
 	msg->type=QOnFrontConnected;
 
-	/**/
 	printf("OnFront Connect DEBUG\n");
-    this->ctpquoter->post_msg(msg);
+    	this->ctpquoter->post_msg(msg);
+#endif
 
 }
 int CtpQuoteSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
 	        TThostFtdcUserIDType	vUserId,	TThostFtdcPasswordType	vPasswd)
 {
+	int ret;
+#if 0
+	CThostFtdcReqUserLoginField f;
+	memset(&f, 0, sizeof(f));
+	strcpy(f.BrokerID, "1017");
+	strcpy(f.UserID, "00000071");
+	strcpy(f.Password, "123456");
+	this->api->ReqUserLogin(&f, 1);
+#else
 	CThostFtdcReqUserLoginField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, vAppId); strcpy(appId, vAppId); 
-	strcpy(req.UserID, vUserId);  strcpy(userId, vUserId); 
+	strcpy(req.BrokerID, vAppId); //strcpy(appId, vAppId); 
+	strcpy(req.UserID, vUserId);  //strcpy(userId, vUserId); 
 	strcpy(req.Password, vPasswd);
 	this->login_status=LOGIN;
-	int ret = this->api->ReqUserLogin(&req, ++this->requestId);	
+	ret = this->api->ReqUserLogin(&req, 1);	
 	if (ret) {
 		this->login_status=FAIL;
 	}
-	cerr<<" md 请求 | 发送登录..."<<((ret == 0) ? "成功" :"失败") << endl;
+	cerr<<"ReqUserLogin send request"<<std::endl;
+#endif
 	return ret;
 }
 
@@ -111,6 +140,7 @@ void CtpQuoteSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 }
 void CtpQuoteSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
+	cerr<<"sub md begin--------"<<std::endl;
 	cout<<pSpecificInstrument->InstrumentID<<std::endl;
 	cout<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
 	msg_t *msg=new(msg_t);
@@ -118,7 +148,8 @@ void CtpQuoteSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecifi
 	msg->len=sizeof(QOnRspSubMarketData_t);
 	msg->data=(void*)data;
 	msg->type=QOnRspSubMarketData;
-    this->ctpquoter->post_msg(msg);
+    	this->ctpquoter->post_msg(msg);
+	cerr<<"sub md end----------"<<std::endl;
 }
 void CtpQuoteSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -135,6 +166,7 @@ void CtpQuoteSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpeci
 void CtpQuoteSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	/**/
+	printf("on rsp login\n");
 	cout<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
 	msg_t *msg=new(msg_t);
 	QOnRspUserLogin_t *data=new(QOnRspUserLogin_t);
@@ -146,7 +178,7 @@ void CtpQuoteSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTh
 	msg->data=(void*)data;
 	msg->type=QOnRspUserLogin;
 	this->ctpquoter->post_msg(msg);
-
+	printf("OnRspUserLogin post msg");
 }
 
 void CtpQuoteSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

@@ -50,7 +50,7 @@ datalocal::datalocal()
 	ret=sqlite3_exec(this->db, "drop table contractschema",0,0,&error);
 	ret=sqlite3_exec(this->db,"create table contractschema(contract char(32),ctype char(32))",callback,NULL,&error);
 	assert(ret== SQLITE_OK);
-	ret=sqlite3_exec(this->db,"insert into contractschema values('rm1401','rm')",callback,NULL,&error);
+	ret=sqlite3_exec(this->db,"insert into contractschema values('m1409','m')",callback,NULL,&error);
 	assert(ret== SQLITE_OK);
 
 	vector<map<string,string> > result;
@@ -67,7 +67,7 @@ datalocal::datalocal()
 		cout<<"sql1:end"<<endl;
 	}
 	cout<<"sql2:end"<<endl;
-	ret=sqlite3_exec(this->db, "insert into instrument values('au1406','au',1,1380629713)",0,0,&error);
+	ret=sqlite3_exec(this->db, "insert into instrument values('m1409','m',1,1380629713)",0,0,&error);
 	//ret=sqlite3_exec(this->db,"drop table ",0,0,&error);
 	//sqlite3_close(this->db);
 }

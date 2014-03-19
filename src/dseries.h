@@ -1,6 +1,8 @@
 #ifndef DSERIES_H_
 #define DSERIES_H_
+#include "log.h"
 #include "boosthelp.h"
+using namespace std;
 using namespace boost;
 enum period_type {
 	MIRCO,
@@ -45,6 +47,8 @@ public:
 	int update_mec(float v, int sec, int msec,period_type ptype, int period);
 	int update_me(float v, int sec, int msec,kdata_type type,period_type ptype, int period);
 	int update_other(float v, int sec, int msec, period_type ptype,kdata_type ktype,int period);
+	int dump();
+
 	float operator[](int i){
 		/*fault tolerent*/
 		return this->data[cidx-i];

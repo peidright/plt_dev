@@ -53,14 +53,28 @@ int  ctp_work()
 		创建线程，专门处理行情的消息
 		*/
 		/*
+		g_ctp_quoter->mds->regmd("m1409");
+
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}*/
-		printf("mdsed\n");
+
 		g_ctp_quoter->init(g_mdservice);
+		g_quote_tg.add_thread(new boost::thread(quote_loop,g_ctp_quoter));
+		printf("mdsed\n");
 		printf("inited\n");
 		g_ctp_quoter->start();
-		printf("started\n");
+#if 0
+		msg_t *msg=new(msg_t);
+		msg->len=sizeof(QOnFrontConnected_t);
+		msg->data=new(QOnFrontConnected_t);
+		msg->type=QOnFrontConnected;
+		printf("OnFront Connect DEBUG\n");
+    		g_ctp_quoter->post_msg(msg);
+#endif
+
+		printf("started!!!!\n");
+
 		/*
 		创建线程，专门处理交易的信息
 		for (i=0;i<CTP_WORK_THREAD_NUM;i++){
@@ -79,6 +93,10 @@ int  ctp_work()
 		/*
 		创建一组线程，负责各个合约的定时更新行情。
 		*/
+		while(1){
+			sleep(1);
+			cerr<<" main loop sleep 1"<<std::endl;
+		}
 		getchar();
 		return 0;
 }
@@ -133,7 +151,7 @@ int main(int argc, char * argv[]){
 	api->RegisterSpi((CThostFtdcTraderSpi*)t);
 	api->RegisterFront("tcp://ctpmn1-front1.citicsf.com:51205");
 	api->Init();
-    getchar();
+	getchar();
 	*/
 
 	//CtpTraderSpi* pUserSpi = new CtpTraderSpi(pUserApi);

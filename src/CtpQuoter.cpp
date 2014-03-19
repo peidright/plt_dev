@@ -3,6 +3,8 @@
 #include <deque>
 CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
 {
+
+	this->running=1;
 	/*
 	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
 	this->trade_api=trade_api;
@@ -19,19 +21,14 @@ CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
 	/*
 	CThostFtdcMdApi *quote_api = CThostFtdcMdApi::CreateFtdcMdApi(QUOTE_DIR);
 	CtpQuoteSpi *quote_spi = new CtpQuoteSpi(quote_api,quoter);
+	this->qupte_spi=quote_spi;
+	this->quote_api=quote_api;
+
 	quote_api->RegisterSpi((CThostFtdcMdSpi*)quote_spi);
 	quote_api->RegisterFront((char*)quoter->quote_addr.c_str());
 	quote_api->Init();
 	cout<<"i am here"<<endl;
 	getchar();
-	*/
-
-	/*
-	md->Init();
-	cout<<"market init"<<endl;
-	pUserApi->Init();
-	//todo
-	pUserApi->Join();
 	*/
 	this->quoter=quoter;
 }
@@ -54,21 +51,36 @@ int  CtpQuoter::init(mdservice *mds)
 	}
 	return 0;
 }
+
 void CtpQuoter::start()
 {
 	CThostFtdcMdApi *quote_api = CThostFtdcMdApi::CreateFtdcMdApi(QUOTE_DIR);
 		printf("1\n");
 	CtpQuoteSpi *quote_spi = new CtpQuoteSpi(quote_api,this);
 		printf("2\n");
+	this->quote_api=quote_api;
+	this->quote_spi=quote_spi;
 	quote_api->RegisterSpi((CThostFtdcMdSpi*)quote_spi);
 			printf("3\n");
 	quote_api->RegisterFront((char*)quoter->quote_addr.c_str());
 			printf("4\n");
 	quote_api->Init();
-		printf("5\n");
-
-
 	
+	printf("quote_api sleep 1 finished\n");
+	sleep(1);
+	/*
+	msg_t *msg=new(msg_t);
+	msg->len=sizeof(QOnFrontConnected_t);
+	msg->data=new(QOnFrontConnected_t);
+	msg->type=QOnFrontConnected;
+	printf("OnFront Connect DEBUG\n");
+	this->post_msg(msg);
+	*/
+
+	while(1){
+		sleep(1);
+		break;
+	}	
 	cout<<"i am here"<<endl;
 	getchar();
 }
@@ -83,7 +95,7 @@ again:
 	if(lk) {
 		this->mqueue.push_back(*msg);
 		this->qsem.post();
-		
+		printf("post msg\n");	
 		lk.unlock();
 	}else {
 		/*
@@ -119,14 +131,15 @@ int CtpQuoter::SubscribeMarketData()
 	//char*ppInst[1];
 
 	//ppInst[0] = inst;
-	ret=this->quote_api->SubscribeMarketData(ppInst, count);
-	cout<<"md subscribeMarketDate cu1401"<<endl;
+	ret=this->quote_spi->api->SubscribeMarketData(ppInst, count);
+	cout<<"md subscribeMarketDate cu1406!!!"<<endl;
 	delete [] ppInst;
 	return ret;
 }
 void CtpQuoter::quote_stm(msg_t &msg)
 {
 	/*负责从队列中取数据，进行处理*/
+	msg_t *mmsg;
 	int ret;
 	while(msg.type!=QSTOP) {
 		switch(msg.type) {
@@ -137,7 +150,6 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				break;
 			case QOnFrontConnected:
 				cerr <<"md connected stm"<<endl;
-				getchar();
 				msg.type=QReqUserLogin;
 				break;
 			case QOnFrontDisconnected:
@@ -157,20 +169,30 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				break;
 			case QOnRspSubMarketData:
 				/**/
+				cerr<<"sub md succed\n";
+				msg.type=QSTOP;
 				break;
 			case QOnRspUnSubMarketData:
 				break;
 			case QReqUserLogin:
+				#if 0
+				mmsg=new(msg_t);
+				mmsg->len=sizeof(QOnRspUserLogin_t);
+				mmsg->data=(void*)new(QOnRspUserLogin_t);
+				mmsg->type=QOnRspUserLogin;
+				this->post_msg(mmsg);
+				printf("fake on user Login");
+				#endif
+
+
 				ret= this->quote_spi->ReqUserLogin((char*)this->quoter->brokerid.c_str(),
 					(char*)this->quoter->username.c_str(),
-				(char*)this->quoter->password.c_str()
-				);
+				(char*)this->quoter->password.c_str());
 				if(ret==0) {
+					printf("quote_stm login msg sended\n");
 					msg.type=QSTOP;
 				}else {
-					/*err process
-					
-					
+					/*err process					
 					*/
 				}
 				break;
@@ -178,6 +200,7 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				/*err process
 				  else subscribe
 				*/
+				printf("OnRspUserLogin stm\n");
 				msg.type=QReqSubscribeMarketData;
 				break;
 			case QOnRspUserLogout:
@@ -191,33 +214,97 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				break;
 		}
 	}
+	msg.type=QSTOP;
 	if(msg.type == QSTOP) {
 		/*todo free message*/
+		free(msg.data);
 	}
 }
 
 int CtpQuoter::DepthMarketProcess(msg_t &msg)
 {
 	/*
-	    这里只处理报价信息。
-	    内存拥有策略所需要的全部数据，更新ma
-		发信号量给策略
-		
-		?把数据拷贝到io线程等待入库.(暂时io直接入库)
+		1. update market data to mem
+			1.update tick data
+			2.update minute data
+			3.update tech data 
+		2. send signal to stragte
+		3. copy data to io thread to permnate
 	*/
 	QOnRtnDepthMarketData_t *mdata=(QOnRtnDepthMarketData_t*)msg.data;
 	assert(msg.type==QOnRtnDepthMarketData);
-
-	
-    
-
+	int msec=mdata->pDepthMarketData.UpdateMillisec;
+	int  sec=atoi(mdata->pDepthMarketData.UpdateTime);
+	string contract=mdata->pDepthMarketData.InstrumentID;
+	float  v=(mdata->pDepthMarketData.LastPrice);
+	this->mds->update(contract, v, sec, msec);
 
 	/*
-	   上面处理完后，不应该再有其他地方持有msg.data的指针。将 msg丢到io_queue，待入库。
+	cout<<"业务日期         ActionDay :     "<<dmd->ActionDay<<endl;
+	cout<<"交易所代码       ExchangeID:     "<<dmd->ExchangeID<<endl;
+	cout<<"更新时间         UpdateTime:     "<<dmd->UpdateTime<<endl;
+	cout<<"最后修改毫秒 UpdateMillisec:     "<<dmd->UpdateMillisec<<endl;
+	cout<<"合约ID         InstrumentID:     "<<dmd->InstrumentID<<endl;
+	cout<<"交易日           TradingDay:     "<<dmd->TradingDay<<endl;
+	cout<<"今收盘           ClosePrice:     "<<dmd->ClosePrice<<endl;
+	cout<<"昨收盘        PreClosePrice:     "<<dmd->PreClosePrice<<endl;
+	cout<<"今开盘            OpenPrice:     "<<dmd->OpenPrice<<endl;
+	cout<<"最高价         HighestPrice:     "<<dmd->HighestPrice<<endl;
+	cout<<"最低价          LowestPrice:     "<<dmd->LowestPrice<<endl;
+	cout<<"本次结算价  SettlementPrice:     "<<dmd->SettlementPrice<<endl;
+	cout<<"上次结算价  PreSettlementPrice:  "<<dmd->PreSettlementPrice<<endl;
+	cout<<"涨停板价    UpperLimitPrice:     "<<dmd->UpperLimitPrice<<endl;
+	cout<<"跌停板价    LowerLimitPrice:     "<<dmd->LowerLimitPrice<<endl;
+	cout<<"昨虚实度           PreDelta:     "<<dmd->PreDelta<<endl;
+	cout<<"今虚实度          CurrDelta:     "<<dmd->CurrDelta<<endl;
+	cout<<"数量                 Volume:     "<<dmd->Volume<<endl;
+	cout<<"成交金额           Turnover:     "<<dmd->Turnover<<endl;
+	cout<<"持仓量         OpenInterest:     "<<dmd->OpenInterest<<endl;
+	cout<<"买1               BidPrice1:     "<<dmd->BidPrice1<<endl;
+	cout<<"最新价            LastPrice:     "<<dmd->LastPrice<<endl;
+	cout<<"买2               BidPrice2:     "<<dmd->BidPrice2<<endl;
+	cout<<"买3               BidPrice3:     "<<dmd->BidPrice3<<endl;
+	cout<<"买4               BidPrice4:     "<<dmd->BidPrice4<<endl;
+	cout<<"买5               BidPrice5:     "<<dmd->BidPrice5<<endl;
+	cout<<"卖1               AskPrice1:     "<<dmd->AskPrice1<<endl;
+	cout<<"卖2               AskPrice1:     "<<dmd->AskPrice2<<endl;
+	cout<<"卖3               AskPrice1:     "<<dmd->AskPrice3<<endl;
+	cout<<"卖4               AskPrice1:     "<<dmd->AskPrice4<<endl;
+	cout<<"卖5               AskPrice1:     "<<dmd->AskPrice5<<endl;
+	cout<<"均价           AveragePrice:     "<<dmd->AveragePrice<<endl;
+	*/
+
+	/*
+		we should not hold msg->data now.
 	*/
 	//mdata->pDepthMarketData->
 	return 0;
 }
+
+void quote_loop(CtpQuoter *ctpquoter)
+{
+loop:
+	while(ctpquoter->running) {
+		ctpquoter->qsem.wait();
+		boost::unique_lock<boost::timed_mutex> lk(ctpquoter->qmutex,boost::chrono::milliseconds(1));
+		if (lk) {
+			if(ctpquoter->mqueue.size()<=0) {
+				/*bug happen*/
+				cout<<"should not be zero qqueue"<<std::endl;
+				lk.unlock();
+			}
+			msg_t msg=ctpquoter->mqueue[0];
+			printf("quote_loop get this msg\n");
+			ctpquoter->mqueue.pop_front();
+			lk.unlock();
+			//continue;
+			ctpquoter->quote_stm(msg);
+		} else {
+			cout<<"quote main loop err"<<std::endl;
+		}
+	}
+}
+
 
 void DepthMarketProcess(CtpQuoter *ctpquoter, int key)
 {
