@@ -152,3 +152,15 @@ out:
 		return 0;
 	};
 	/*need a mutex*/
+
+
+int date2time(string dat)
+{
+	//11:03:18
+	ptime pt(time_from_string(dat)); 
+	tm tm1 = to_tm(pt);
+ 	time_t tt = mktime(&tm1);
+	cerr<<"str: " <<dat<<" time"<<to_simple_string(pt) <<std::endl;
+	return (int)tt;
+}
+

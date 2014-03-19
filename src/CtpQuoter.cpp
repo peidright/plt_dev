@@ -1,6 +1,7 @@
 #include "CtpQuoter.h"
 #include "trader.h"
 #include <deque>
+#include "help.h"
 CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
 {
 
@@ -253,15 +254,25 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 			3.update tech data 
 		2. send signal to stragte
 		3. copy data to io thread to permnate
+
+		cout<<"业务日期         ActionDay :     "<<dmd->ActionDay<<endl;
+		cout<<"交易所代码       ExchangeID:     "<<dmd->ExchangeID<<endl;
+		cout<<"更新时间         UpdateTime:     "<<dmd->UpdateTime<<endl;
+		cout<<"最后修改毫秒 UpdateMillisec:     "<<dmd->UpdateMillisec<<endl;
+		cout<<"合约ID         InstrumentID:     "<<dmd->InstrumentID<<endl;
+		cout<<"交易日           TradingDay:     "<<dmd->TradingDay<<endl;
 	*/
-	cerr<<"in DepthMarketProcess"<<std::endl;
 	QOnRtnDepthMarketData_t *mdata=(QOnRtnDepthMarketData_t*)msg.data;
 	assert(msg.type==QOnRtnDepthMarketData);
 	int msec=mdata->pDepthMarketData.UpdateMillisec;
-	int  sec=atoi(mdata->pDepthMarketData.UpdateTime);
+	int  sec=date2time(string(mdata->pDepthMarketData.ActionDay)+" "+ string(mdata->pDepthMarketData.UpdateTime));
 	string contract=mdata->pDepthMarketData.InstrumentID;
+	assert(0);
 	float  v=(mdata->pDepthMarketData.LastPrice);
 	this->mds->update(contract, v, sec, msec);
+	cerr<<"Price :"<<v<<" sec: "<<sec<<" msec:" <<msec<<std::endl;
+	cerr<<"Price :"<<(mdata->pDepthMarketData.LastPrice)<<" sec: "<<(mdata->pDepthMarketData.UpdateTime)<<" msec:" <<msec<<std::endl;
+
 
 	/*
 	cout<<"业务日期         ActionDay :     "<<dmd->ActionDay<<endl;

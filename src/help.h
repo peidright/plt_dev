@@ -10,4 +10,5 @@ time_t tm_fix(tm *t,int hour,int minutes);
 int tm_continue(tm *t1, tm *t2);
 int is_continue(int e1,int e2, int b1, int b2);
 int fix();
+int date2time(string dat);
 #endif
