@@ -18,6 +18,8 @@
 #include <algorithm>
 #include "mdseries.h"
 #include "boosthelp.h"
+
+#include "quote_io.h"
 #include "log.h"
 
 using namespace std;
@@ -83,10 +85,8 @@ int  ctp_work()
 
 		/*
 		创建线程，专门负责将行情信息，刷进sqlite
-		for (i=0;i<CTP_WORK_THREAD_NUM;i++){
-		g_io_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
-		}
 		*/
+		g_io_tg.add_thread(new boost::thread(quote_io_work));
 
 
 		/*
@@ -131,6 +131,7 @@ int main(int argc, char * argv[]){
 	//return 0;
 	cout<<"ddd1"<<endl;
 	datalocal *dl=new datalocal();
+	g_quote_io.regdb("master",dl);
 	vector<map<string,string> > rows;
 	cout<<"ddd2"<<endl;
 	dl->exe_cmd("select name from sqlite_master where type='table'",rows);

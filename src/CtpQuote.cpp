@@ -246,5 +246,6 @@ typedef struct {
 	msg->type=QOnRtnDepthMarketData;
 	contract=pDepthMarketData->InstrumentID;
 	this->ctpquoter->post_msg(msg,contract);
+
 }
 

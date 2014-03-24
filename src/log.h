@@ -6,8 +6,16 @@
 #include <boost/log/trivial.hpp>  
 #include <boost/log/expressions.hpp>  
 #include <boost/log/utility/setup/file.hpp>  
+
 namespace logging = boost::log;  
+namespace sinks = boost::log::sinks;
+namespace attrs = boost::log::attributes;
+namespace src = boost::log::sources;
+namespace expr = boost::log::expressions;
+namespace keywords = boost::log::keywords;
 using namespace std;  
+using namespace sinks;
+using namespace keywords;
 
 
 #define LOG_DEBUG\  

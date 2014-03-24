@@ -31,5 +31,18 @@ int main () {
 
 void log_init()
 {
-	logging::add_file_log("sample.log"); 
+	boost::shared_ptr<sinks::synchronous_sink<sinks::text_file_backend> > fsink=logging::add_file_log
+        (
+        keywords::file_name="sample1.log",      //文件名
+        keywords::rotation_size=10*1024*1024,       //单个文件限制大小
+        keywords::time_based_rotation=sinks::file::rotation_at_time_point(0,0,0)    //每天重建
+        );
+
+	fsink->locked_backend()->auto_flush(true);
+	logging::core::get()->add_sink(fsink);
+
+	//logging::add_file_log("sample.log"); 
+        //keywords::file_name="%Y-%m-%d_%N.log"
+
+
 }

@@ -2,6 +2,7 @@
 #include "trader.h"
 #include <deque>
 #include "help.h"
+#include "quote_io.h"
 CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
 {
 
@@ -233,6 +234,7 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				/*以后可能要把行情数据单独用线程来处理
 				*/
 				this->DepthMarketProcess(msg);
+				msg.type=QSTOP;
 				break;
 			default:
 				break;
@@ -243,6 +245,7 @@ void CtpQuoter::quote_stm(msg_t &msg)
 		/*todo free message*/
 		free(msg.data);
 	}
+	LOG_DEBUG<<"finish one Market data"<<std::endl;
 }
 
 int CtpQuoter::DepthMarketProcess(msg_t &msg)
@@ -267,11 +270,12 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	int msec=mdata->pDepthMarketData.UpdateMillisec;
 	int  sec=date2time(string(mdata->pDepthMarketData.ActionDay)+" "+ string(mdata->pDepthMarketData.UpdateTime));
 	string contract=mdata->pDepthMarketData.InstrumentID;
-	assert(0);
 	float  v=(mdata->pDepthMarketData.LastPrice);
 	this->mds->update(contract, v, sec, msec);
 	cerr<<"Price :"<<v<<" sec: "<<sec<<" msec:" <<msec<<std::endl;
 	cerr<<"Price :"<<(mdata->pDepthMarketData.LastPrice)<<" sec: "<<(mdata->pDepthMarketData.UpdateTime)<<" msec:" <<msec<<std::endl;
+
+	//assert(0);
 
 
 	/*
@@ -295,26 +299,39 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	cout<<"数量                 Volume:     "<<dmd->Volume<<endl;
 	cout<<"成交金额           Turnover:     "<<dmd->Turnover<<endl;
 	cout<<"持仓量         OpenInterest:     "<<dmd->OpenInterest<<endl;
-	cout<<"买1               BidPrice1:     "<<dmd->BidPrice1<<endl;
 	cout<<"最新价            LastPrice:     "<<dmd->LastPrice<<endl;
-	cout<<"买2               BidPrice2:     "<<dmd->BidPrice2<<endl;
-	cout<<"买3               BidPrice3:     "<<dmd->BidPrice3<<endl;
-	cout<<"买4               BidPrice4:     "<<dmd->BidPrice4<<endl;
-	cout<<"买5               BidPrice5:     "<<dmd->BidPrice5<<endl;
-	cout<<"卖1               AskPrice1:     "<<dmd->AskPrice1<<endl;
-	cout<<"卖2               AskPrice1:     "<<dmd->AskPrice2<<endl;
-	cout<<"卖3               AskPrice1:     "<<dmd->AskPrice3<<endl;
-	cout<<"卖4               AskPrice1:     "<<dmd->AskPrice4<<endl;
-	cout<<"卖5               AskPrice1:     "<<dmd->AskPrice5<<endl;
 	cout<<"均价           AveragePrice:     "<<dmd->AveragePrice<<endl;
 	*/
-
 	/*
 		we should not hold msg->data now.
 	*/
 	//mdata->pDepthMarketData->
+	tdata_t *data=new(tdata_t);
+	data->sec=sec;
+	data->msec=msec;
+	data->ask1=mdata->pDepthMarketData.AskPrice1;
+	data->ask2=mdata->pDepthMarketData.AskPrice2;
+	data->ask3=mdata->pDepthMarketData.AskPrice3;
+	data->ask4=mdata->pDepthMarketData.AskPrice4;
+	data->ask5=mdata->pDepthMarketData.AskPrice5;
+	data->bid1=mdata->pDepthMarketData.BidPrice1;
+	data->bid2=mdata->pDepthMarketData.BidPrice2;
+	data->bid3=mdata->pDepthMarketData.BidPrice3;
+	data->bid4=mdata->pDepthMarketData.BidPrice4;
+	data->bid5=mdata->pDepthMarketData.BidPrice5;
+	data->vol=mdata->pDepthMarketData.Volume;
+	data->uprice=mdata->pDepthMarketData.UpperLimitPrice;
+	data->lprice=mdata->pDepthMarketData.LowerLimitPrice;
+	data->high=mdata->pDepthMarketData.HighestPrice;
+	data->low=mdata->pDepthMarketData.LowestPrice;
+	data->close=mdata->pDepthMarketData.OpenPrice;
+	data->open=mdata->pDepthMarketData.ClosePrice;
+	data->lastprice=mdata->pDepthMarketData.LastPrice;
+	quote_push(contract,data);
+	//data->avgprice=
 	return 0;
 }
+
 
 void quote_loop(CtpQuoter *ctpquoter)
 {

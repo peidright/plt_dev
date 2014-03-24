@@ -20,7 +20,7 @@ int get_period_slot(int sec,int msec, period_type ptype,int period){
 
 dseries::dseries(){
 	/*
-	static const int MAX_DSERIES_SIZE=10000;
+	static const int MAX_DSERIES_SIZE=100000;
 	float data[MAX_DSERIES_SIZE];
 	int   tsec[MAX_DSERIES_SIZE];
 	int   tmsec[MAX_DSERIES_SIZE];
@@ -52,7 +52,9 @@ int dseries::dump()
 {
 	/*
 	*/
-	LOG_DEBUG<<"price:"<<this->data[this->cidx]<< " time: "<<this->tsec[this->cidx]<<std::endl;
+	if(this->cidx>1) {
+	LOG_DEBUG<<"price:"<<this->data[this->cidx-1]<< " time: "<<this->tsec[this->cidx-1]<<" mtime: "<<this->tmsec[this->cidx-1] <<"idx is:"<<this->cidx-1<<std::endl;
+	}
 	return 0;
 }
 
@@ -79,10 +81,12 @@ int dseries::update_ms(float v, int sec, int msec){
 					
 			}else {
 				/*todo warning, drop old message*/
-				cerr<<"dseries update_ms drop old message"<<std::endl;
+				LOG_DEBUG<<"dseries update_ms drop old message this->csec:"<<this->csec<<" sec:"<<sec\
+<<"this->cmsec: "<<this->cmsec <<" msec :"<<msec<<" idx:"<<this->cidx<<std::endl;
 			}
 			lk.unlock();
 			this->dump();
+			return -1;
 		}else {
 			/*warnring*/
 			cerr<<"dseries update_ms lock err,again" <<std::endl;

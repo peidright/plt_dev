@@ -1,5 +1,6 @@
 #include "mdseries.h"
 #include "boost/date_time.hpp"
+#include <iostream>
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 	
@@ -157,10 +158,21 @@ out:
 int date2time(string dat)
 {
 	//11:03:18
-	ptime pt(time_from_string(dat)); 
+	try{
+	ptime pt;
+	std::stringstream ss;
+	time_input_facet *input_facet=new time_input_facet("%Y%m%d %H:%M:%S");
+	ss.imbue(std::locale(ss.getloc(),input_facet));
+	ss<<dat;
+	ss>>pt;
+	//ptime pt(time_from_string(dat)); 
 	tm tm1 = to_tm(pt);
  	time_t tt = mktime(&tm1);
 	cerr<<"str: " <<dat<<" time"<<to_simple_string(pt) <<std::endl;
 	return (int)tt;
+	} catch (...) {
+		cerr<<"err dat is"<<" "<<dat<<std::endl;
+		assert(0);
+	}
 }
 

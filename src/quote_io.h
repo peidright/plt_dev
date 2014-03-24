@@ -5,6 +5,7 @@
 #include <string>
 
 #include "boosthelp.h"
+#include "datalocal.h"
 using namespace boost;
 
 using namespace std;
@@ -21,8 +22,8 @@ typedef struct tdata_s {
 	int open;
 	int uprice;
 	int lprice;
-	int highprice;
-	int lowprice;
+	int high;
+	int low;
 	int lastprice;
 	int avgprice;
 	int vol;
@@ -74,12 +75,16 @@ class quote_io {
 public:
 	map<string, kdata_io_t *> kdata_map;
 	map<string, tdata_io_t *> tdata_map;
+	map<string, datalocal  *> db_map;
+	void regdb(string dbname,datalocal *db){this->db_map[dbname]=db;};
 	void quote_kdata_push(string contract, kdata_t *data);
 	void quote_tdata_push(string contract, tdata_t *data);
 	void quote_kdata_work();
 	void quote_tdata_work();
 	void quote_io_work();
 };
+extern quote_io g_quote_io;
 
-
+void quote_push(string contract ,tdata_t *data);
+void quote_io_work();
 #endif
