@@ -27,6 +27,9 @@ string g_password="7236122";
 string g_brokerid="6000";
 string g_trade_addr="tcp://180.166.132.66:41205";
 string g_quote_addr="tcp://180.166.132.66:41213";
+string g_db_tdata="tdata.sdb";
+string g_db_kdata="kdata.sdb";
+string g_db_sdata="sdata.sdb";
 
 #endif
 vector<string> g_product_list;

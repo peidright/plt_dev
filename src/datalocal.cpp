@@ -4,7 +4,7 @@
 #include "assert.h"
 #include <map>
 #include <vector>
-string g_db_name="local.sdb";
+#include "quote_io.h"
 
 int callback(void *,int count, char **row,char **titles)
 {
@@ -13,7 +13,7 @@ int callback(void *,int count, char **row,char **titles)
 	}
 	return 0;
 }
-datalocal::datalocal()
+datalocal::datalocal(string dbname)
 {
 	int ret;
 	char                  *error = 0;
@@ -22,7 +22,7 @@ datalocal::datalocal()
 	ret=sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
 	// assert(ret==SQLITE_OK);
 	//ret = sqlite3_open("file:memdb1?mode=memory&cache=shared", &this->db); 
-	ret = sqlite3_open(g_db_name.c_str(), &this->db); 
+	ret = sqlite3_open(dbname.c_str(), &this->db); 
 	if(ret==-1) {
 		cout<<"localdb create error"<<endl; 
 	} else {
@@ -71,6 +71,89 @@ datalocal::datalocal()
 	//ret=sqlite3_exec(this->db,"drop table ",0,0,&error);
 	//sqlite3_close(this->db);
 }
+
+int datalocal::create_tdata_table(string contract)
+{
+	/*
+	data->sec=sec;
+	data->msec=msec;
+	data->ask1=mdata->pDepthMarketData.AskPrice1;
+	data->ask2=mdata->pDepthMarketData.AskPrice2;
+	data->ask3=mdata->pDepthMarketData.AskPrice3;
+	data->ask4=mdata->pDepthMarketData.AskPrice4;
+	data->ask5=mdata->pDepthMarketData.AskPrice5;
+	data->bid1=mdata->pDepthMarketData.BidPrice1;
+	data->bid2=mdata->pDepthMarketData.BidPrice2;
+	data->bid3=mdata->pDepthMarketData.BidPrice3;
+	data->bid4=mdata->pDepthMarketData.BidPrice4;
+	data->bid5=mdata->pDepthMarketData.BidPrice5;
+	data->vol=mdata->pDepthMarketData.Volume;
+	data->uprice=mdata->pDepthMarketData.UpperLimitPrice;
+	data->lprice=mdata->pDepthMarketData.LowerLimitPrice;
+	data->high=mdata->pDepthMarketData.HighestPrice;
+	data->low=mdata->pDepthMarketData.LowestPrice;
+	data->close=mdata->pDepthMarketData.OpenPrice;
+	data->open=mdata->pDepthMarketData.ClosePrice;
+	data->lastprice=mdata->pDepthMarketData.LastPrice;
+	*/
+	char sqlbuf[256];
+	sprintf(sqlbuf,"create table tdata_%s(open real,close real,high real,low real,uprice real,lprice real,bid1 real,bid2 real,bid3 real, bid4 real, bid5 real,ask1 real,ask2 real,ask3 real,ask4 real,ask5 real,lastprice real,sec integer,msec integer,vol integer)",contract.c_str());
+	this->exe_cmd(sqlbuf);
+}
+
+int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
+{
+	int ret;
+	char *errmsg;
+	int size=tdataq.size();
+	char sqlbuf[512];
+
+	/*todo err check, sure the table existed!
+	*/
+
+	if(size > 10){
+		ret = sqlite3_exec(this->db, "BEGIN;", 0, 0, &errmsg);
+		assert(ret==0);
+	}
+
+	for(deque<struct tdata_s*>::iterator it=tdataq.begin();it!=tdataq.end();it++) {
+		/**/
+		sprintf(sqlbuf,"insert into tdata_%s values ('%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%d','%d','%d')",(*it)->open,(*it)->close,(*it)->high,(*it)->low,(*it)->uprice,(*it)->lprice,(*it)->bid1,(*it)->bid2,(*it)->bid3,(*it)->bid4,(*it)->bid5,(*it)->ask1,(*it)->ask2,(*it)->ask3,(*it)->ask4,(*it)->ask5,(*it)->lastprice,(*it)->sec,(*it)->msec,(*it)->vol);
+		ret=sqlite3_exec(this->db,sqlbuf,NULL,NULL,&errmsg);
+		assert(ret==SQLITE_OK);
+	}
+	if(size > 10) {
+		ret = sqlite3_exec(this->db, "COMMIT;", 0, 0, &errmsg);
+		assert(ret==0);
+	}
+	return 0;
+}
+int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
+{
+	int ret;
+	char *errmsg;
+	int size=kdataq.size();
+	if(size > 10){
+		ret = sqlite3_exec(this->db, "BEGIN;", 0, 0, &errmsg);
+		assert(ret==0);
+	}
+
+	for(deque<struct kdata_s*>::iterator it=kdataq.begin();it!=kdataq.end();it++) {
+		/**/
+	}
+	if(size > 10) {
+		ret = sqlite3_exec(this->db, "COMMIT;", 0, 0, &errmsg);
+		assert(ret==0);
+	}
+	return 0;
+}
+
+
+
+int datalocal::create_kdata_table(string contract)
+{
+}
+
 
 int get_product_callback(void *arg,int count, char **row,char **titles)
 {

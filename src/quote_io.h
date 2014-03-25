@@ -7,6 +7,7 @@
 #include "boosthelp.h"
 #include "datalocal.h"
 using namespace boost;
+class datalocal;
 
 using namespace std;
 typedef struct tdata_s {

@@ -64,9 +64,34 @@ void quote_io::quote_tdata_work()
 		if(it->second->tdataq.size()>10 || ((int)t -it->second->lsec )>10) {
 			/*
 				lockit, copy it out , flush it to db
+				todo assert it->first exit in db_map
 			*/
 			boost::unique_lock<boost::timed_mutex> lk(it->second->qmutex,boost::chrono::milliseconds(100));
 			tdataq.swap(it->second->tdataq);
+			this->db_map[it->first]->update_tdata(it->first, tdataq);
+		/*
+	data->sec=sec;
+	data->msec=msec;
+	data->ask1=mdata->pDepthMarketData.AskPrice1;
+	data->ask2=mdata->pDepthMarketData.AskPrice2;
+	data->ask3=mdata->pDepthMarketData.AskPrice3;
+	data->ask4=mdata->pDepthMarketData.AskPrice4;
+	data->ask5=mdata->pDepthMarketData.AskPrice5;
+	data->bid1=mdata->pDepthMarketData.BidPrice1;
+	data->bid2=mdata->pDepthMarketData.BidPrice2;
+	data->bid3=mdata->pDepthMarketData.BidPrice3;
+	data->bid4=mdata->pDepthMarketData.BidPrice4;
+	data->bid5=mdata->pDepthMarketData.BidPrice5;
+	data->vol=mdata->pDepthMarketData.Volume;
+	data->uprice=mdata->pDepthMarketData.UpperLimitPrice;
+	data->lprice=mdata->pDepthMarketData.LowerLimitPrice;
+	data->high=mdata->pDepthMarketData.HighestPrice;
+	data->low=mdata->pDepthMarketData.LowestPrice;
+	data->close=mdata->pDepthMarketData.OpenPrice;
+	data->open=mdata->pDepthMarketData.ClosePrice;
+	data->lastprice=mdata->pDepthMarketData.LastPrice;
+	quote_push(contract,data);
+		*/
 
 			/*push it into db*/
 	

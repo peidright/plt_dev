@@ -45,5 +45,8 @@ extern string g_brokerid;
 extern string g_trade_addr;
 extern string g_quote_addr;
 extern vector<string> g_product_list;
+extern string g_db_tdata;
+extern string g_db_kdata;
+extern string g_db_sdata;
 
 #endif

@@ -130,8 +130,11 @@ int main(int argc, char * argv[]){
 	getchar();
 	//return 0;
 	cout<<"ddd1"<<endl;
-	datalocal *dl=new datalocal();
-	g_quote_io.regdb("master",dl);
+	datalocal *dl=new datalocal(g_db_tdata);
+	dl->create_tdata_table("cu1406");
+	//exit(0);
+
+	g_quote_io.regdb("tdata",dl);
 	vector<map<string,string> > rows;
 	cout<<"ddd2"<<endl;
 	dl->exe_cmd("select name from sqlite_master where type='table'",rows);
