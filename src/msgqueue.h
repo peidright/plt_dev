@@ -16,7 +16,7 @@
 enum msgtype {
 	TSTOP,
 	TSTART,
-	TOnFrontConnected=1,
+	TOnFrontConnected,
 	TReqUserLogin,
 	TOnRspUserLogin,
 

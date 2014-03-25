@@ -1,36 +1,108 @@
 #include "CtpTrader.h"
 #include "trader.h"
+#include <deque>
+#include "help.h"
 
-CtpTrader::CtpTrader(Trader *trader)
+
+CtpTrader::CtpTrader(Trader *trader):qsem(0)
+{
+	this->trader=trader;
+}
+int CtpTrader::init()
 {
 	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
 	this->trade_api=trade_api;
 	CtpTradeSpi* trade_spi = new CtpTradeSpi(trade_api,trader);
 	this->trade_spi = trade_spi;
 	cout<<"begin api"<<endl;
-	trade_api->RegisterSpi((CThostFtdcTraderSpi*)trade_spi);			// 注册事件类
+
+	return 0;
+}
+
+int CtpTrader::start()
+{
+	trade_api->RegisterSpi((CThostFtdcTraderSpi*)this->trade_spi);			// 注册事件类
 	trade_api->SubscribePublicTopic(THOST_TERT_RESTART);					// 注册公有流
 	trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);			  // 注册私有流
-	trade_api->RegisterFront((char*)trader->trade_addr.c_str());	// 注册交易前置地址
+	trade_api->RegisterFront((char*)this->trader->trade_addr.c_str());	// 注册交易前置地址
 	trade_api->Init();
-	cout<<"end api"<<endl;
-	
-	//return;
-	/*
-	CThostFtdcMdApi *quote_api = CThostFtdcMdApi::CreateFtdcMdApi(QUOTE_DIR);
-	CtpQuoteSpi *quote_spi = new CtpQuoteSpi(quote_api,trader);
-	quote_api->RegisterSpi((CThostFtdcMdSpi*)quote_spi);
-	quote_api->RegisterFront((char*)trader->quote_addr.c_str());
-	//return;
-	quote_api->Init();
-	cout<<"i am here"<<endl;
-	getchar();
-	*/
-	/*
-	md->Init();
-	cout<<"market init"<<endl;
-	pUserApi->Init();
-	//todo
-	pUserApi->Join();
-	*/
+	cout<<"start trade api"<<endl;
+	return 0;
 }
+
+
+void CtpTrader::trade_stm(msg_t &msg)
+{
+	msg_t *mmsg;
+	int ret;
+
+	while(msg.type!=TSTOP) {
+		switch(msg.type) {
+			/*        */
+			case TSTART:
+				this->start();
+				msg.type=TSTOP;
+				break;
+			case TOnFrontConnected:
+				cerr <<"md connected stm"<<endl;
+				msg.type=QReqUserLogin;
+				break;
+			case TOnFrontDisconnected:
+				break;
+			case TOnHeartBeatWarning:
+				/*todo err process
+				*/
+				break;
+			case TOnRspError:
+				/*todo err process
+				*/
+				break;
+			case TReqSettlementInfoConfirm:
+				break;
+			case TOnRspSettlementInfoConfirm:
+				/**/
+				msg.type=QSTOP;
+				break;
+			case TReqUserLogin:
+				break;
+			case TOnRspUserLogin:
+				break;
+			case TReqQryInstrument:
+				break;
+			case TOnRspQryInstrument:
+				break;
+			case TReqQryTradingAccount:
+				break;
+			case TOnRspQryTradingAccount:
+				break;
+			case TReqQryInvestorPosition:
+				break;
+			case TOnRspQryInvestorPosition:
+				break;
+			case TReqOrderInsert:
+				break;
+			case TOnRspOrderInsert:
+				break;
+			case TReqOrderAction:
+				break;
+			case TOnRspOrderAction:
+				break;
+			case TOnRtnOrder:
+				break;
+			default:
+				break;
+		}
+	}
+	msg.type=TSTOP;
+	if(msg.type == TSTOP) {
+		/*todo free message*/
+		free(msg.data);
+	}
+	LOG_DEBUG<<"finish one Trade data"<<std::endl;
+}
+
+void TradeProcess(CtpTrader *ctptrader, int key)
+{
+	return;
+}
+
