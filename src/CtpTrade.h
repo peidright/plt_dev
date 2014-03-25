@@ -4,6 +4,9 @@
 #include "config.h"
 #include "ThostFtdcTraderApi.h"
 #include "trader.h"
+
+
+class CtpTrader;
 class CtpTradeApi : public CThostFtdcTraderApi
 {
 	
@@ -25,6 +28,21 @@ public:
 	int confirm;
 
 
+	CThostFtdcTraderApi *api;
+	string test;
+	CtpTrader* ctptrader;
+
+	//Quoter *quoter;
+	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
+	CtpTradeSpi(CThostFtdcTraderApi* api, CtpTrader *ctptrader):api(api){this->ctptrader=ctptrader;
+		this->frontId=0;
+		this->sessionId=0;
+		this->nextOrderRef=0;
+		this->confirm=0;
+		this->login_status=0;
+	};
+
+	/*
    CtpTradeSpi(CThostFtdcTraderApi* api, Trader *trader):api(api){
 
 	   this->trader=trader;
@@ -34,6 +52,7 @@ public:
 	   this->confirm=0;
 	   this->login_status=0;
    };
+	*/
    ~CtpTradeSpi(){};
 
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
@@ -101,7 +120,7 @@ public:
   void PrintTrades();
 
 private:
-  CThostFtdcTraderApi* api;
+  //CThostFtdcTraderApi* api;
   //CtpTradeApi *api;
 
 };

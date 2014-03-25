@@ -7,12 +7,13 @@
 CtpTrader::CtpTrader(Trader *trader):qsem(0)
 {
 	this->trader=trader;
+	this->running=1;
 }
 int CtpTrader::init()
 {
 	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
 	this->trade_api=trade_api;
-	CtpTradeSpi* trade_spi = new CtpTradeSpi(trade_api,trader);
+	CtpTradeSpi* trade_spi = new CtpTradeSpi(trade_api,this);
 	this->trade_spi = trade_spi;
 	cout<<"begin api"<<endl;
 
@@ -101,8 +102,48 @@ void CtpTrader::trade_stm(msg_t &msg)
 	LOG_DEBUG<<"finish one Trade data"<<std::endl;
 }
 
-void TradeProcess(CtpTrader *ctptrader, int key)
+void trader_loop(CtpTrader *ctptrader, int key)
 {
-	return;
+loop:
+	while(ctptrader->running) {
+		ctptrader->qsem.wait();
+		boost::unique_lock<boost::timed_mutex> lk(ctptrader->qmutex,boost::chrono::milliseconds(1));
+		if (lk) {
+			if(ctptrader->mqueue.size()<=0) {
+				/*bug happen*/
+				cout<<"should not be zero qqueue"<<std::endl;
+				lk.unlock();
+			}
+			msg_t msg=ctptrader->mqueue[0];
+			printf("trader_loop get this msg\n");
+			ctptrader->mqueue.pop_front();
+			lk.unlock();
+			//continue;
+			ctptrader->trade_stm(msg);
+		} else {
+			cout<<"quote main loop err"<<std::endl;
+		}
+	}
+}
+
+void CtpTrader::post_msg(msg_t *msg)
+{
+	/*lock
+	*/
+	
+again:
+	boost::unique_lock<boost::timed_mutex> lk(this->qmutex,boost::chrono::milliseconds(1));
+	if(lk) {
+		this->mqueue.push_back(*msg);
+		this->qsem.post();
+		printf("post msg\n");	
+		lk.unlock();
+	}else {
+		/*
+		   do some warnning
+		*/
+
+		goto again;
+	}
 }
 

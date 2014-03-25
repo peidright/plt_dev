@@ -18,11 +18,13 @@ public:
 
 	CtpTrader(Trader *trader);
 	void trade_stm(msg_t &msg);
+	void post_msg(msg_t *msg);
+
 
 	int init();
 	int start();
 	Account account; 
-
+	int running;
 	std::deque<msg_t> mqueue;
 	boost::interprocess::interprocess_semaphore qsem;
     	boost::timed_mutex qmutex;
@@ -30,6 +32,6 @@ public:
 	//map<int, boost::interprocess::interprocess_semaphore* > qsem_map;
 	//map<int, std::deque<msg_t> > mqueue_map;
 };
-void TradeProcess(CtpTrader *ctptrader, int key);
+void trader_loop(CtpTrader *ctptrader, int key);
 
 #endif

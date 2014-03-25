@@ -80,7 +80,7 @@ int CtpQuoteApi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount)
 
 void CtpQuoteSpi::OnFrontConnected()
 {
-#if 1
+#if 0
 	printf("spi on connected\n");
 	this->test="dddd";
 	t_group.add_thread(new boost::thread(quote_test,this));

@@ -96,7 +96,7 @@ int  ctp_work()
 		/*
 		创建线程，专门负责处理该trader 的交易
 		*/
-		g_trade_tg.add_thread(new boost::thread(TradeProcess,g_ctp_trader,0));
+		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
 
 		/*
 		创建一组线程，负责各个合约的定时更新行情。
