@@ -35,6 +35,7 @@ int CtpTrader::start()
 void CtpTrader::trade_stm(msg_t &msg)
 {
 	msg_t *mmsg;
+	TThostFtdcInstrumentIDType instId;
 	int ret;
 
 	while(msg.type!=TSTOP) {
@@ -45,8 +46,8 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnFrontConnected:
-				cerr <<"md connected stm"<<endl;
-				msg.type=QReqUserLogin;
+				LOG_DEBUG <<"trade connected stm"<<std::endl;
+				msg.type=TReqUserLogin;
 				break;
 			case TOnFrontDisconnected:
 				break;
@@ -59,18 +60,63 @@ void CtpTrader::trade_stm(msg_t &msg)
 				*/
 				break;
 			case TReqSettlementInfoConfirm:
+				/**/
+				LOG_DEBUG<<"trade req settle stm"<<std::endl;
+				this->trade_spi->ReqSettlementInfoConfirm(this->trader->brokerid.c_str(), 
+						this->trader->username.c_str()
+						);
+				msg.type=TSTOP;
 				break;
 			case TOnRspSettlementInfoConfirm:
 				/**/
-				msg.type=QSTOP;
+				if(   !this->trade_spi->IsErrorRspInfo(&(((TOnRspSettlementInfoConfirm_t*)msg.data)->pRspInfo))) {
+					LOG_DEBUG<<"OnRspSettlement investor :"<<((TOnRspSettlementInfoConfirm_t*)msg.data)->pSettlementInfoConfirm.ConfirmDate<<std::endl;
+				} else {
+					LOG_DEBUG<<"fail Onrsp settlement confirm"<<std::endl;
+				}
+				msg.type=TReqQryInstrument;
 				break;
 			case TReqUserLogin:
+				/**/
+				LOG_DEBUG<<"trade login stm"<<std::endl;
+				 this->trade_spi->ReqUserLogin((char*)this->trader->brokerid.c_str(),
+					(char*)this->trader->username.c_str(),
+				(char*)this->trader->password.c_str());
+				if(ret==0) {
+					LOG_DEBUG<<"trade_stm login msg sended\n" <<std::endl;
+					msg.type=TSTOP;
+				}else {
+					LOG_DEBUG<<"trade_stm login msg sended fail\n" <<std::endl;
+					/*err process					
+					*/
+				}
+				msg.type=TSTOP;
 				break;
 			case TOnRspUserLogin:
+				LOG_DEBUG<<"TOnRspUserLogin stm"<<std::endl;;
+				msg.type=TReqSettlementInfoConfirm;		
+				msg.data=NULL;
 				break;
 			case TReqQryInstrument:
+				/*two case, if msg.data==NULL, query all the Instrument
+				 *else 
+				 * */
+				LOG_DEBUG<<"send TReqQryInstrument"<<std::endl;
+				memset(&instId,0x0,sizeof(TThostFtdcInstrumentIDType));
+				this->trade_spi->ReqQryInstrument(instId);
+				msg.type=TSTOP;
 				break;
 			case TOnRspQryInstrument:
+				/**/
+				msg.type=TSTOP;
+				//CThostFtdcInstrumentField pInstrument;
+				//TOnRspQryInstrument_t;
+				if(!this->trade_spi->IsErrorRspInfo(&((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
+					LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
+				} else {
+					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
+				}
+				msg.type=TSTOP;
 				break;
 			case TReqQryTradingAccount:
 				break;
@@ -107,7 +153,7 @@ void trader_loop(CtpTrader *ctptrader, int key)
 loop:
 	while(ctptrader->running) {
 		ctptrader->qsem.wait();
-		boost::unique_lock<boost::timed_mutex> lk(ctptrader->qmutex,boost::chrono::milliseconds(1));
+		boost::unique_lock<boost::timed_mutex> lk(ctptrader->qmutex,boost::chrono::milliseconds(3));
 		if (lk) {
 			if(ctptrader->mqueue.size()<=0) {
 				/*bug happen*/
@@ -132,12 +178,12 @@ void CtpTrader::post_msg(msg_t *msg)
 	*/
 	
 again:
-	boost::unique_lock<boost::timed_mutex> lk(this->qmutex,boost::chrono::milliseconds(1));
+	boost::unique_lock<boost::timed_mutex> lk(this->qmutex,boost::chrono::milliseconds(3));
 	if(lk) {
 		this->mqueue.push_back(*msg);
 		this->qsem.post();
 		printf("post msg\n");	
-		lk.unlock();
+		//?lk.unlock();
 	}else {
 		/*
 		   do some warnning

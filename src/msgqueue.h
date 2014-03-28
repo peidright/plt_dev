@@ -94,7 +94,7 @@ typedef struct {
 
 typedef struct {
 	CThostFtdcInstrumentField pInstrument;
-    CThostFtdcRspInfoField pRspInfo;
+    	CThostFtdcRspInfoField pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspQryInstrument_t;

@@ -4,6 +4,7 @@
 #include "config.h"
 #include "ThostFtdcTraderApi.h"
 #include "trader.h"
+#include "CtpTrader.h"
 
 
 class CtpTrader;
@@ -20,12 +21,11 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 {
 public:
 	int requestId;
-	Trader *trader;
-	int login_status;
 	int frontId;
 	int sessionId;
 	int nextOrderRef;
 	int confirm;
+	int login_status;
 
 
 	CThostFtdcTraderApi *api;
@@ -99,7 +99,9 @@ public:
 	void ReqUserLogin(TThostFtdcBrokerIDType	appId,
 	        TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd);
 	///投资者结算结果确认
-	void ReqSettlementInfoConfirm();
+	//void ReqSettlementInfoConfirm();
+	void   ReqSettlementInfoConfirm(const char * brokerid, const char *userid);
+	
 	///请求查询合约
 	void ReqQryInstrument(TThostFtdcInstrumentIDType instId);
 	///请求查询资金账户

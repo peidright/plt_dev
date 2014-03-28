@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "ThostFtdcTraderApi.h"
 #include "CtpTraderSpi.h"
@@ -65,26 +66,28 @@ void CtpTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
   if(bIsLast) sem.sem_v();
 }
 
-void CtpTraderSpi::ReqSettlementInfoConfirm()
+void CtpTraderSpi::ReqSettlementInfoConfirm(char * brokerid, char *userid)
 {
 	CThostFtdcSettlementInfoConfirmField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, appId);
+	strcpy(req.BrokerID, brokerid);
 	strcpy(req.InvestorID, userId);
 	int ret = this->api->ReqSettlementInfoConfirm(&req, ++requestId);
-	cerr<<" 请求 | 发送结算单确认..."<<((ret == 0)?"成功":"失败")<<endl;
+	assert(ret==0);
 }
 
 void CtpTraderSpi::OnRspSettlementInfoConfirm(
         CThostFtdcSettlementInfoConfirmField  *pSettlementInfoConfirm, 
         CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {	
+	/*
 	if( !IsErrorRspInfo(pRspInfo) && pSettlementInfoConfirm){
     cerr<<" 响应 | 结算单..."<<pSettlementInfoConfirm->InvestorID
       <<"...<"<<pSettlementInfoConfirm->ConfirmDate
       <<" "<<pSettlementInfoConfirm->ConfirmTime<<">...确认"<<endl;
   }
   if(bIsLast) sem.sem_v();
+        */
 }
 
 void CtpTraderSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)

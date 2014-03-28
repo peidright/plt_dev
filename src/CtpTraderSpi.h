@@ -53,7 +53,9 @@ public:
 	void ReqUserLogin(TThostFtdcBrokerIDType	appId,
 	        TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd);
 	///投资者结算结果确认
-	void ReqSettlementInfoConfirm();
+	//void ReqSettlementInfoConfirm();
+	void   ReqSettlementInfoConfirm(char * brokerid, char *userid);
+
 	///请求查询合约
 	void ReqQryInstrument(TThostFtdcInstrumentIDType instId);
 	///请求查询资金账户

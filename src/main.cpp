@@ -44,33 +44,42 @@ Trader *g_trader;
 CtpQuoter *g_ctp_quoter;
 CtpTrader *g_ctp_trader;
 mdservice *g_mdservice;
-int  ctp_work()
+
+int ctp_trade_init()
+{
+		g_trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
+		g_ctp_trader=new CtpTrader(g_trader);
+		g_ctp_trader->init();
+		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
+		g_ctp_trader->start();
+		LOG_DEBUG<<"g_ctp_trader started"<<std::endl;
+		return 0;
+}
+
+
+int ctp_quote_init()
 {
 		int i;
-		/*
-		初始化行情登录
-		*/
-		g_trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
 		printf("Quoter\n");
 		g_ctp_quoter=new CtpQuoter(g_quoter);
-		g_ctp_trader=new CtpTrader(g_trader);
-
-		printf("Ctpquoted\n");
 		g_mdservice=new mdservice();
-		/*
-		创建线程，专门处理行情的消息
-		*/
+
 		g_ctp_quoter->init(g_mdservice);
 		g_ctp_quoter->mds->regmd("cu1406");
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}
-
 		g_quote_tg.add_thread(new boost::thread(quote_loop,g_ctp_quoter));
-		printf("mdsed\n");
-		printf("inited\n");
 		g_ctp_quoter->start();
+		g_io_tg.add_thread(new boost::thread(quote_io_work));
+
+}
+
+int  ctp_work()
+{
+		//ctp_quote_init();
+		ctp_trade_init();
 #if 0
 		msg_t *msg=new(msg_t);
 		msg->len=sizeof(QOnFrontConnected_t);
@@ -80,25 +89,9 @@ int  ctp_work()
     		g_ctp_quoter->post_msg(msg);
 #endif
 
-		printf("started!!!!\n");
 
 		/*
-		for (i=0;i<CTP_WORK_THREAD_NUM;i++){
-			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
-		}
-		*/
 
-		/*
-		创建线程，专门负责将行情信息，刷进sqlite
-		*/
-		g_io_tg.add_thread(new boost::thread(quote_io_work));
-
-		/*
-		创建线程，专门负责处理该trader 的交易
-		*/
-		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
-
-		/*
 		创建一组线程，负责各个合约的定时更新行情。
 		*/
 		while(1){
