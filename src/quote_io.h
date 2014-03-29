@@ -77,7 +77,7 @@ class quote_io {
 public:
 	map<string, kdata_io_t *> kdata_map;
 	map<string, tdata_io_t *> tdata_map;
-	map<string, datalocal  *> db_map;
+	//map<string, datalocal  *> db_map;
 	dmgr *pdmgr;
 	void reg_dmgr(dmgr *mgr){this->pdmgr=mgr;};
 	void quote_kdata_push(string contract, kdata_t *data);
