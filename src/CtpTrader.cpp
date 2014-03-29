@@ -69,7 +69,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				break;
 			case TOnRspSettlementInfoConfirm:
 				/**/
-				if(   !this->trade_spi->IsErrorRspInfo(&(((TOnRspSettlementInfoConfirm_t*)msg.data)->pRspInfo))) {
+				if(   !this->trade_spi->IsErrorRspInfo((((TOnRspSettlementInfoConfirm_t*)msg.data)->pRspInfo))) {
 					LOG_DEBUG<<"OnRspSettlement investor :"<<((TOnRspSettlementInfoConfirm_t*)msg.data)->pSettlementInfoConfirm.ConfirmDate<<std::endl;
 				} else {
 					LOG_DEBUG<<"fail Onrsp settlement confirm"<<std::endl;
@@ -111,7 +111,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				//CThostFtdcInstrumentField pInstrument;
 				//TOnRspQryInstrument_t;
-				if(!this->trade_spi->IsErrorRspInfo(&((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
+				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
 					LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
@@ -182,13 +182,13 @@ again:
 	if(lk) {
 		this->mqueue.push_back(*msg);
 		this->qsem.post();
-		printf("post msg\n");	
+		LOG_DEBUG<<"post_msg func"<<std::endl;
 		//?lk.unlock();
 	}else {
 		/*
 		   do some warnning
 		*/
-
+		LOG_DEBUG<<"post_msg again"<<std::endl;
 		goto again;
 	}
 }

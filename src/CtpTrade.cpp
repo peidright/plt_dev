@@ -144,22 +144,29 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	}
 	  if(bIsLast) sem.sem_v();
 	*/
-
-	printf("on rsp login\n");
-	cout<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
+	/*
+	if(pRspInfo)
+		LOG_DEBUG<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
+	*/
 	if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
 
 	msg_t *msg=new(msg_t);
 	TOnRspUserLogin_t *data=new(TOnRspUserLogin_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+	data->pRspInfo=NULL;
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+	}
 	memcpy(&data->pRspUserLogin,pRspUserLogin,sizeof(pRspUserLogin));
 	msg->len=sizeof(TOnRspUserLogin_t);
 	msg->data=(void*)data;
 	msg->type=TOnRspUserLogin;
 	this->ctptrader->post_msg(msg);
-	printf("OnRspUserLogin post msg");
+	LOG_DEBUG<<"spi OnRspUserLogin post msg"<<std::endl;
+	} else {
+		LOG_DEBUG<<"err OnRspUserLogin "<<std::endl;
 	}
 
 }
@@ -192,16 +199,30 @@ void CtpTradeSpi::OnRspSettlementInfoConfirm(
 	}
   	if(bIsLast) sem.sem_v();
 	*/
+	if( !IsErrorRspInfo(pRspInfo) && pSettlementInfoConfirm){
+
 	msg_t *msg=new(msg_t);
 	TOnRspSettlementInfoConfirm_t *data=new(TOnRspSettlementInfoConfirm_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(*pRspInfo));
+
+	data->pRspInfo=NULL;
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+	} else {
+		LOG_DEBUG<<"spi OnRspSettlement NULL pRspInfo"<<std::endl;
+	}
 	memcpy(&data->pSettlementInfoConfirm,pSettlementInfoConfirm,sizeof(*pSettlementInfoConfirm));
 	msg->len=sizeof(TOnRspSettlementInfoConfirm_t);
 	msg->data=(void*)data;
 	msg->type=TOnRspSettlementInfoConfirm;
 	this->ctptrader->post_msg(msg);
+		LOG_DEBUG<<"spi OnRspSettlement ok"<<std::endl;
+	}
+	else {
+		LOG_DEBUG<<"spi OnRspSettlement err"<<std::endl;
+	}
 }
 
 
@@ -232,12 +253,23 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	TOnRspQryInstrument_t *data=new(TOnRspQryInstrument_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(*pRspInfo));
+
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+	} else {
+		LOG_DEBUG<<"spi OnRspQryInstruent NULL pRspInfo"<<std::endl;
+	}
+
 	memcpy(&data->pInstrument,pInstrument,sizeof(*pInstrument));
 	msg->len=sizeof(TOnRspQryInstrument_t);
 	msg->data=(void*)data;
 	msg->type=TOnRspQryInstrument;;
 	this->ctptrader->post_msg(msg);
+		LOG_DEBUG<<"spi OnRspQryInstruent ok"<<std::endl;
+	} else
+	{
+		LOG_DEBUG<<"spi OnRspQryInstruent err"<<std::endl;
 	}
 }
 
@@ -275,7 +307,15 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	TOnRspQryTradingAccount_t *data=new(TOnRspQryTradingAccount_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(*pRspInfo));
+
+	data->pRspInfo=NULL;
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+	}else {
+		LOG_DEBUG<<"spi OnRspQryTradingAccount"<<std::endl;
+	}
+
 	memcpy(&data->pTradingAccount,pTradingAccount,sizeof(*pTradingAccount));
 	msg->len=sizeof(TOnRspQryTradingAccount_t);
 	msg->data=(void*)data;
@@ -316,7 +356,14 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 	TOnRspQryInvestorPosition_t *data=new(TOnRspQryInvestorPosition_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(*pRspInfo));
+
+	data->pRspInfo=NULL;
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+	}else {
+		LOG_DEBUG<<"spi OnRspQryInvestorPosition"<<std::endl;
+	}
 	memcpy(&data->pInvestorPosition,pInvestorPosition,sizeof(*pInvestorPosition));
 	msg->len=sizeof(TOnRspQryInvestorPosition_t);
 	msg->data=(void*)data;
@@ -328,6 +375,7 @@ void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
     TThostFtdcDirectionType dir, TThostFtdcCombOffsetFlagType kpp,
     TThostFtdcPriceType price,   TThostFtdcVolumeType vol)
 {
+	/*
 	CThostFtdcInputOrderField req;
 	memset(&req, 0, sizeof(req));	
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());  //应用单元代码	
@@ -356,13 +404,13 @@ void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 	req.MinVolume = 1;	//最小成交量:1	
 	req.ContingentCondition = THOST_FTDC_CC_Immediately;  //触发条件:立即
 	
-  //TThostFtdcPriceType	StopPrice;  //止损价
+  	//TThostFtdcPriceType	StopPrice;  //止损价
 	req.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;	//强平原因:非强平	
 	req.IsAutoSuspend = 0;  //自动挂起标志:否	
 	req.UserForceClose = 0;   //用户强评标志:否
 
 	int ret = this->api->ReqOrderInsert(&req, ++this->requestId);
-	//cerr<<" 请求 | 发送报单..."<<((ret == 0)?"成功":"失败")<< endl;
+	*/
 }
 
 
@@ -379,7 +427,15 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	TOnRspOrderInsert_t *data=new(TOnRspOrderInsert_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(*pRspInfo));
+
+	data->pRspInfo=NULL;
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+	}else {
+		LOG_DEBUG<<"spi OnRspOrderInsert"<<std::endl;
+	}
+
 	memcpy(&data->pInputOrder,pInputOrder,sizeof(*pInputOrder));
 	msg->len=sizeof(TOnRspOrderInsert_t);
 	msg->data=(void*)data;
@@ -389,26 +445,25 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 
 void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 {
-	/*???? need todo*/
-  bool found=false; unsigned int i=0;
-  for(i=0;i<orderList.size();i++){
-    if(orderList[i]->BrokerOrderSeq == orderSeq){ found = true; break;}
-  }
-  if(!found){cerr<<" 请求 | 报单不存在."<<endl; return;} 
+	/*
+	   bool found=false; unsigned int i=0;
+	   for(i=0;i<orderList.size();i++){
+	   if(orderList[i]->BrokerOrderSeq == orderSeq){ found = true; break;}
+	   }
+	   if(!found){cerr<<" 请求 | 报单不存在."<<endl; return;} 
 
-	CThostFtdcInputOrderActionField req;
-	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());   //经纪公司代码	
-	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str()); //投资者代码
+	   CThostFtdcInputOrderActionField req;
+	   memset(&req, 0, sizeof(req));
+	   strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());   //经纪公司代码	
+	   strcpy(req.InvestorID, this->ctptrader->trader->username.c_str()); //投资者代码
 	//strcpy(req.OrderRef, pOrderRef); //报单引用	
 	//req.FrontID = frontId;           //前置编号	
 	//req.SessionID = sessionId;       //会话编号
-    strcpy(req.ExchangeID, orderList[i]->ExchangeID);
-    strcpy(req.OrderSysID, orderList[i]->OrderSysID);
+	strcpy(req.ExchangeID, orderList[i]->ExchangeID);
+	strcpy(req.OrderSysID, orderList[i]->OrderSysID);
 	req.ActionFlag = THOST_FTDC_AF_Delete;  //操作标志 
-
 	int ret = this->api->ReqOrderAction(&req, ++this->requestId);
-	cerr<< " 请求 | 发送撤单..." <<((ret == 0)?"成功":"失败") << endl;
+	*/
 }
 
 void CtpTradeSpi::OnRspOrderAction(
@@ -427,7 +482,15 @@ void CtpTradeSpi::OnRspOrderAction(
 	TOnRspOrderAction_t *data=new(TOnRspOrderAction_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(*pRspInfo));
+
+	data->pRspInfo=NULL;
+	if(pRspInfo) {
+		data->pRspInfo=new(CThostFtdcRspInfoField);
+		memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+	}else {
+		LOG_DEBUG<<"spi OnRspOrderAction"<<std::endl;
+	}
+
 	memcpy(&data->pInputOrderAction,pInputOrderAction,sizeof(*pInputOrderAction));
 	msg->len=sizeof(TOnRspOrderAction_t);
 	msg->data=(void*)data;
@@ -439,7 +502,7 @@ void CtpTradeSpi::OnRspOrderAction(
 ///报单回报
 void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 {	
-	/*todo orderlist*/
+	/*
   CThostFtdcOrderField* order = new CThostFtdcOrderField();
   memcpy(order,  pOrder, sizeof(CThostFtdcOrderField));
   bool founded=false;    unsigned int i=0;
@@ -450,43 +513,94 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
   }
   if(founded) orderList[i]= order;   
   else  orderList.push_back(order);
-  //cerr<<" 回报 | 报单已提交...序号:"<<order->BrokerOrderSeq<<endl;
-  sem.sem_v();	
+  */
+	msg_t *msg=new(msg_t);
+	TOnRtnOrder_t *data=new(TOnRtnOrder_t);
+	memcpy(&data->pOrder,pOrder,sizeof(CThostFtdcOrderField));
+	msg->len=sizeof(TOnRtnOrder_t);
+	msg->data=(void*)data;
+	msg->type=TOnRtnOrder;
+	this->ctptrader->post_msg(msg);
 }
 
 ///成交通知
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 {
-  CThostFtdcTradeField* trade = new CThostFtdcTradeField();
-  memcpy(trade,  pTrade, sizeof(CThostFtdcTradeField));
-  bool founded=false;     unsigned int i=0;
-  for(i=0; i<tradeList.size(); i++){
-    if(tradeList[i]->TradeID == trade->TradeID) {
-      founded=true;   break;
-    }
-  }
-  if(founded) tradeList[i] = trade;   
-  else  tradeList.push_back(trade);
-  cerr<<" 回报 | 报单已成交...成交编号:"<<trade->TradeID<<endl;
-  sem.sem_v();
+	/*
+	   CThostFtdcTradeField* trade = new CThostFtdcTradeField();
+	   memcpy(trade,  pTrade, sizeof(CThostFtdcTradeField));
+	   bool founded=false;     unsigned int i=0;
+	   for(i=0; i<tradeList.size(); i++){
+	   if(tradeList[i]->TradeID == trade->TradeID) {
+	   founded=true;   break;
+	   }
+	   }
+  	if(founded) tradeList[i] = trade;   
+  	else  tradeList.push_back(trade);
+  	sem.sem_v();
+  	*/
+	msg_t *msg=new(msg_t);
+	TOnRtnTrade_t *data=new(TOnRtnTrade_t);
+	memcpy(&data->pTrade,pTrade,sizeof( CThostFtdcTradeField));
+	msg->len=sizeof(TOnRtnTrade_t);
+	msg->data=(void*)data;
+	msg->type=TOnRtnTrade;
+	this->ctptrader->post_msg(msg);
 }
 
 void CtpTradeSpi::OnFrontDisconnected(int nReason)
 {
+	/*
 	cerr<<" 响应 | 连接中断..." 
 	  << " reason=" << nReason << endl;
+	*/
+	msg_t *msg=new(msg_t);
+	TOnFrontDisconnected_t *data=new(TOnFrontDisconnected_t);
+	data->nReason=nReason;
+	msg->len=sizeof(TOnFrontDisconnected_t);
+	msg->data=(void*)data;
+	msg->type=TOnFrontDisconnected;
+	this->ctptrader->post_msg(msg);
+
 }
 		
 void CtpTradeSpi::OnHeartBeatWarning(int nTimeLapse)
 {
+	/*
 	cerr<<" 响应 | 心跳超时警告..." 
 	  << " TimerLapse = " << nTimeLapse << endl;
+	*/
+
+	msg_t *msg=new(msg_t);
+	TOnHeartBeatWarning_t *data=new(TOnHeartBeatWarning_t);
+	data->nTimeLapse=nTimeLapse;
+	msg->len=sizeof(TOnHeartBeatWarning_t);
+	msg->data=(void*)data;
+	msg->type=TOnHeartBeatWarning;
+	this->ctptrader->post_msg(msg);
+
 }
 
 void CtpTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cout<<"error"<<endl;
-	IsErrorRspInfo(pRspInfo);
+	//IsErrorRspInfo(pRspInfo);
+	if(!this->IsErrorRspInfo(pRspInfo)) {
+		msg_t *msg=new(msg_t);
+		TOnRspError_t *data=new(TOnRspError_t);
+		data->bIsLast=bIsLast;
+		data->nRequestID=nRequestID;
+		data->pRspInfo=NULL;
+		msg->len=sizeof(TOnRspError_t);
+		msg->type=TOnRspError;
+		if(pRspInfo) {
+			data->pRspInfo=new(CThostFtdcRspInfoField);
+			memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+		} else {
+			LOG_DEBUG<<"spi OnRspInfo is NULL"<<std::endl;
+		}
+	} else {
+		LOG_DEBUG<<"spi OnRspError pRspInfo error"<<std::endl;
+	}
 }
 
 bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

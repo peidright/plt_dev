@@ -25,4 +25,10 @@ public:
 	int update_kdata(string contract, deque<struct kdata_s*> &kdataq);
 	sqlite3 *db;
 };
+
+class dmgr {
+	public:
+		map<string, datalocal  *> db_map;
+		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;};
+};
 #endif

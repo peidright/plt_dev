@@ -8,6 +8,7 @@
 #include "datalocal.h"
 using namespace boost;
 class datalocal;
+class dmgr;
 
 using namespace std;
 typedef struct tdata_s {
@@ -77,7 +78,8 @@ public:
 	map<string, kdata_io_t *> kdata_map;
 	map<string, tdata_io_t *> tdata_map;
 	map<string, datalocal  *> db_map;
-	void regdb(string dbname,datalocal *db){this->db_map[dbname]=db;};
+	dmgr *pdmgr;
+	void reg_dmgr(dmgr *mgr){this->pdmgr=mgr;};
 	void quote_kdata_push(string contract, kdata_t *data);
 	void quote_tdata_push(string contract, tdata_t *data);
 	void quote_kdata_work();

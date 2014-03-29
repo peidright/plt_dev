@@ -44,6 +44,7 @@ Trader *g_trader;
 CtpQuoter *g_ctp_quoter;
 CtpTrader *g_ctp_trader;
 mdservice *g_mdservice;
+dmgr      *g_dmgr;
 
 int ctp_trade_init()
 {
@@ -135,8 +136,13 @@ int main(int argc, char * argv[]){
 	datalocal *dl=new datalocal(g_db_tdata);
 	dl->create_tdata_table("cu1406");
 	//exit(0);
+	
+	//g_quote_io.regdb("tdata",dl);
+	g_dmgr=new (dmgr);
+	g_dmgr->regdb("tdata",dl);
 
-	g_quote_io.regdb("tdata",dl);
+
+
 	vector<map<string,string> > rows;
 	cout<<"ddd2"<<endl;
 	dl->exe_cmd("select name from sqlite_master where type='table'",rows);
@@ -146,6 +152,9 @@ int main(int argc, char * argv[]){
 		for(int i=0;i<g_product_list.size();i++) {
 		printf("%s\n",g_product_list[i].c_str());
 	}
+
+
+	g_quote_io.reg_dmgr(g_dmgr);
 	
 	//getchar();
 

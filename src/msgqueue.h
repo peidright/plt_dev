@@ -40,6 +40,7 @@ enum msgtype {
 
 
 	TOnRtnOrder,
+	TOnRtnTrade,
 	TOnFrontDisconnected,
 	TOnHeartBeatWarning,
 	TOnRspError,
@@ -80,41 +81,41 @@ typedef struct  {
 
 typedef struct {
 	struct CThostFtdcRspUserLoginField pRspUserLogin;
-	struct CThostFtdcRspInfoField pRspInfo;
+	struct CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspUserLogin_t;
 
 typedef struct {
 	CThostFtdcSettlementInfoConfirmField  pSettlementInfoConfirm;
-	struct CThostFtdcRspInfoField pRspInfo;
+	struct CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspSettlementInfoConfirm_t;
 
 typedef struct {
 	CThostFtdcInstrumentField pInstrument;
-    	CThostFtdcRspInfoField pRspInfo;
+    	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspQryInstrument_t;
 
 typedef struct {
 	CThostFtdcTradingAccountField pTradingAccount;
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspQryTradingAccount_t;
 
 typedef struct {
 	CThostFtdcInvestorPositionField pInvestorPosition;
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspQryInvestorPosition_t;
 
 typedef struct {
-    CThostFtdcInputOrderField pInputOrder;
+    	CThostFtdcInputOrderField pInputOrder;
 	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
@@ -122,7 +123,7 @@ typedef struct {
 
 typedef struct {
 	  CThostFtdcInputOrderActionField pInputOrderAction;
-      CThostFtdcRspInfoField pRspInfo;
+      	  CThostFtdcRspInfoField *pRspInfo;
 	  int nRequestID;
 	  bool bIsLast;
 }TOnRspOrderAction_t;
@@ -145,7 +146,7 @@ typedef struct {
 }TOnHeartBeatWarning_t;
 
 typedef struct {
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspError_t;
@@ -161,35 +162,35 @@ typedef struct {
 }QOnHeartBeatWarning_t;
 
 typedef struct {
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }QOnRspError_t;
 
 typedef struct {
 	CThostFtdcSpecificInstrumentField pSpecificInstrument;
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }QOnRspSubMarketData_t;
 
 typedef struct {
 	CThostFtdcSpecificInstrumentField pSpecificInstrument;
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }QOnRspUnSubMarketData_t;
 
 typedef struct {
 	CThostFtdcRspUserLoginField  pRspUserLogin;
-	CThostFtdcRspInfoField       pRspInfo;
+	CThostFtdcRspInfoField       *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }QOnRspUserLogin_t;
 
 typedef struct {
 	CThostFtdcUserLogoutField pUserLogout;
-	CThostFtdcRspInfoField pRspInfo;
+	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }QOnRspUserLogout_t;
