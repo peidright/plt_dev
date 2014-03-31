@@ -240,12 +240,12 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 { 	
 	/*
 	if ( !IsErrorRspInfo(pRspInfo) &&  pInstrument){
-    cerr<<" 响应 | 合约:"<<pInstrument->InstrumentID
-      <<" 交割月:"<<pInstrument->DeliveryMonth
-      <<" 多头保证金率:"<<pInstrument->LongMarginRatio
-      <<" 空头保证金率:"<<pInstrument->ShortMarginRatio<<endl; 
-  }
-  if(bIsLast) sem.sem_v();
+    		cerr<<" 响应 | 合约:"<<pInstrument->InstrumentID
+      		<<" 交割月:"<<pInstrument->DeliveryMonth
+      		<<" 多头保证金率:"<<pInstrument->LongMarginRatio
+      		<<" 空头保证金率:"<<pInstrument->ShortMarginRatio<<endl; 
+  	}
+  	if(bIsLast) sem.sem_v();
 	*/
 	if ( !IsErrorRspInfo(pRspInfo) &&  pInstrument){
 
@@ -253,6 +253,7 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	TOnRspQryInstrument_t *data=new(TOnRspQryInstrument_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
+	data->pRspInfo=NULL;
 
 	if(pRspInfo) {
 		data->pRspInfo=new(CThostFtdcRspInfoField);

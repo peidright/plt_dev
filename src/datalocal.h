@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include "quote_io.h"
+#include "instrument.h"
 using namespace std;
 struct kdata_s;
 struct tdata_s;
@@ -21,6 +22,13 @@ public:
 	void exe_cmd(string cmd);
 	int create_tdata_table(string contract);
 	int create_kdata_table(string contract);
+	int create_inst_tdata(string instn);
+	int create_inst_sdata(string instn);
+	int create_inst_kdata(string instn);
+
+	int load_inst_sdata( map<string, inst_t * > &instmap );
+	int insert_inst_sdata(inst_t *pinst);
+
 	int update_tdata(string contract, deque<struct tdata_s*> &tdataq);
 	int update_kdata(string contract, deque<struct kdata_s*> &kdataq);
 	sqlite3 *db;
@@ -28,7 +36,37 @@ public:
 
 class dmgr {
 	public:
-		map<string, datalocal  *> db_map;
+		map<string , datalocal * > db_map;
+		map<string ,  inst_t *> instmap;
+		map<string ,  inst_t *> new_instmap;
+		int cstatus;
+		dmgr(){
+			this->cstatus=0;
+		}
 		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;};
+		int init(){};
+		int load_inst(){
+			return 0;
+		}
+		int add_inst(string instn, inst_t *pinst) {
+			if(this->instmap.find(instn)==this->instmap.end()) {
+				/*
+				 * */
+				this->new_instmap[instn]=pinst;
+			}
+			return 0;
+		}
+		int get_inst(string instn, inst_t **pinst) {
+			if(this->instmap.find(instn)==this->instmap.end()) {
+				/*
+				 * */
+				(*pinst)=this->new_instmap[instn];
+				/*insert it into table
+				 * */
+			} else {
+				(*pinst)=NULL;
+			}
+			return 0;
+		}
 };
 #endif

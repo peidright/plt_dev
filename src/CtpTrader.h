@@ -8,15 +8,16 @@
 #include "boosthelp.h"
 #include "msgqueue.h"
 #include "mdseries.h"
-
+class dmgr;
 class CtpTradeSpi;
 class CtpTrader{
 public:
 	Trader *trader;
 	CtpTradeSpi * trade_spi;
 	CThostFtdcTraderApi* trade_api;
+	dmgr *pdmgr;
 
-	CtpTrader(Trader *trader);
+	CtpTrader(Trader *trader,dmgr *pdmgr);
 	void trade_stm(msg_t &msg);
 	void post_msg(msg_t *msg);
 

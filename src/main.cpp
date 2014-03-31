@@ -49,7 +49,7 @@ dmgr      *g_dmgr;
 int ctp_trade_init()
 {
 		g_trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
-		g_ctp_trader=new CtpTrader(g_trader);
+		g_ctp_trader=new CtpTrader(g_trader,g_dmgr);
 		g_ctp_trader->init();
 		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
 		g_ctp_trader->start();
@@ -67,7 +67,7 @@ int ctp_quote_init()
 		g_mdservice=new mdservice();
 
 		g_ctp_quoter->init(g_mdservice);
-		g_ctp_quoter->mds->regmd("cu1406");
+		g_ctp_quoter->mds->regmd("IF1404");
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}
@@ -107,82 +107,47 @@ int  ctp_work()
 int main(int argc, char * argv[]){
 	log_init();
 
-	test1();
-	getchar();
-	std::string line;
-    /*
-	boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
-
-    while (std::cin)
-    {
-		break;
-        std::getline(std::cin, line);
-        boost::smatch matches;
-        if (boost::regex_match(line, matches, pat))
-            std::cout << matches[2] << std::endl;
-    }*/
-
-//int main(){
-	//ntpdate();
-	//exit(0);
-	//CThostFtdcTraderApi* pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi("./tlog");
-	//getchar();
-	//return 0;
-	//datalocal *dl=new datalocal();
-	//luajit_demo();
-	getchar();
-	//return 0;
-	cout<<"ddd1"<<endl;
-	datalocal *dl=new datalocal(g_db_tdata);
-	dl->create_tdata_table("cu1406");
-	//exit(0);
+	datalocal *dt=new datalocal(g_db_tdata);
+	datalocal *ds=new datalocal(g_db_sdata);
+	datalocal *dk=new datalocal(g_db_kdata);
+	dt->create_tdata_table("IF1404");
 	
 	//g_quote_io.regdb("tdata",dl);
 	g_dmgr=new (dmgr);
-	g_dmgr->regdb("tdata",dl);
-
-
+	g_dmgr->regdb("tdata",dt);
 
 	vector<map<string,string> > rows;
-	cout<<"ddd2"<<endl;
-	dl->exe_cmd("select name from sqlite_master where type='table'",rows);
-	getchar();
-	
-	dl->get_product_list(g_product_list);
+	dt->exe_cmd("select name from sqlite_master where type='table'",rows);
+	dt->get_product_list(g_product_list);
 		for(int i=0;i<g_product_list.size();i++) {
 		printf("%s\n",g_product_list[i].c_str());
 	}
 
-
 	g_quote_io.reg_dmgr(g_dmgr);
-	
-	//getchar();
-
-	//Trader *trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
-	//CtpTrader *ctp_trader=new CtpTrader(trader);
 	ctp_work();
 	getchar();
-	/*
-	api = CThostFtdcTraderApi::CreateFtdcTraderApi("./tlog");
-	api->RegisterSpi((CThostFtdcTraderSpi*)t);
-	api->RegisterFront("tcp://ctpmn1-front1.citicsf.com:51205");
-	api->Init();
-	getchar();
-	*/
-
-	//CtpTraderSpi* pUserSpi = new CtpTraderSpi(pUserApi);
-	//pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);			// 注册事件类
-	//pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);					// 注册公有流
-	//pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);			  // 注册私有流
-	//pUserApi->RegisterFront(tradeFront);							// 注册交易前置地址
-	//pUserApi->Init();
-	//todo
 	
 	/*
 	  CThostFtdcTraderApi* pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi("./tlog");
 	  pUserApi->Join();
+	  pUserApi->Release();
 	*/
-    //pUserapi->
-	//pUserApi->Release();
+
+    	/*
+	test1();
+	getchar();
+	std::string line;
+       boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
+       while (std::cin)
+       {
+       break;
+       std::getline(std::cin, line);
+       boost::smatch matches;
+       if (boost::regex_match(line, matches, pat))
+       std::cout << matches[2] << std::endl;
+       }
+       ntpdate();
+       luajit_demo();
+	*/
 	return 0;
 }

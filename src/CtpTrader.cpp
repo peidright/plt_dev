@@ -3,10 +3,10 @@
 #include <deque>
 #include "help.h"
 
-
-CtpTrader::CtpTrader(Trader *trader):qsem(0)
+CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr):qsem(0)
 {
 	this->trader=trader;
+	this->pdmgr=pdmgr;
 	this->running=1;
 }
 int CtpTrader::init()

@@ -50,7 +50,7 @@ datalocal::datalocal(string dbname)
 	ret=sqlite3_exec(this->db, "drop table contractschema",0,0,&error);
 	ret=sqlite3_exec(this->db,"create table contractschema(contract char(32),ctype char(32))",callback,NULL,&error);
 	assert(ret== SQLITE_OK);
-	ret=sqlite3_exec(this->db,"insert into contractschema values('cu1406','m')",callback,NULL,&error);
+	ret=sqlite3_exec(this->db,"insert into contractschema values('IF1404','m')",callback,NULL,&error);
 	assert(ret== SQLITE_OK);
 
 	vector<map<string,string> > result;
@@ -67,7 +67,7 @@ datalocal::datalocal(string dbname)
 		cout<<"sql1:end"<<endl;
 	}
 	cout<<"sql2:end"<<endl;
-	ret=sqlite3_exec(this->db, "insert into instrument values('cu1406','m',1,1380629713)",0,0,&error);
+	ret=sqlite3_exec(this->db, "insert into instrument values('IF1404','m',1,1380629713)",0,0,&error);
 	//ret=sqlite3_exec(this->db,"drop table ",0,0,&error);
 	//sqlite3_close(this->db);
 }
@@ -101,6 +101,85 @@ int datalocal::create_tdata_table(string contract)
 	this->exe_cmd(sqlbuf);
 }
 
+int datalocal::create_inst_tdata(string instn){
+	/*todo err process
+	 * */
+	char sqlbuf[256];
+	sprintf(sqlbuf,"create table tdata_%s(open real,close real,high real,low real,uprice real,lprice real,bid1 real,bid2 real,bid3 real, bid4 real, bid5 real,ask1 real,ask2 real,ask3 real,ask4 real,ask5 real,lastprice real,sec integer,msec integer,vol integer)",instn.c_str());
+	this->exe_cmd(sqlbuf);
+	return 0;
+}
+
+int datalocal::create_inst_sdata(string instn){
+	/*todo err process
+		struct CThostFtdcInstrumentField
+	 */
+	char sqlbuf[512];
+	sprintf(sqlbuf,"create table sdata_inst(InstrumentID char(32),ExchangeID char(32),InstrumentName char(32),ExchangeInstID char(32),ProductID char(32),ProductClass char(1),DeliveryYear int,DeliveryMonth int,MaxMarketOrderVolume int,MinMarketOrderVolume int,MaxLimitOrderVolume int,MinLimitOrderVolume int,VolumeMultiple int,PriceTick float,CreateDate char(32),OpenDate char(32),ExpirDate char(32),StartDelivDate char(32),EndDelivDate char(32),InstLifePhase char(1),IsTrading int,PositionType char(1) ,PositionDateType char(1),LongMarginRatio float,ShortMarginRatio float,MaxMarginSideAlgorithm char(1))");
+	this->exe_cmd(sqlbuf);
+	return 0;
+}
+
+int datalocal::load_inst_sdata( map<string , inst_t * > &instmap )
+{
+	/**/
+	int ret=0;
+	vector<map<string,string> > rows;
+	datalocal::exe_cmd("select * from sdata_inst", rows);
+	assert(ret==0);
+	inst_t *pinst;
+	for (vector<map<string,string> >::iterator it=rows.begin();it!=rows.end();it++) {
+		pinst=new(inst_t);
+		instmap[(*it)["InstrumentID"]]=pinst;
+		sprintf(pinst->base.InstrumentID,(*it)["InstrumentID"].c_str());
+		sprintf(pinst->base.ExchangeID,(*it)["ExchangeID"].c_str());
+		sprintf(pinst->base.InstrumentName,(*it)["InstrumentName"].c_str());
+		sprintf(pinst->base.ExchangeInstID,(*it)["ExchangeInstID"].c_str());
+		sprintf(pinst->base.ProductID,(*it)["ProductID"].c_str());
+
+		/*to do there has a bug*/
+		pinst->base.ProductClass=(*it)["ProductClass"].c_str()[0];
+		pinst->base.InstLifePhase=(*it)["InstLifePhase"].c_str()[0];
+		pinst->base.IsTrading=atoi((*it)["IsTrading"].c_str());
+		pinst->base.PositionType=(*it)["PositionType"].c_str()[0];
+		pinst->base.PositionDateType=(*it)["PositionDateType"].c_str()[0];
+		pinst->base.LongMarginRatio=atof((*it)["LongMarginRatio"].c_str());
+		pinst->base.ShortMarginRatio=atof((*it)["ShortMarginRatio"].c_str());
+		pinst->base.MaxMarginSideAlgorithm=(*it)["MaxMarginSideAlgorithm"].c_str()[0];
+
+		pinst->base.DeliveryYear=atoi((*it)["DeliveryYear"].c_str());
+		pinst->base.DeliveryMonth=atoi((*it)["DeliveryMonth"].c_str());
+		pinst->base.MaxMarketOrderVolume=atoi((*it)["MaxMarketOrderVolume"].c_str());
+		pinst->base.MinMarketOrderVolume=atoi((*it)["MinMarketOrderVolume"].c_str());
+		pinst->base.MaxLimitOrderVolume=atoi((*it)["MinLimitOrderVolume"].c_str());
+		pinst->base.VolumeMultiple=atoi((*it)["VolumeMultiple"].c_str());
+		pinst->base.PriceTick=atof((*it)["PriceTick"].c_str());
+
+		sprintf(pinst->base.CreateDate,(*it)["CreateDate"].c_str());
+		sprintf(pinst->base.OpenDate,(*it)["OpenDate"].c_str());
+		sprintf(pinst->base.ExpireDate,(*it)["ExpireDate"].c_str());
+		sprintf(pinst->base.StartDelivDate,(*it)["StarDelivDate"].c_str());
+		sprintf(pinst->base.EndDelivDate,(*it)["EndDelivDate"].c_str());
+	}
+}
+
+int datalocal::insert_inst_sdata(inst_t *pinst)
+{
+	/**/
+	char sqlbuf[512];
+	sprintf(sqlbuf,"insert into sdata_inst values ('%s','%s','%s','%s','%s','%c','%d','%d','%d','%d','%d','%d','%d','%f','%s','%s','%s','%s','%s','%c','%d', '%c','%c', '%f','%f','%c')",pinst->base.InstrumentID,pinst->base.ExchangeID,pinst->base.InstrumentName,pinst->base.ExchangeInstID,pinst->base.ProductID,pinst->base.ProductClass,pinst->base.DeliveryYear,pinst->base.DeliveryMonth,pinst->base.MaxMarketOrderVolume,pinst->base.MinMarketOrderVolume,pinst->base.MaxLimitOrderVolume,pinst->base.MinLimitOrderVolume,pinst->base.VolumeMultiple,pinst->base.PriceTick,pinst->base.CreateDate,pinst->base.OpenDate,pinst->base.ExpireDate,pinst->base.StartDelivDate,pinst->base.EndDelivDate,pinst->base.InstLifePhase,pinst->base.IsTrading,pinst->base.PositionType,pinst->base.PositionDateType,pinst->base.LongMarginRatio,pinst->base.ShortMarginRatio,pinst->base.MaxMarginSideAlgorithm);
+	this->exe_cmd(sqlbuf);
+	return 0;
+}
+
+int datalocal::create_inst_kdata(string instn){
+	/*todo err process
+	 * */
+	return 0;
+}
+
+
+
 int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 {
 	int ret;
@@ -109,6 +188,7 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 	char sqlbuf[512];
 
 	/*todo err check, sure the table existed!
+	 * NLL
 	*/
 
 	if(size > 10){
