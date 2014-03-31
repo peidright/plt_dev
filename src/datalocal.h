@@ -41,12 +41,21 @@ class dmgr {
 	public:
 		map<string , datalocal * > db_map;
 		map<string ,  inst_t *> instmap;
+		map<string ,  inst_t *> qinstmap;
+
+		map<string,string> filter_inst;
+		map<string,string> need_inst;
+
 		map<string ,  inst_t *> new_instmap;
 		int cstatus;
 		int inst_sync;
 		dmgr(){
 			this->cstatus=0;
 			this->inst_sync=0;
+
+			/*todo for debug
+			 * */
+			this->need_inst["IF1404"]="IF1404";
 		}
 		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;return 0;};
 		int init(){
@@ -105,6 +114,11 @@ class dmgr {
 			(*pppinst)= (char**)new char *[c];
 			for(map<string ,  inst_t *>::iterator it=this->instmap.begin();it!=this->instmap.end();it++) {
 				/**/
+				if((this->need_inst.size()!=0 && this->need_inst.find(it->first)==this->need_inst.end())
+				   ||(this->filter_inst.size()!=0 && this->filter_inst.find(it->first)!=this->filter_inst.end())			
+				) {
+					continue;
+				}
 				(*pppinst)[i]= new char [(it->first.size()+1)];
 				strcpy((*pppinst)[i], it->first.c_str());
 				i=i+1;

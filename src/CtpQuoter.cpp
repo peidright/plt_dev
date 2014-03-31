@@ -180,8 +180,8 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				break;
 			case QOnRspSubMarketData:
 				/**/
-				LOG_DEBUG<<"sub md: "<<((QOnRspUnSubMarketData_t*)msg.data)->pSpecificInstrument.InstrumentID<<std::endl;
-				if(((QOnRspUnSubMarketData_t*)msg.data)->bIsLast) {
+				LOG_DEBUG<<"sub md: "<<((QOnRspSubMarketData_t*)msg.data)->pSpecificInstrument.InstrumentID<<std::endl;
+				if(((QOnRspSubMarketData_t*)msg.data)->bIsLast) {
 					LOG_DEBUG<<"sub md: finished"<<std::endl;
 				}
 				msg.type=QSTOP;
@@ -265,7 +265,7 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 		LOG_DEBUG<<"TradingDay is NULL"<<std::endl;
 		time_t t1=time(NULL);
 		tm *tm1=gmtime(&t1);
-		snprintf((char*)&mdata->pDepthMarketData.TradingDay,9,"%04d%02d%02d",tm1->tm_year+1900,tm1->tm_mon, tm1->tm_mday);
+		snprintf((char*)&mdata->pDepthMarketData.TradingDay,9,"%04d%02d%02d",tm1->tm_year+1900,tm1->tm_mon+1, tm1->tm_mday-1);
 		LOG_DEBUG<<"year: "<<tm1->tm_year<<" mon: "<<tm1->tm_mon<< " mday "<<tm1->tm_mday<<std::endl;
 	}
 	int  sec=date2time(string(mdata->pDepthMarketData.TradingDay)+" "+ string(mdata->pDepthMarketData.UpdateTime));
