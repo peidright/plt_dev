@@ -9,7 +9,7 @@ boost::thread_group t_group;
  CtpQuote::CtpQuote(string username,string password, string quote_addr)
 {
 	/*
-	this->api = CThostFtdcMdApi::CreateFtdcMdApi("./qlog");
+	this->api = CThostFtdcMdApi::CreateFtdcMdApi(localdir.c_str());
 	md->RegisterSpi((CThostFtdcMdSpi*)q);
 	md->RegisterFront("tcp://ctpmn1-front1.citicsf.com:51213");
 	md->Init();

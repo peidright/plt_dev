@@ -49,7 +49,7 @@ dmgr      *g_dmgr;
 int ctp_trade_init()
 {
 		g_trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
-		g_ctp_trader=new CtpTrader(g_trader,g_dmgr);
+		g_ctp_trader=new CtpTrader(g_trader,g_dmgr,TRADE_DIR);
 		g_ctp_trader->init();
 		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
 		g_ctp_trader->start();
@@ -63,7 +63,7 @@ int ctp_quote_init()
 		int i;
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
 		printf("Quoter\n");
-		g_ctp_quoter=new CtpQuoter(g_quoter);
+		g_ctp_quoter=new CtpQuoter(g_quoter,QUOTE_DIR);
 		g_mdservice=new mdservice();
 
 		g_ctp_quoter->init(g_mdservice);
@@ -114,6 +114,10 @@ int main(int argc, char * argv[]){
 	dt->create_tdata_table("IF1404");
 	g_dmgr=new (dmgr);
 	g_dmgr->regdb("tdata",dt);
+	g_dmgr->regdb("sdata",ds);
+	g_dmgr->regdb("kdata",dk);
+	g_dmgr->init();
+
 
 	vector<map<string,string> > rows;
 	dt->exe_cmd("select name from sqlite_master where type='table'",rows);

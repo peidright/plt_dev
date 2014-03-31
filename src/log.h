@@ -18,13 +18,13 @@ using namespace sinks;
 using namespace keywords;
 
 
-#define LOG_DEBUG\  
+#define LOG_DEBUG\
 	BOOST_LOG_TRIVIAL(debug) 
-#define LOG_INFO\  
+#define LOG_INFO\
 	BOOST_LOG_TRIVIAL(info) 
-#define LOG_ERROR\  
+#define LOG_ERROR\
 	BOOST_LOG_TRIVIAL(error) 
-#define LOG_WARNING\  
+#define LOG_WARNING\
 	BOOST_LOG_TRIVIAL(warning) 
 #define LOG_FATAL(fatal)\
 	BOOST_LOG_TRIVIAL(fatal) 

@@ -6,6 +6,9 @@
 #include <vector>
 #include "quote_io.h"
 #include "instrument.h"
+
+#include "log.h"
+
 using namespace std;
 struct kdata_s;
 struct tdata_s;
@@ -45,15 +48,22 @@ class dmgr {
 			this->cstatus=0;
 			this->inst_sync=0;
 		}
-		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;};
-		int init(){};
+		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;return 0;};
+		int init(){
+			LOG_DEBUG<<"Begin"<<std::endl;
+			this->db_map["sdata"]->load_inst_sdata(this->instmap);
+			LOG_DEBUG<<"End"<<std::endl;
+			return 0;
+		};
 		int sync_inst(){
 			for(map<string, inst_t *>::iterator it=new_instmap.begin();it!=new_instmap.end();it++) {
 				/*
 				 * */
 				this->add_inst(it->first,it->second, 1);
 			}	
+			LOG_DEBUG<<"syn inst finished"<<std::endl;
 			this->inst_sync=1;	
+			return 0;
 		};
 		int load_inst(){
 			return 0;
@@ -69,6 +79,11 @@ class dmgr {
 				 * */
 				this->db_map["tdata"]->create_inst_tdata(instn);
 				this->db_map["sdata"]->create_inst_sdata(instn);
+
+				LOG_DEBUG<<"try syn before:"<<instn.c_str()<<std::endl;
+				this->db_map["sdata"]->insert_inst_sdata(pinst);
+				LOG_DEBUG<<"try syn after:"<<instn.c_str()<<std::endl;
+
 			}
 			return 0;
 		};

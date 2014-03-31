@@ -646,9 +646,9 @@ void CtpTradeSpi::PrintTrades(){
 //char MapDirection(char src, bool toOrig=true);
 //char MapOffset(char src, bool toOrig=true);
 /*
-CtpTrade::CtpTrade(Trader *trader)
+CtpTrade::CtpTrade(Trader *trader, string localdir)
 {
-	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
+	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(localdir.c_str());
 	this->trade_api=trade_api;
 	CtpTradeSpi* trade_spi = new CtpTradeSpi(trade_api,trader);
 	this->trade_spi = trade_spi;

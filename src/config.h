@@ -27,8 +27,8 @@ extern int	 frontId;	//«∞÷√±‡∫≈
 extern int	 sessionId;	//ª·ª∞±‡∫≈
 extern char orderRef[13];
 
-#define TRADE_DIR "./tlog"
-#define QUOTE_DIR "./qlog"
+#define TRADE_DIR "./tlog/"
+#define QUOTE_DIR "./qlog/"
 
 typedef enum LoginStatus {
 	SUCESS=0,

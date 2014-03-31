@@ -16,8 +16,9 @@ public:
 	CtpTradeSpi * trade_spi;
 	CThostFtdcTraderApi* trade_api;
 	dmgr *pdmgr;
+	string localdir;
 
-	CtpTrader(Trader *trader,dmgr *pdmgr);
+	CtpTrader(Trader *trader,dmgr *pdmgr, string localdir);
 	void trade_stm(msg_t &msg);
 	void post_msg(msg_t *msg);
 

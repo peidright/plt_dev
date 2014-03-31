@@ -48,7 +48,7 @@ public:
 	//ctpquoter->qqueue[key].size()<=0)
 
 
-	CtpQuoter(Quoter *quoter);
+	CtpQuoter(Quoter *quoter, string localdir);
 	CtpQuoter(const CtpQuoter &);
 	int  init(mdservice *mds);
 	void start();

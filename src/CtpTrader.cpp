@@ -4,15 +4,16 @@
 #include <deque>
 #include "help.h"
 
-CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr):qsem(0)
+CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr, string localdir):qsem(0)
 {
 	this->trader=trader;
 	this->pdmgr=pdmgr;
 	this->running=1;
+	this->localdir=localdir;
 }
 int CtpTrader::init()
 {
-	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
+	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(this->localdir.c_str());
 	this->trade_api=trade_api;
 	CtpTradeSpi* trade_spi = new CtpTradeSpi(trade_api,this);
 	this->trade_spi = trade_spi;
@@ -36,6 +37,7 @@ int CtpTrader::start()
 void CtpTrader::trade_stm(msg_t &msg)
 {
 	msg_t *mmsg;
+	inst_t *pinst;
 	TThostFtdcInstrumentIDType instId;
 	int ret;
 
@@ -115,13 +117,15 @@ void CtpTrader::trade_stm(msg_t &msg)
 				//CThostFtdcInstrumentField pInstrument;
 				//TOnRspQryInstrument_t;
 				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
-					LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
-
+					//LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
+					pinst=new (inst_t);
+					memset(pinst,0x0, sizeof(inst_t));
+					memcpy(&pinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
+					this->pdmgr->add_inst(pinst->base.InstrumentID,pinst,0);
 					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
 						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
 						this->pdmgr->sync_inst();
 					}
-
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}
@@ -151,8 +155,8 @@ void CtpTrader::trade_stm(msg_t &msg)
 	}
 	msg.type=TSTOP;
 	if(msg.type == TSTOP) {
-		/*todo free message*/
-		free(msg.data);
+		/*todo free message,bug fix*/
+		//free(msg.data);
 	}
 	LOG_DEBUG<<"finish one Trade data"<<std::endl;
 }

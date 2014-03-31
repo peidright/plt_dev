@@ -3,7 +3,7 @@
 #include <deque>
 #include "help.h"
 #include "quote_io.h"
-CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
+CtpQuoter::CtpQuoter(Quoter *quoter,string localdir):qsem(0)
 {
 
 	this->running=1;
@@ -21,7 +21,7 @@ CtpQuoter::CtpQuoter(Quoter *quoter):qsem(0)
 	cout<<"end api"<<endl;
 	*/
 	/*
-	CThostFtdcMdApi *quote_api = CThostFtdcMdApi::CreateFtdcMdApi(QUOTE_DIR);
+	CThostFtdcMdApi *quote_api = CThostFtdcMdApi::CreateFtdcMdApi(localdir.c_str());
 	CtpQuoteSpi *quote_spi = new CtpQuoteSpi(quote_api,quoter);
 	this->qupte_spi=quote_spi;
 	this->quote_api=quote_api;

@@ -114,7 +114,7 @@ int datalocal::create_inst_sdata(string instn){
 	/*todo err process
 		struct CThostFtdcInstrumentField
 	 */
-	char sqlbuf[512];
+	char sqlbuf[1024];
 	sprintf(sqlbuf,"create table sdata_inst(InstrumentID char(32),ExchangeID char(32),InstrumentName char(32),ExchangeInstID char(32),ProductID char(32),ProductClass char(1),DeliveryYear int,DeliveryMonth int,MaxMarketOrderVolume int,MinMarketOrderVolume int,MaxLimitOrderVolume int,MinLimitOrderVolume int,VolumeMultiple int,PriceTick float,CreateDate char(32),OpenDate char(32),ExpirDate char(32),StartDelivDate char(32),EndDelivDate char(32),InstLifePhase char(1),IsTrading int,PositionType char(1) ,PositionDateType char(1),LongMarginRatio float,ShortMarginRatio float,MaxMarginSideAlgorithm char(1))");
 	this->exe_cmd(sqlbuf);
 	return 0;
@@ -136,16 +136,17 @@ int datalocal::load_inst_sdata( map<string , inst_t * > &instmap )
 		sprintf(pinst->base.InstrumentName,(*it)["InstrumentName"].c_str());
 		sprintf(pinst->base.ExchangeInstID,(*it)["ExchangeInstID"].c_str());
 		sprintf(pinst->base.ProductID,(*it)["ProductID"].c_str());
-
-		/*to do there has a bug*/
-		pinst->base.ProductClass=(*it)["ProductClass"].c_str()[0];
-		pinst->base.InstLifePhase=(*it)["InstLifePhase"].c_str()[0];
 		pinst->base.IsTrading=atoi((*it)["IsTrading"].c_str());
-		pinst->base.PositionType=(*it)["PositionType"].c_str()[0];
-		pinst->base.PositionDateType=(*it)["PositionDateType"].c_str()[0];
 		pinst->base.LongMarginRatio=atof((*it)["LongMarginRatio"].c_str());
 		pinst->base.ShortMarginRatio=atof((*it)["ShortMarginRatio"].c_str());
-		pinst->base.MaxMarginSideAlgorithm=(*it)["MaxMarginSideAlgorithm"].c_str()[0];
+
+
+		/*to do there has a bug*/
+		pinst->base.ProductClass=atoi((*it)["ProductClass"].c_str());
+		pinst->base.InstLifePhase=atoi((*it)["InstLifePhase"].c_str());
+		pinst->base.PositionType=atoi((*it)["PositionType"].c_str());
+		pinst->base.PositionDateType=atoi((*it)["PositionDateType"].c_str());
+		pinst->base.MaxMarginSideAlgorithm=atoi((*it)["MaxMarginSideAlgorithm"].c_str());
 
 		pinst->base.DeliveryYear=atoi((*it)["DeliveryYear"].c_str());
 		pinst->base.DeliveryMonth=atoi((*it)["DeliveryMonth"].c_str());
@@ -166,8 +167,9 @@ int datalocal::load_inst_sdata( map<string , inst_t * > &instmap )
 int datalocal::insert_inst_sdata(inst_t *pinst)
 {
 	/**/
-	char sqlbuf[512];
-	sprintf(sqlbuf,"insert into sdata_inst values ('%s','%s','%s','%s','%s','%c','%d','%d','%d','%d','%d','%d','%d','%f','%s','%s','%s','%s','%s','%c','%d', '%c','%c', '%f','%f','%c')",pinst->base.InstrumentID,pinst->base.ExchangeID,pinst->base.InstrumentName,pinst->base.ExchangeInstID,pinst->base.ProductID,pinst->base.ProductClass,pinst->base.DeliveryYear,pinst->base.DeliveryMonth,pinst->base.MaxMarketOrderVolume,pinst->base.MinMarketOrderVolume,pinst->base.MaxLimitOrderVolume,pinst->base.MinLimitOrderVolume,pinst->base.VolumeMultiple,pinst->base.PriceTick,pinst->base.CreateDate,pinst->base.OpenDate,pinst->base.ExpireDate,pinst->base.StartDelivDate,pinst->base.EndDelivDate,pinst->base.InstLifePhase,pinst->base.IsTrading,pinst->base.PositionType,pinst->base.PositionDateType,pinst->base.LongMarginRatio,pinst->base.ShortMarginRatio,pinst->base.MaxMarginSideAlgorithm);
+	char sqlbuf[2048];
+	sprintf(sqlbuf,"insert into sdata_inst values (\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%f\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%d\',\'%d\', \'%d\',\'%d\', \'%f\',\'%f\',\'%d\')",pinst->base.InstrumentID,pinst->base.ExchangeID,pinst->base.InstrumentName,pinst->base.ExchangeInstID,pinst->base.ProductID,pinst->base.ProductClass,pinst->base.DeliveryYear,pinst->base.DeliveryMonth,pinst->base.MaxMarketOrderVolume,pinst->base.MinMarketOrderVolume,pinst->base.MaxLimitOrderVolume,pinst->base.MinLimitOrderVolume,pinst->base.VolumeMultiple,pinst->base.PriceTick,pinst->base.CreateDate,pinst->base.OpenDate,pinst->base.ExpireDate,pinst->base.StartDelivDate,pinst->base.EndDelivDate,pinst->base.InstLifePhase,pinst->base.IsTrading,pinst->base.PositionType,pinst->base.PositionDateType,pinst->base.LongMarginRatio,pinst->base.ShortMarginRatio,pinst->base.MaxMarginSideAlgorithm);
+	LOG_DEBUG<<"strlen:"<<strlen(sqlbuf)<<std::endl;
 	this->exe_cmd(sqlbuf);
 	return 0;
 }
@@ -299,17 +301,16 @@ void datalocal::exe_cmd(string cmd, vector<map<string,string> > &rows)
 	//vector< map<string,string> > rows;
 	vector< map<string,string> >::iterator rows_it;
 	map<string,string>::iterator rows_map_it;
-	//cout<<"!!!!!!!!!!!!!!!!!"<<endl;
 	ret=sqlite3_exec(this->db,cmd.c_str(),general_callback,&rows,&error);
 	if (ret!=SQLITE_OK) {
-		cout<<"sqlite exe err: "<<error<<endl;
+		LOG_DEBUG<<"sqlstr :"<<cmd.c_str()<<" exe err: "<<error<<endl;
 	}
 	for(rows_it=rows.begin();rows_it!=rows.end();rows_it++) {
 		for(rows_map_it=rows_it->begin();rows_map_it!=rows_it->end();rows_map_it++) {
-			cout<<rows_map_it->first<<"=="<<rows_map_it->second<<endl;
+			LOG_DEBUG<<" ; "<<rows_map_it->first<<"=="<<rows_map_it->second;
 		}
+		LOG_DEBUG<<std::endl;
 	}
-	//cout<<"!!!!!!!!!!!!!!!!!"<<endl;
 }
 
 void datalocal::exe_cmd(string cmd)
@@ -317,12 +318,10 @@ void datalocal::exe_cmd(string cmd)
 	int ret;
 	char                  *error = 0;
 	//vector< map<string,string> > rows;
-	//cout<<"!!!!!!!!!!!!!!!!!"<<endl;
 	ret=sqlite3_exec(this->db,cmd.c_str(),NULL,NULL,&error);
 	if (ret!=SQLITE_OK) {
-		cout<<"sqlite exe err: "<<error<<endl;
+		LOG_DEBUG<<"sqlstr :"<<cmd.c_str()<<" exe err: "<<error<<endl;
 	}
-	//cout<<"!!!!!!!!!!!!!!!!!"<<endl;
 }
 
 void datalocal::store_instant_info(string product)
