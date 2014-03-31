@@ -15,7 +15,7 @@ struct tdata_s;
 class datalocal {
 public:
 	string dbn;
-	datalocal(string dbname);
+	datalocal(string dir,string dbname);
 	~datalocal();
 	void get_product_list(vector<string> &product_list);
 	void store_instant_info(string product);
@@ -99,5 +99,18 @@ class dmgr {
 			}
 			return 0;
 		};
+		int get_inst_list(char ***pppinst, int *count) {
+			int i=0;
+			int c=this->instmap.size();
+			(*pppinst)= (char**)new char *[c];
+			for(map<string ,  inst_t *>::iterator it=this->instmap.begin();it!=this->instmap.end();it++) {
+				/**/
+				(*pppinst)[i]= new char [(it->first.size()+1)];
+				strcpy((*pppinst)[i], it->first.c_str());
+				i=i+1;
+			}
+			(*count)=i;
+			return 0;
+		}
 };
 #endif

@@ -46,10 +46,10 @@ CtpTrader *g_ctp_trader;
 mdservice *g_mdservice;
 dmgr      *g_dmgr;
 
-int ctp_trade_init()
+int ctp_trade_init(string tradedir)
 {
 		g_trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
-		g_ctp_trader=new CtpTrader(g_trader,g_dmgr,TRADE_DIR);
+		g_ctp_trader=new CtpTrader(g_trader,g_dmgr,tradedir);
 		g_ctp_trader->init();
 		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
 		g_ctp_trader->start();
@@ -58,16 +58,31 @@ int ctp_trade_init()
 }
 
 
-int ctp_quote_init()
+int ctp_quote_init(string quotedir)
 {
-		int i;
+		int i,count;
+		char **ppinst;
+
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
 		printf("Quoter\n");
-		g_ctp_quoter=new CtpQuoter(g_quoter,QUOTE_DIR);
+		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,quotedir);
 		g_mdservice=new mdservice();
 
 		g_ctp_quoter->init(g_mdservice);
-		g_ctp_quoter->mds->regmd("IF1404");
+
+
+		/*
+		 *todo regmd all
+		 * */
+		g_ctp_quoter->pdmgr->get_inst_list(&ppinst,&count);
+		for(i=0;i<count;i++) {
+			g_ctp_quoter->mds->regmd(ppinst[i]);
+			LOG_DEBUG<<"regmd:"<<ppinst[i]<<std::endl;
+		}
+		//g_ctp_quoter->mds->regmd("IF1404");
+
+
+
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}
@@ -77,39 +92,11 @@ int ctp_quote_init()
 
 }
 
-int  ctp_work()
+int ctp_db_init()
 {
-		//ctp_quote_init();
-		ctp_trade_init();
-#if 0
-		msg_t *msg=new(msg_t);
-		msg->len=sizeof(QOnFrontConnected_t);
-		msg->data=new(QOnFrontConnected_t);
-		msg->type=QOnFrontConnected;
-		printf("OnFront Connect DEBUG\n");
-    		g_ctp_quoter->post_msg(msg);
-#endif
-
-
-		/*
-
-		创建一组线程，负责各个合约的定时更新行情。
-		*/
-		while(1){
-			sleep(1);
-			cerr<<" main loop sleep 1"<<std::endl;
-		}
-		getchar();
-		return 0;
-}
-
-
-int main(int argc, char * argv[]){
-	log_init();
-
-	datalocal *dt=new datalocal(g_db_tdata);
-	datalocal *ds=new datalocal(g_db_sdata);
-	datalocal *dk=new datalocal(g_db_kdata);
+	datalocal *dt=new datalocal("datadir",g_db_tdata);
+	datalocal *ds=new datalocal("datadir",g_db_sdata);
+	datalocal *dk=new datalocal("datadir",g_db_kdata);
 
 	dt->create_tdata_table("IF1404");
 	g_dmgr=new (dmgr);
@@ -117,7 +104,6 @@ int main(int argc, char * argv[]){
 	g_dmgr->regdb("sdata",ds);
 	g_dmgr->regdb("kdata",dk);
 	g_dmgr->init();
-
 
 	vector<map<string,string> > rows;
 	dt->exe_cmd("select name from sqlite_master where type='table'",rows);
@@ -127,30 +113,79 @@ int main(int argc, char * argv[]){
 	}
 
 	g_quote_io.reg_dmgr(g_dmgr);
+
+	return 0;
+}
+
+int ctp_stragte_init()
+{
+	return 0;
+}
+
+int ctp_wait_loop()
+{
+	while(1){
+		sleep(1);
+		cerr<<" main loop sleep 1"<<std::endl;
+	}
+	return 0;
+}
+
+int ctp_debug_plug()
+{
+#if 0
+		/*send debug msg to test all compent*/
+		msg_t *msg=new(msg_t);
+		msg->len=sizeof(QOnFrontConnected_t);
+		msg->data=new(QOnFrontConnected_t);
+		msg->type=QOnFrontConnected;
+		printf("OnFront Connect DEBUG\n");
+    		g_ctp_quoter->post_msg(msg);
+#endif
+		return 0;
+}
+
+int  ctp_work()
+{
+		ctp_db_init();
+		ctp_trade_init(TRADE_DIR);
+
+		//ctp_quote_init(QUOTE_DIR);
+		ctp_stragte_init();
+		//ctp_debug_plug();
+		ctp_wait_loop();
+
+#if 0
+		msg_t *msg=new(msg_t);
+		msg->len=sizeof(QOnFrontConnected_t);
+		msg->data=new(QOnFrontConnected_t);
+		msg->type=QOnFrontConnected;
+		printf("OnFront Connect DEBUG\n");
+    		g_ctp_quoter->post_msg(msg);
+#endif
+		return 0;
+}
+
+
+int main(int argc, char * argv[]){
+	log_init();
 	ctp_work();
 	getchar();
-	
-	/*
-	  CThostFtdcTraderApi* pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi("./tlog");
-	  pUserApi->Join();
-	  pUserApi->Release();
-	*/
-
     	/*
 	   test1();
 	   getchar();
 	   std::string line;
-       boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
-       while (std::cin)
-       {
-       break;
-       std::getline(std::cin, line);
-       boost::smatch matches;
-       if (boost::regex_match(line, matches, pat))
-       std::cout << matches[2] << std::endl;
-       }
-       ntpdate();
-       luajit_demo();
+	   boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
+	   while (std::cin)
+	   {
+	   break;
+	   std::getline(std::cin, line);
+	   boost::smatch matches;
+	   if (boost::regex_match(line, matches, pat))
+	   std::cout << matches[2] << std::endl;
+	   }
+	   ntpdate();
+	   luajit_demo();
 	*/
 	return 0;
 }

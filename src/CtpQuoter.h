@@ -12,6 +12,7 @@
 
 class CtpTradeSpi;
 class CtpQuoteSpi;
+class dmgr;
 
 /*
 typedef struct  {
@@ -24,17 +25,13 @@ typedef struct  {
 
 class CtpQuoter{
 public:
-	//CtpTradeSpi * trade_spi;
-	//CThostFtdcTraderApi* trade_api
 	CtpQuoteSpi *quote_spi;
 	CThostFtdcMdApi *quote_api;
+	dmgr *pdmgr;
 	mdservice *mds;
 	int running;
 	std::deque<msg_t> mqueue;
-
 	Quoter *quoter;
-	
-	
 
 	boost::interprocess::interprocess_semaphore qsem;
     	boost::timed_mutex qmutex;
@@ -48,7 +45,7 @@ public:
 	//ctpquoter->qqueue[key].size()<=0)
 
 
-	CtpQuoter(Quoter *quoter, string localdir);
+	CtpQuoter(Quoter *quoter,dmgr *pdmgr, string localdir);
 	CtpQuoter(const CtpQuoter &);
 	int  init(mdservice *mds);
 	void start();

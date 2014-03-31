@@ -13,16 +13,17 @@ int callback(void *,int count, char **row,char **titles)
 	}
 	return 0;
 }
-datalocal::datalocal(string dbname)
+datalocal::datalocal(string dir,string dbname)
 {
 	int ret;
 	char                  *error = 0;
 	//
+	string path = dir + "/" + dbname;
 	ret= sqlite3_config(SQLITE_CONFIG_URI) ;
 	ret=sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
 	// assert(ret==SQLITE_OK);
 	//ret = sqlite3_open("file:memdb1?mode=memory&cache=shared", &this->db); 
-	ret = sqlite3_open(dbname.c_str(), &this->db); 
+	ret = sqlite3_open(path.c_str(), &this->db); 
 	if(ret==-1) {
 		cout<<"localdb create error"<<endl; 
 	} else {

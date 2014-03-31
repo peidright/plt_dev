@@ -3,10 +3,11 @@
 #include <deque>
 #include "help.h"
 #include "quote_io.h"
-CtpQuoter::CtpQuoter(Quoter *quoter,string localdir):qsem(0)
+CtpQuoter::CtpQuoter(Quoter *quoter,dmgr *pdmgr, string localdir):qsem(0)
 {
 
 	this->running=1;
+	this->pdmgr=pdmgr;
 	/*
 	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
 	this->trade_api=trade_api;
@@ -133,34 +134,19 @@ again:
 
 int CtpQuoter::SubscribeMarketData()
 {
-	int count,ret;
-	count=g_product_list.size();
-	char ** ppInst = (char**)new char *[MAX_INSTS];
-	//char insts[MAX_INSTS][32];
-	//ppInst=(char**)insts;
-	//memset(insts,0x0, sizeof(insts));
-	cerr<<"md login sucess: "<<count<<endl;
-	//g_product_list
-	assert(count <MAX_INSTS);
-	for(int i=0;i<MAX_INSTS;i++) {
-		ppInst[i]=(char*)0;
-	}
-	for(int i=0;i<count;i++) {
-		    ppInst[i]=new char[32];
-			strcpy(ppInst[i], g_product_list[i].c_str());
-			printf("insts is %s\n",ppInst[i]);
-	}
-	//return;
-	//char inst[32];
-	//strcpy(inst, "cu1401");
-	//char*ppInst[1];
 
-	//ppInst[0] = inst;
-	ret=this->quote_spi->api->SubscribeMarketData(ppInst, count);
-	cout<<"md subscribeMarketDate cu1406!!!"<<endl;
-	delete [] ppInst;
+	int count,ret;
+	char **ppinst;
+
+	/*todo free ppinst
+	 *
+	 * */
+	this->pdmgr->get_inst_list(&ppinst,&count);
+	ret=this->quote_spi->api->SubscribeMarketData(ppinst, count);
+	assert(ret==0);
 	return ret;
 }
+
 void CtpQuoter::quote_stm(msg_t &msg)
 {
 	/*负责从队列中取数据，进行处理*/
@@ -194,7 +180,10 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				break;
 			case QOnRspSubMarketData:
 				/**/
-				cerr<<"sub md succed\n";
+				LOG_DEBUG<<"sub md: "<<((QOnRspUnSubMarketData_t*)msg.data)->pSpecificInstrument.InstrumentID<<std::endl;
+				if(((QOnRspUnSubMarketData_t*)msg.data)->bIsLast) {
+					LOG_DEBUG<<"sub md: finished"<<std::endl;
+				}
 				msg.type=QSTOP;
 				break;
 			case QOnRspUnSubMarketData:
