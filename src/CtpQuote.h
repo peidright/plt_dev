@@ -131,6 +131,7 @@ class CtpQuoteSpi:public CThostFtdcMdSpi
 	/*add by me*/
 	int  ReqUserLogin(TThostFtdcBrokerIDType	appId,
 		TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd);
+	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 private:
 	//CThostFtdcMdApi *api;
 };

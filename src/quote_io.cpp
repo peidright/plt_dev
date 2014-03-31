@@ -68,7 +68,7 @@ void quote_io::quote_tdata_work()
 			*/
 			boost::unique_lock<boost::timed_mutex> lk(it->second->qmutex,boost::chrono::milliseconds(100));
 			tdataq.swap(it->second->tdataq);
-			this->pdmgr->db_map[it->first]->update_tdata(it->first, tdataq);
+			this->pdmgr->db_map["tdata"]->update_tdata(it->first, tdataq);
 		/*
 	data->sec=sec;
 	data->msec=msec;

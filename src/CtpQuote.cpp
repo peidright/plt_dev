@@ -130,54 +130,102 @@ int CtpQuoteSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
 
 void CtpQuoteSpi::OnFrontDisconnected(int nReason)
 {
+	msg_t *msg=new(msg_t);
+	QOnFrontDisconnected_t *data=new( QOnFrontDisconnected_t );
+	data->nReason=nReason;
+	msg->data=data;
+	this->ctpquoter->post_msg(msg);
 }
+
 void CtpQuoteSpi::OnHeartBeatWarning(int nTimeLapse)
 {
+	msg_t *msg=new(msg_t);
+	QOnHeartBeatWarning_t *data=new( QOnHeartBeatWarning_t );
+	data->nTimeLapse=nTimeLapse;
+	msg->data=data;
+	this->ctpquoter->post_msg(msg);
 }
+
 void CtpQuoteSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
+	msg_t *msg=new(msg_t);
+	QOnRspError_t *data=new( QOnRspError_t );
+
+	if ( !this->IsErrorRspInfo(pRspInfo) ) {  
+		data->bIsLast=bIsLast;
+		data->nRequestID=nRequestID;
+		data->pRspInfo=NULL;
+
+		if(pRspInfo) {
+			data->pRspInfo=new(CThostFtdcRspInfoField);
+			memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+		}
+		this->ctpquoter->post_msg(msg);
+	}
 }
 void CtpQuoteSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr<<"sub md begin--------"<<std::endl;
-	cout<<pSpecificInstrument->InstrumentID<<std::endl;
-	cout<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
 	msg_t *msg=new(msg_t);
 	QOnRspSubMarketData_t *data=new(QOnRspSubMarketData_t);
+
+	if ( !this->IsErrorRspInfo(pRspInfo) && pSpecificInstrument ) {  
+		data->pRspInfo=NULL;
+		memcpy(&data->pSpecificInstrument,pSpecificInstrument,sizeof(CThostFtdcSpecificInstrumentField));
+		if(pRspInfo) {
+			data->pRspInfo=new(CThostFtdcRspInfoField);
+			memcpy(data->pRspInfo, pRspInfo,sizeof(CThostFtdcRspInfoField));
+		}
+	} else {
+		/*todo err process
+		 * */
+	}
+
 	msg->len=sizeof(QOnRspSubMarketData_t);
 	msg->data=(void*)data;
 	msg->type=QOnRspSubMarketData;
     	this->ctpquoter->post_msg(msg);
-	cerr<<"sub md end----------"<<std::endl;
 }
 void CtpQuoteSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cout<<pSpecificInstrument->InstrumentID<<std::endl;
-	cout<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
 	msg_t *msg=new(msg_t);
 	QOnRspUnSubMarketData_t *data=new(QOnRspUnSubMarketData_t);
+	data->bIsLast=bIsLast;
+	data->nRequestID=nRequestID;
+	/*todo bugfix*/
+
+	if ( !this->IsErrorRspInfo(pRspInfo) && pSpecificInstrument ) {  
+		memcpy(&data->pSpecificInstrument,pSpecificInstrument,sizeof(CThostFtdcSpecificInstrumentField));
+		data->pRspInfo=NULL;
+		if(pRspInfo) {
+			data->pRspInfo=new (CThostFtdcRspInfoField);
+			memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
+		}
+	}
+
 	msg->len=sizeof(QOnRspUnSubMarketData_t);
 	msg->data=(void*)data;
 	msg->type=QOnRspUnSubMarketData;
-    this->ctpquoter->post_msg(msg);
+    	this->ctpquoter->post_msg(msg);
 }
 
 void CtpQuoteSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	/**/
-	printf("on rsp login\n");
-	cout<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
+	/*bug fix*/
 	msg_t *msg=new(msg_t);
 	QOnRspUserLogin_t *data=new(QOnRspUserLogin_t);
 	data->bIsLast=bIsLast;
 	data->nRequestID=nRequestID;
-	memcpy(&data->pRspInfo,pRspInfo,sizeof(pRspInfo));
-	memcpy(&data->pRspUserLogin,pRspUserLogin,sizeof(pRspUserLogin));
-	msg->len=sizeof(QOnRspUserLogin_t);
+
+	if ( !this->IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
+
+		memcpy(&data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+		memcpy(&data->pRspUserLogin,pRspUserLogin,sizeof(pRspUserLogin));
+		msg->len=sizeof(QOnRspUserLogin_t);
+
+	}
 	msg->data=(void*)data;
 	msg->type=QOnRspUserLogin;
 	this->ctpquoter->post_msg(msg);
-	printf("OnRspUserLogin post msg");
 }
 
 void CtpQuoteSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -248,3 +296,12 @@ typedef struct {
 
 }
 
+bool CtpQuoteSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
+{
+	// 如果ErrorID != 0, 说明收到了错误的响应
+	bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
+  if (ret){
+    LOG_DEBUG<<"ERR MSG: "<<pRspInfo->ErrorMsg<<endl;
+  }
+	return ret;
+}
