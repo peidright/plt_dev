@@ -150,7 +150,7 @@ int  ctp_work()
 		ctp_db_init();
 		ctp_trade_init(TRADE_DIR);
 
-		//ctp_quote_init(QUOTE_DIR);
+		ctp_quote_init(QUOTE_DIR);
 		ctp_stragte_init();
 		//ctp_debug_plug();
 		ctp_wait_loop();

@@ -257,7 +257,18 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	QOnRtnDepthMarketData_t *mdata=(QOnRtnDepthMarketData_t*)msg.data;
 	assert(msg.type==QOnRtnDepthMarketData);
 	int msec=mdata->pDepthMarketData.UpdateMillisec;
-	int  sec=date2time(string(mdata->pDepthMarketData.ActionDay)+" "+ string(mdata->pDepthMarketData.UpdateTime));
+
+	/*todo ActionDay TradingDay ?
+	 * */
+	if(mdata->pDepthMarketData.TradingDay[0]=='\0') {
+		/*todo free tm1*/
+		LOG_DEBUG<<"TradingDay is NULL"<<std::endl;
+		time_t t1=time(NULL);
+		tm *tm1=gmtime(&t1);
+		snprintf((char*)&mdata->pDepthMarketData.TradingDay,9,"%04d%02d%02d",tm1->tm_year+1900,tm1->tm_mon, tm1->tm_mday);
+		LOG_DEBUG<<"year: "<<tm1->tm_year<<" mon: "<<tm1->tm_mon<< " mday "<<tm1->tm_mday<<std::endl;
+	}
+	int  sec=date2time(string(mdata->pDepthMarketData.TradingDay)+" "+ string(mdata->pDepthMarketData.UpdateTime));
 	string contract=mdata->pDepthMarketData.InstrumentID;
 	float  v=(mdata->pDepthMarketData.LastPrice);
 	this->mds->update(contract, v, sec, msec);
