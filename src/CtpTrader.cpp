@@ -1,4 +1,5 @@
 #include "CtpTrader.h"
+#include "datalocal.h"
 #include "trader.h"
 #include <deque>
 #include "help.h"
@@ -107,12 +108,20 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryInstrument:
-				/**/
+				/*1.update it into dmgr
+				 *2.if is last,..
+				 * */
 				msg.type=TSTOP;
 				//CThostFtdcInstrumentField pInstrument;
 				//TOnRspQryInstrument_t;
 				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
 					LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
+
+					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
+						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
+						this->pdmgr->sync_inst();
+					}
+
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}

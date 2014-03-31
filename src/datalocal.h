@@ -40,22 +40,38 @@ class dmgr {
 		map<string ,  inst_t *> instmap;
 		map<string ,  inst_t *> new_instmap;
 		int cstatus;
+		int inst_sync;
 		dmgr(){
 			this->cstatus=0;
+			this->inst_sync=0;
 		}
 		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;};
 		int init(){};
+		int sync_inst(){
+			for(map<string, inst_t *>::iterator it=new_instmap.begin();it!=new_instmap.end();it++) {
+				/*
+				 * */
+				this->add_inst(it->first,it->second, 1);
+			}	
+			this->inst_sync=1;	
+		};
 		int load_inst(){
 			return 0;
-		}
-		int add_inst(string instn, inst_t *pinst) {
+		};
+		int add_inst(string instn, inst_t *pinst, int syn) {
 			if(this->instmap.find(instn)==this->instmap.end()) {
 				/*
 				 * */
 				this->new_instmap[instn]=pinst;
 			}
+			if(syn) {
+				/*flush it into db;
+				 * */
+				this->db_map["tdata"]->create_inst_tdata(instn);
+				this->db_map["sdata"]->create_inst_sdata(instn);
+			}
 			return 0;
-		}
+		};
 		int get_inst(string instn, inst_t **pinst) {
 			if(this->instmap.find(instn)==this->instmap.end()) {
 				/*
@@ -67,6 +83,6 @@ class dmgr {
 				(*pinst)=NULL;
 			}
 			return 0;
-		}
+		};
 };
 #endif

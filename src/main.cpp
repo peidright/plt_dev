@@ -110,9 +110,8 @@ int main(int argc, char * argv[]){
 	datalocal *dt=new datalocal(g_db_tdata);
 	datalocal *ds=new datalocal(g_db_sdata);
 	datalocal *dk=new datalocal(g_db_kdata);
+
 	dt->create_tdata_table("IF1404");
-	
-	//g_quote_io.regdb("tdata",dl);
 	g_dmgr=new (dmgr);
 	g_dmgr->regdb("tdata",dt);
 
@@ -134,9 +133,9 @@ int main(int argc, char * argv[]){
 	*/
 
     	/*
-	test1();
-	getchar();
-	std::string line;
+	   test1();
+	   getchar();
+	   std::string line;
        boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
        while (std::cin)
        {

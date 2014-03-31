@@ -20,25 +20,25 @@ typedef struct tdata_s {
     */
 	int sec;
 	int msec;
-	int close;
-	int open;
-	int uprice;
-	int lprice;
-	int high;
-	int low;
-	int lastprice;
-	int avgprice;
+	float close;
+	float open;
+	float uprice;
+	float lprice;
+	float high;
+	float low;
+	float lastprice;
+	float avgprice;
 	int vol;
-	int bid1;
-	int ask1;
-	int bid2;
-	int ask2;
-	int bid3;
-	int ask3;
-	int bid4;
-	int ask4;
-	int bid5;
-	int ask5;
+	float bid1;
+	float ask1;
+	float bid2;
+	float ask2;
+	float bid3;
+	float ask3;
+	float bid4;
+	float ask4;
+	float bid5;
+	float ask5;
 }tdata_t;
 
 typedef struct tdata_io_s {
