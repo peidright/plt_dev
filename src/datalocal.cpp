@@ -204,6 +204,7 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 
 	if(size > 10){
 		this->exe_cmd("BEGIN;");
+		//this->exe_cmd("VACUUM;");
 	}
 	LOG_DEBUG<<"update tdata begin"<<std::endl;
 
@@ -214,9 +215,9 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 
 		this->exe_cmd(sqlbuf);
 		if((*it)->bid4==std::numeric_limits<float>::infinity()) {
-			LOG_DEBUG<<"MAX FLOAT equal"<<std::endl;
+			//LOG_DEBUG<<"MAX FLOAT equal"<<std::endl;
 		} else {
-			LOG_DEBUG<<"MAX FLOAT not equal"<<(*it)->bid4<<"  "<<  std::numeric_limits<float>::infinity() <<std::endl;
+			//LOG_DEBUG<<"MAX FLOAT not equal"<<(*it)->bid4<<"  "<<  std::numeric_limits<float>::infinity() <<std::endl;
 		}
 		LOG_DEBUG<<sqlbuf<<std::endl;
 	}
