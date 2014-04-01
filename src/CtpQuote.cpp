@@ -257,19 +257,15 @@ void dump_depthmarketdata(CThostFtdcDepthMarketDataField *dmd)
 	cout<<"³Ö²ÖÁ¿         OpenInterest:     "<<dmd->OpenInterest<<endl;
 	cout<<"Âò1               BidPrice1:     "<<dmd->BidPrice1<<endl;
 	cout<<"×îÐÂ¼Û            LastPrice:     "<<dmd->LastPrice<<endl;
-	/*
 	cout<<"Âò2               BidPrice2:     "<<dmd->BidPrice2<<endl;
 	cout<<"Âò3               BidPrice3:     "<<dmd->BidPrice3<<endl;
 	cout<<"Âò4               BidPrice4:     "<<dmd->BidPrice4<<endl;
 	cout<<"Âò5               BidPrice5:     "<<dmd->BidPrice5<<endl;
-	*/
 	cout<<"Âô1               AskPrice1:     "<<dmd->AskPrice1<<endl;
-	/*
-	cout<<"Âô2               AskPrice1:     "<<dmd->AskPrice2<<endl;
-	cout<<"Âô3               AskPrice1:     "<<dmd->AskPrice3<<endl;
-	cout<<"Âô4               AskPrice1:     "<<dmd->AskPrice4<<endl;
-	cout<<"Âô5               AskPrice1:     "<<dmd->AskPrice5<<endl;
-	*/
+	cout<<"Âô2               AskPrice2:     "<<dmd->AskPrice2<<endl;
+	cout<<"Âô3               AskPrice3:     "<<dmd->AskPrice3<<endl;
+	cout<<"Âô4               AskPrice4:     "<<dmd->AskPrice4<<endl;
+	cout<<"Âô5               AskPrice5:     "<<dmd->AskPrice5<<endl;
 	cout<<"¾ù¼Û           AveragePrice:     "<<dmd->AveragePrice<<endl;
 }
 

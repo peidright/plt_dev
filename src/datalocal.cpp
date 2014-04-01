@@ -6,6 +6,14 @@
 #include <vector>
 #include "quote_io.h"
 
+#include <limits>
+
+//...
+//
+//std::numeric_limits<float>::max();
+//std::numeric_limits<float>::min();
+//std::numeric_limits<float>::infinity();
+
 int callback(void *,int count, char **row,char **titles)
 {
 	for(int i=0;i<count;i++){
@@ -188,7 +196,7 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 	int ret;
 	char *errmsg;
 	int size=tdataq.size();
-	char sqlbuf[1024];
+	char sqlbuf[2048];
 
 	/*todo err check, sure the table existed!
 	 * NLL
@@ -197,19 +205,27 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 	if(size > 10){
 		this->exe_cmd("BEGIN;");
 	}
-	LOG_DEBUG<<"update tdate begin"<<std::endl;
+	LOG_DEBUG<<"update tdata begin"<<std::endl;
 
 	for(deque<struct tdata_s*>::iterator it=tdataq.begin();it!=tdataq.end();it++) {
 		/**/
-		sprintf(sqlbuf,"insert into tdata_%s values ('%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%d','%d','%d')",contract.c_str(),(*it)->open,(*it)->close,(*it)->high,(*it)->low,(*it)->uprice,(*it)->lprice,(*it)->bid1,(*it)->bid2,(*it)->bid3,(*it)->bid4,(*it)->bid5,(*it)->ask1,(*it)->ask2,(*it)->ask3,(*it)->ask4,(*it)->ask5,(*it)->lastprice,(*it)->sec,(*it)->msec,(*it)->vol);
+		memset(sqlbuf,0x0,sizeof(sqlbuf));
+		sprintf(sqlbuf,"insert into tdata_%s values ('%f','%f','%f','%f','%f','%f', '%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%d','%d','%d')",contract.c_str(),(*it)->open,(*it)->close,(*it)->high,(*it)->low,(*it)->uprice,(*it)->lprice,(*it)->bid1,(*it)->bid2,(*it)->bid3,(*it)->bid4,(*it)->bid5,(*it)->ask1,(*it)->ask2,(*it)->ask3,(*it)->ask4,(*it)->ask5,(*it)->lastprice,(*it)->sec,(*it)->msec,(*it)->vol);
+
 		this->exe_cmd(sqlbuf);
+		if((*it)->bid4==std::numeric_limits<float>::infinity()) {
+			LOG_DEBUG<<"MAX FLOAT equal"<<std::endl;
+		} else {
+			LOG_DEBUG<<"MAX FLOAT not equal"<<(*it)->bid4<<"  "<<  std::numeric_limits<float>::infinity() <<std::endl;
+		}
+		LOG_DEBUG<<sqlbuf<<std::endl;
 	}
 
 	if(size > 10) {
 		this->exe_cmd("COMMIT;");
 	}
 
-	LOG_DEBUG<<"update tdate end, size: "<<size<<std::endl;
+	LOG_DEBUG<<"update tdata end, size: "<<size<<std::endl;
 	return 0;
 }
 int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
