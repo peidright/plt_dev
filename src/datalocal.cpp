@@ -188,27 +188,28 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 	int ret;
 	char *errmsg;
 	int size=tdataq.size();
-	char sqlbuf[512];
+	char sqlbuf[1024];
 
 	/*todo err check, sure the table existed!
 	 * NLL
 	*/
 
 	if(size > 10){
-		ret = sqlite3_exec(this->db, "BEGIN;", 0, 0, &errmsg);
-		assert(ret==0);
+		this->exe_cmd("BEGIN;");
 	}
+	LOG_DEBUG<<"update tdate begin"<<std::endl;
 
 	for(deque<struct tdata_s*>::iterator it=tdataq.begin();it!=tdataq.end();it++) {
 		/**/
 		sprintf(sqlbuf,"insert into tdata_%s values ('%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%f','%d','%d','%d')",contract.c_str(),(*it)->open,(*it)->close,(*it)->high,(*it)->low,(*it)->uprice,(*it)->lprice,(*it)->bid1,(*it)->bid2,(*it)->bid3,(*it)->bid4,(*it)->bid5,(*it)->ask1,(*it)->ask2,(*it)->ask3,(*it)->ask4,(*it)->ask5,(*it)->lastprice,(*it)->sec,(*it)->msec,(*it)->vol);
-		ret=sqlite3_exec(this->db,sqlbuf,NULL,NULL,&errmsg);
-		assert(ret==SQLITE_OK);
+		this->exe_cmd(sqlbuf);
 	}
+
 	if(size > 10) {
-		ret = sqlite3_exec(this->db, "COMMIT;", 0, 0, &errmsg);
-		assert(ret==0);
+		this->exe_cmd("COMMIT;");
 	}
+
+	LOG_DEBUG<<"update tdate end, size: "<<size<<std::endl;
 	return 0;
 }
 int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)

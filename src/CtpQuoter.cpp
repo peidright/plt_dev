@@ -68,24 +68,6 @@ void CtpQuoter::start()
 	quote_api->RegisterFront((char*)quoter->quote_addr.c_str());
 			printf("4\n");
 	quote_api->Init();
-	
-	printf("quote_api sleep 1 finished\n");
-	sleep(1);
-	/*
-	msg_t *msg=new(msg_t);
-	msg->len=sizeof(QOnFrontConnected_t);
-	msg->data=new(QOnFrontConnected_t);
-	msg->type=QOnFrontConnected;
-	printf("OnFront Connect DEBUG\n");
-	this->post_msg(msg);
-	*/
-
-	while(1){
-		sleep(1);
-		break;
-	}	
-	cout<<"i am here"<<endl;
-	getchar();
 }
 
 void CtpQuoter::post_msg(msg_t *msg, string contract)
@@ -272,8 +254,8 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	string contract=mdata->pDepthMarketData.InstrumentID;
 	float  v=(mdata->pDepthMarketData.LastPrice);
 	this->mds->update(contract, v, sec, msec);
-	cerr<<"Price :"<<v<<" sec: "<<sec<<" msec:" <<msec<<std::endl;
-	cerr<<"Price :"<<(mdata->pDepthMarketData.LastPrice)<<" sec: "<<(mdata->pDepthMarketData.UpdateTime)<<" msec:" <<msec<<std::endl;
+	//cerr<<"Price :"<<v<<" sec: "<<sec<<" msec:" <<msec<<std::endl;
+	//cerr<<"Price :"<<(mdata->pDepthMarketData.LastPrice)<<" sec: "<<(mdata->pDepthMarketData.UpdateTime)<<" msec:" <<msec<<std::endl;
 
 	//assert(0);
 

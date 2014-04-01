@@ -74,12 +74,13 @@ int ctp_quote_init(string quotedir)
 		/*
 		 *todo regmd all
 		 * */
+		LOG_DEBUG<<"STP1"<<std::endl;
 		g_ctp_quoter->pdmgr->get_inst_list(&ppinst,&count);
 		for(i=0;i<count;i++) {
 			g_ctp_quoter->mds->regmd(ppinst[i]);
 			LOG_DEBUG<<"regmd:"<<ppinst[i]<<std::endl;
 		}
-		//g_ctp_quoter->mds->regmd("IF1404");
+		LOG_DEBUG<<"STP2"<<std::endl;
 
 
 
@@ -87,8 +88,13 @@ int ctp_quote_init(string quotedir)
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}
 		g_quote_tg.add_thread(new boost::thread(quote_loop,g_ctp_quoter));
+		LOG_DEBUG<<"STP3"<<std::endl;
+
 		g_ctp_quoter->start();
+		LOG_DEBUG<<"STP4"<<std::endl;
 		g_io_tg.add_thread(new boost::thread(quote_io_work));
+		LOG_DEBUG<<"quote_io loop begin"<<std::endl;
+		LOG_DEBUG<<"STP5"<<std::endl;
 
 }
 
@@ -147,10 +153,14 @@ int ctp_debug_plug()
 
 int  ctp_work()
 {
-		ctp_db_init();
-		ctp_trade_init(TRADE_DIR);
 
+		ctp_db_init();
+		LOG_DEBUG<<"DB_INIT"<<std::endl;
+		ctp_trade_init(TRADE_DIR);
+		LOG_DEBUG<<"TRADE_INIT"<<std::endl;
 		ctp_quote_init(QUOTE_DIR);
+		LOG_DEBUG<<"QUOTE_INIT"<<std::endl;
+
 		ctp_stragte_init();
 		//ctp_debug_plug();
 		ctp_wait_loop();
