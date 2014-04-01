@@ -243,7 +243,7 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	/*todo ActionDay TradingDay ?
 	 * */
 	if(mdata->pDepthMarketData.TradingDay[0]=='\0') {
-		/*todo free tm1*/
+		/*todo free tm1, time bug*/
 		LOG_DEBUG<<"TradingDay is NULL"<<std::endl;
 		time_t t1=time(NULL);
 		tm *tm1=gmtime(&t1);
@@ -254,11 +254,6 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	string contract=mdata->pDepthMarketData.InstrumentID;
 	float  v=(mdata->pDepthMarketData.LastPrice);
 	this->mds->update(contract, v, sec, msec);
-	//cerr<<"Price :"<<v<<" sec: "<<sec<<" msec:" <<msec<<std::endl;
-	//cerr<<"Price :"<<(mdata->pDepthMarketData.LastPrice)<<" sec: "<<(mdata->pDepthMarketData.UpdateTime)<<" msec:" <<msec<<std::endl;
-
-	//assert(0);
-
 
 	/*
 	cout<<"业务日期         ActionDay :     "<<dmd->ActionDay<<endl;
