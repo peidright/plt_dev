@@ -2,6 +2,7 @@
 #include "mdseries.h"
 #include "help.h"
 #include "boost/date_time.hpp"
+#include "log.h"
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
@@ -84,15 +85,15 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 
 	int mdseries::updateme(float v, int b1, int b2) {
 			/*todo lock 
-			  1.计算...
-			  如果是当前这根K线上的。就更新当前这根k线。如果不是。
-			  对于分钟线，逻辑如下：
-			  如果是当前分钟的，更新本K线。
-			  如果是下一分钟的，更新下跟k线。
-			  如果是是连续，但是不是下一分钟的。留出空隙。但是更新下一分钟。
-			  如果不是连续的。紧接着更新。
-			  如果是之前的数据。忽略此数据。
+			 *1.if on this bar,update it.
+			  2.if not, for minit k,the logic is below:
+			    1.if is for current bar, update it.
+			    2.if is the next bar, update next.
+			    3.if is coninue time, but not next bar, live the space. update next.
+			    4.if it is not the coninue, update it next
+			    5.if is k before, ignore it.
 			*/
+
 		    return  0;
 	};
 
@@ -114,7 +115,7 @@ int md::reg_period(period_type ptype, int period) {
 			//log it
 			return -1;
 		}
-	    mdseries *pmds= new mdseries(ptype,period);
+	    	mdseries *pmds= new mdseries(ptype,period);
 		this->perids.push_back(period);
 		this->mds[period]=pmds;
 		return 0;
@@ -134,50 +135,38 @@ int md::update(float v, int t1, int t2) {
 		int status=this->ds.update_ms(v,t1,t2);
 		if(status <0) {
 			/**/
+			assert(0);
 		}else {
 #if 1
 			cerr<<"update ms finished, return first"<<std::endl;
 			return 0;
 #endif
-			/*
-			*/
-			float o,c,h,l;int e1,e2;
-			/*更新分钟线*/
-			c=ds[0];
-			e1=ds.csec;
-			e2=ds.cmsec;
-			//status=mds[1].update50(c,e1,e2);
-			status=mds[1]->updateme(c,e1,e2);
+			if(this->mds.find(1)!=this->mds.end()) {
+				if( (t1 > this->mds[1]->last_sec) || 
+						(t1== this->mds[1]->last_sec && (t2 >this->mds[1]->last_msec)) ) { 
 
 
-			/*更新其他周期*/
-			o=mds[1]->open[0];
-			c=mds[1]->close[0];
-			h=mds[1]->high[0];
-			l=mds[1]->low[0];
-			e1=mds[1]->close.csec;
-			e2=mds[1]->close.cmsec;
-
-			for(vector<int>::iterator it=perids.begin();it!=perids.end();it++) {
-				int temp=0;
-				if(status & OPEN_FLAG) {
-					temp=temp | mds[*it]->open.update_me(o,e1,e2,OPEN,MIRCO,1);
+						this->mds[1]->open.update_me(v,t1,t2,OPEN,MIRCO,1);
+						this->mds[1]->close.update_me(v,t1,t2,CLOSE,MIRCO,1);
+						this->mds[1]->high.update_me(v,t1,t2,HIGH,MIRCO,1);
+						this->mds[1]->low.update_me(v,t1,t2,LOW,MIRCO,1);
+						this->mds[1]->last_msec=t2;
+						this->mds[1]->last_sec=t1;
+						//todo lock bug
+						//todo update v
+						/*	
+							for(vector<int>::iterator it=perids.begin();it!=perids.end();it++) 
+							*/
+					}
+				else {
+					LOG_DEBUG<<"update kdata: ignore and drop the old data"<<std::endl;
 				}
-				if(status & CLOSE_FLAG) {
-					temp=temp | mds[*it]->close.update_me(c,e1,e2,CLOSE,MIRCO,1);
-				}
-				if(status & HIGH_FLAG) {
-					temp=temp | mds[*it]->high.update_me(h,e1,e2,HIGH,MIRCO,1);
-				}
-				if(status & LOW_FLAG) {
-					temp=temp | mds[*it]->low.update_me(l,e1,e2,LOW,MIRCO,1);
-				}
-				if(status & VOLUME_FLAG) {
-					//vol how to process
-					//temp=temp | mds[*it].open.update(v,e1,e2);
-				}
-				status=temp;
 			}
+			else {
+				/*other process
+				 * */
+			}
+
 		}
 		return 0;
 	}
@@ -201,10 +190,9 @@ int mdservice::update(string contract, float v, int t1, int t2){
 	int ret;
 	if(this->mds.find(contract)==this->mds.end()) {
 		/*!!!!*/
-		cerr<<"find not contract: "<<contract<<std::endl;
+		LOG_DEBUG<<"find not contract: "<<contract<<std::endl;
 		return -1;
 	}
-	cerr<<"mdservice update contract: "<<contract<<std::endl;
 	ret= this->mds[contract]->update(v,t1,t2);
 	assert(ret==0);
 	return ret;
@@ -232,6 +220,8 @@ int mdservice::regmd_period(string contract,period_type ptype, int period){
 	*/
 	if(this->mds.find(contract)==this->mds.end()){
 		/*log it, the contract has not existed*/
+		LOG_DEBUG<<"regmd ,not find the mdservice"<<std::endl;
+		assert(0);
 		return -1;
 	}
 	this->mds[contract]->reg_period(ptype,period);

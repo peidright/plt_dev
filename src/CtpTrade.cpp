@@ -674,3 +674,26 @@ CtpTrade::CtpTrade(Trader *trader, string localdir)
 	
 }*/
 
+
+
+void CtpTradeSpi::OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus)
+{
+	msg_t *msg=new(msg_t);
+	msg->len=sizeof(TOnRtnInstrumentStatus_t);
+	TOnRtnInstrumentStatus_t *data=new(TOnRtnInstrumentStatus_t);
+	memcpy(&data->pInstrumentStatus, pInstrumentStatus, sizeof(CThostFtdcInstrumentStatusField));
+	/*
+THOST_FTDC_IS_BeforeTrading '0'
+THOST_FTDC_IS_NoTrading '1'
+THOST_FTDC_IS_Continous '2'
+THOST_FTDC_IS_AuctionOrdering '3'
+THOST_FTDC_IS_AuctionBalance '4'
+THOST_FTDC_IS_AuctionMatch '5'
+THOST_FTDC_IS_Closed '6'
+	*/
+	msg->data=data;
+	msg->type= TOnRtnInstrumentStatus;
+	LOG_DEBUG<<"OnRtnInstrumentStatus: name"<<pInstrumentStatus->InstrumentID<<" Status:" <<pInstrumentStatus->InstrumentStatus <<std::endl;
+    	this->ctptrader->post_msg(msg);
+	return;
+}

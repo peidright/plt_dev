@@ -48,6 +48,7 @@ public:
 	int update_me(float v, int sec, int msec,kdata_type type,period_type ptype, int period);
 	int update_other(float v, int sec, int msec, period_type ptype,kdata_type ktype,int period);
 	int dump();
+	int kdump(int v, int sec, int msec, int current_slot, int last_slot, int result, kdata_type type);
 
 	float operator[](int i){
 		/*fault tolerent*/

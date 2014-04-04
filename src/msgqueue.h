@@ -37,6 +37,7 @@ enum msgtype {
 
 	TReqOrderAction,
 	TOnRspOrderAction,
+	TOnRtnInstrumentStatus,
 
 
 	TOnRtnOrder,
@@ -127,6 +128,10 @@ typedef struct {
 	  int nRequestID;
 	  bool bIsLast;
 }TOnRspOrderAction_t;
+
+typedef struct {
+	CThostFtdcInstrumentStatusField pInstrumentStatus;
+}TOnRtnInstrumentStatus_t;
 
 typedef struct {
 	  CThostFtdcOrderField  pOrder;

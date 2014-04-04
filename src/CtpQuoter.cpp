@@ -256,30 +256,6 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	this->mds->update(contract, v, sec, msec);
 
 	/*
-	cout<<"业务日期         ActionDay :     "<<dmd->ActionDay<<endl;
-	cout<<"交易所代码       ExchangeID:     "<<dmd->ExchangeID<<endl;
-	cout<<"更新时间         UpdateTime:     "<<dmd->UpdateTime<<endl;
-	cout<<"最后修改毫秒 UpdateMillisec:     "<<dmd->UpdateMillisec<<endl;
-	cout<<"合约ID         InstrumentID:     "<<dmd->InstrumentID<<endl;
-	cout<<"交易日           TradingDay:     "<<dmd->TradingDay<<endl;
-	cout<<"今收盘           ClosePrice:     "<<dmd->ClosePrice<<endl;
-	cout<<"昨收盘        PreClosePrice:     "<<dmd->PreClosePrice<<endl;
-	cout<<"今开盘            OpenPrice:     "<<dmd->OpenPrice<<endl;
-	cout<<"最高价         HighestPrice:     "<<dmd->HighestPrice<<endl;
-	cout<<"最低价          LowestPrice:     "<<dmd->LowestPrice<<endl;
-	cout<<"本次结算价  SettlementPrice:     "<<dmd->SettlementPrice<<endl;
-	cout<<"上次结算价  PreSettlementPrice:  "<<dmd->PreSettlementPrice<<endl;
-	cout<<"涨停板价    UpperLimitPrice:     "<<dmd->UpperLimitPrice<<endl;
-	cout<<"跌停板价    LowerLimitPrice:     "<<dmd->LowerLimitPrice<<endl;
-	cout<<"昨虚实度           PreDelta:     "<<dmd->PreDelta<<endl;
-	cout<<"今虚实度          CurrDelta:     "<<dmd->CurrDelta<<endl;
-	cout<<"数量                 Volume:     "<<dmd->Volume<<endl;
-	cout<<"成交金额           Turnover:     "<<dmd->Turnover<<endl;
-	cout<<"持仓量         OpenInterest:     "<<dmd->OpenInterest<<endl;
-	cout<<"最新价            LastPrice:     "<<dmd->LastPrice<<endl;
-	cout<<"均价           AveragePrice:     "<<dmd->AveragePrice<<endl;
-	*/
-	/*
 		we should not hold msg->data now.
 	*/
 	//mdata->pDepthMarketData->

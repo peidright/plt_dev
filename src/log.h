@@ -19,14 +19,24 @@ using namespace keywords;
 
 
 #define LOG_DEBUG\
-	BOOST_LOG_TRIVIAL(debug) 
+	BOOST_LOG_TRIVIAL(debug)<<"[ file:"<<__FILE__<<" ]"<<"[ line:"<<__LINE__ <<" ]"
+
+
 #define LOG_INFO\
-	BOOST_LOG_TRIVIAL(info) 
+	BOOST_LOG_TRIVIAL(info)
+
 #define LOG_ERROR\
-	BOOST_LOG_TRIVIAL(error) 
+	BOOST_LOG_TRIVIAL(error)
+
 #define LOG_WARNING\
-	BOOST_LOG_TRIVIAL(warning) 
-#define LOG_FATAL(fatal)\
-	BOOST_LOG_TRIVIAL(fatal) 
+	BOOST_LOG_TRIVIAL(warning)
+
+//"[ file:"<<__FILE__<<" ]"<<"[ line:"<<__LINE__ <<" ]"
+
+#define LFATAL(fatal)\
+	BOOST_LOG_TRIVIAL(fatal)
+
+
+
 extern void log_init();
 #endif

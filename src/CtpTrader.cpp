@@ -131,6 +131,11 @@ void CtpTrader::trade_stm(msg_t &msg)
 				}
 				msg.type=TSTOP;
 				break;
+
+			case TOnRtnInstrumentStatus:
+				//(TOnRtnInstrumentStatus_t);
+				msg.type=TSTOP;
+				break;
 			case TReqQryTradingAccount:
 				break;
 			case TOnRspQryTradingAccount:

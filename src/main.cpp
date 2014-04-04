@@ -60,11 +60,11 @@ int ctp_trade_init(string tradedir)
 
 int ctp_quote_init(string quotedir)
 {
+		int ret=0;
 		int i,count;
 		char **ppinst;
 
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
-		printf("Quoter\n");
 		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,quotedir);
 		g_mdservice=new mdservice();
 
@@ -77,8 +77,13 @@ int ctp_quote_init(string quotedir)
 		LOG_DEBUG<<"STP1"<<std::endl;
 		g_ctp_quoter->pdmgr->get_inst_list(&ppinst,&count);
 		for(i=0;i<count;i++) {
+			//regmd
 			g_ctp_quoter->mds->regmd(ppinst[i]);
-			LOG_DEBUG<<"regmd:"<<ppinst[i]<<std::endl;
+
+			//reg one minute k
+			ret=g_ctp_quoter->mds->regmd_period(ppinst[i],MINUTE,1);
+			LOG_DEBUG<<"regmd:"<<ppinst[i]<<" period: 1"<<std::endl;
+			assert(ret==0);
 		}
 		LOG_DEBUG<<"STP2"<<std::endl;
 

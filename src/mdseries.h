@@ -1,6 +1,8 @@
 #ifndef MDSERIES_H_
 #define MDSERIES_H_
 #include "dseries.h"
+#include "log.h"
+
 #include <map>
 using namespace std;
 
@@ -17,6 +19,8 @@ typedef enum update_status {
 class mdseries {
 public:
 	int period;/*周期*/    
+	int last_sec;
+	int last_msec;
 	period_type ptype;/*周期类型*/
 	dseries  high;
 	dseries  low;

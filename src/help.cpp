@@ -1,6 +1,7 @@
 #include "mdseries.h"
 #include "boost/date_time.hpp"
 #include <iostream>
+#include "log.h"
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 	
@@ -117,7 +118,7 @@ out:
 			return ret;
 	}
 	int is_continue(int e1,int e2, int b1, int b2){
-	    /*9点到-10:15,10:30-11:30,1:30-3:00,21:00-2:30
+	    	/*9点到-10:15,10:30-11:30,1:30-3:00,21:00-2:30
 		  0 =is_continue;
 		  1 =biger than xxx
 		  -1=smaller than xxx

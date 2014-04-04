@@ -1,5 +1,5 @@
-#ifndef _LOG_H_
-#define _LOG_H_
+#ifndef _11LOG_H_
+#define _1LOG_H_
 
 #include <string>  
 #include <boost/log/trivial.hpp>  

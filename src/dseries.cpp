@@ -1,5 +1,6 @@
 
 #include "dseries.h"
+#include "help.h"
 
 int get_period_slot(int sec,int msec, period_type ptype,int period){
 	int factor=1;
@@ -83,10 +84,10 @@ int dseries::update_ms(float v, int sec, int msec){
 				/*todo warning, drop old message*/
 				LOG_DEBUG<<"dseries update_ms drop old message this->csec:"<<this->csec<<" sec:"<<sec\
 <<"this->cmsec: "<<this->cmsec <<" msec :"<<msec<<" idx:"<<this->cidx<<std::endl;
+				return -1;
 			}
 			lk.unlock();
 			this->dump();
-			return -1;
 		}else {
 			/*warnring*/
 			cerr<<"dseries update_ms lock err,again" <<std::endl;
@@ -96,90 +97,173 @@ int dseries::update_ms(float v, int sec, int msec){
 		return 0;
 	}
 
+
+int dseries::kdump(int v, int sec, int msec, int current_slot, int last_slot, int result, kdata_type type) 
+{
+	switch(type) {
+		case HIGH:
+			LOG_DEBUG<<"HIGH kdump\t"<<"\t"<<result<<v<<"\t"<<sec<<"\t"<<msec<<"\t"<<current_slot<<"\t"<<last_slot<<std::endl;
+			break;
+		case LOW:
+			LOG_DEBUG<<"LOW kdump\t"<<"\t"<<result<<v<<"\t"<<sec<<"\t"<<msec<<"\t"<<current_slot<<"\t"<<last_slot<<std::endl;
+			break;
+		case OPEN:
+			LOG_DEBUG<<"OPEN kdump\t"<<"\t"<<result<<v<<"\t"<<sec<<"\t"<<msec<<"\t"<<current_slot<<"\t"<<last_slot<<std::endl;
+			break;
+		case CLOSE:
+			LOG_DEBUG<<"CLOSE kdump\t"<<"\t"<<result<<v<<"\t"<<sec<<"\t"<<msec<<"\t"<<current_slot<<"\t"<<last_slot<<std::endl;
+			break;
+		default:
+			assert(0);
+	}
+	return 0;
+}
+
 int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period){
-			/*判断是否是当前这根k线
-			  如果是当前分钟的，更新本k线。
-		      如果是下一分钟线，更新下根k线，如果本根k线为空，是否考虑修复本根？
-			  如果是是连续的，但不是下一分钟，流出空隙。但更新下一分钟。
-			  如果不是连续的，紧接着更新。
-			  如果是之前的数据，忽略此数据..
-			*/	
-		    int start,mstart,cidx,now,start_slot,curr_slot;
-			start=this->tsec[this->cidx];
-			mstart=this->tmsec[this->cidx];
+
+	/*check if is the current bar
+	 *if is:
+	 	update current bar
+	  else is next:
+		update next bar. if current bar is not full,or changed,fix?
+	  else is nnn*ext bar:
+	  	if is continue, update next
+		if is not continue,save space, update next
+		if is the data before, igore  the data
+	  */	
+	int start,mstart,cidx,now,start_slot,curr_slot,bar_slot,last_bar_slot;
+	float result;
+	start=this->tsec[this->cidx];
+	mstart=this->tmsec[this->cidx];
+	cidx=this->cidx;
+	now=60*(sec/60);
+	start_slot = get_period_slot(start,mstart, ptype,period);
+	curr_slot=get_period_slot(sec,msec,ptype,period);
+	bar_slot=cidx;
+	last_bar_slot=cidx;
+	if(start_slot==0 && cidx==0) {
+		//init, zero tick
+		this->data[cidx]=v;
+		this->tsec[cidx]=sec;
+		this->tmsec[cidx]=msec;
+		bar_slot=cidx;
+		result=v;
+	}else if(cidx==0 && start_slot!=0){
+		//init, first tick
+		if(start_slot==curr_slot) {
+			/*update current bar*/
+			this->data[cidx]=std::max<float>(this->data[cidx],v);
+			this->tmsec[cidx]=msec;
+			this->tsec[cidx]=sec;
+			bar_slot=cidx;
+			result = this->data[cidx];
+		}else if((start_slot+1)==curr_slot){
+			/*update next bar*/
+			this->cidx++;
 			cidx=this->cidx;
-			now=60*(sec/60);
-			start_slot = get_period_slot(start,mstart, ptype,period);
-			curr_slot=get_period_slot(sec,msec,ptype,period);
-			if(start_slot==0 && cidx==0) {
-				/*如果当前是刚开始。	  
-				*/
-				this->data[cidx]=v;
-				this->tsec[cidx]=sec;
+			this->tsec[cidx]=now;
+			this->data[cidx]=v;
+			this->tmsec[cidx]=msec;
+			bar_slot=cidx+1;
+			result=this->data[cidx];
+		}else if( is_continue(start_slot,0, curr_slot, 0)) {
+			if(curr_slot == start_slot+2) {
+				/*fix one tick
+				 *update next tick
+				 * */	
+				this->cidx++;
+				cidx=this->cidx;
+				this->data[cidx]=this->data[cidx-1];
 				this->tmsec[cidx]=msec;
-			}else if(cidx==0 && start_slot!=0){
-	           /*如果是第一根k线，
-			      1.是否是最新的数据
-				  2.取max值。
-			   */
-				if(start_slot==curr_slot) {
-					/*如果是同一分钟*/
-				    this->data[cidx]=std::max<float>(this->data[cidx],v);
-					this->tmsec[cidx]=msec;
-					this->tsec[cidx]=sec;
-				}else if((start_slot+1)==curr_slot){
-					/*如果是新的一分钟*/
-					this->cidx++;
-					cidx=this->cidx;
-					this->tsec[cidx]=now;
-					this->data[cidx]=v;
-					this->tmsec[cidx]=msec;
-				}else if(1/*是同一时间段*/) {
-					/*有可能要考虑补全间隙*/
+				this->tsec[cidx]=sec;
 
-				}else {
-					/*不再考虑补全间隙*/
-					this->cidx++;
-					cidx=this->cidx;
-					this->tsec[cidx]=sec;
-					this->data[cidx]=v;
-					this->tmsec[cidx]=msec;
-				}
+				/*
+				 * */
+				this->cidx++;
+				cidx=this->cidx;
+				this->data[cidx]=v;
+				this->tmsec[cidx]=msec;
+				this->tsec[cidx]=sec;
 
-			} else if(cidx!=0 && start_slot!=0) {
-			   /*当cidx为非零值得时候，这个cidx必然是已经有有实际报价，
-			     或者timer定时器已经发生过!
-			   */
-				if(start_slot==curr_slot) {
-					/*如果是同一分钟*/
-				    this->data[cidx]=std::max<float>(this->data[cidx],v);
-					this->tsec[cidx]=sec;
-					this->tmsec[cidx]=msec;
-				}else if((start+1)==now){
-					/*如果是新的一分钟*/
-					this->cidx++;
-					cidx=this->cidx;
-					this->tsec[cidx]=sec;
-					this->data[cidx]=v;
-					this->tmsec[cidx]=msec;
-				}else if(1/*是同一时间段*/) {
-					/*有可能要考虑补全间隙*/
-
-				}else {
-					/*不再考虑补全间隙*/
-					this->cidx++;
-					cidx=this->cidx;
-					this->tsec[cidx]=sec;
-					this->data[cidx]=v;
-					this->tmsec[cidx]=msec;
-				}
-			} else if(cidx!=0 && start==0) {
-					assert(0);
+				bar_slot=cidx;
+				result=v;
+			} else {
+				LOG_DEBUG<<"curr_slot: "<<curr_slot<<" start_slot: "<<start_slot<<std::endl;
+				assert(curr_slot <= start_slot+2);
 			}
-			this->csec=sec;
-			this->cmsec=msec;
-			return 0;
-	};
+		}else {
+			assert(curr_slot > start_slot);
+			this->cidx++;
+			cidx=this->cidx;
+			this->tsec[cidx]=sec;
+			this->data[cidx]=v;
+			this->tmsec[cidx]=msec;
+			bar_slot=cidx+1;
+			result=this->data[cidx];
+		}
+	} else if(cidx!=0 && start_slot!=0) {
+		/*当cidx为非零值得时候，这个cidx必然是已经有有实际报价，
+		  或者timer定时器已经发生过!
+		  */
+		if(start_slot==curr_slot) {
+			/*is current bar*/
+			this->data[cidx]=std::max<float>(this->data[cidx],v);
+			this->tsec[cidx]=sec;
+			this->tmsec[cidx]=msec;
+			bar_slot=cidx;
+			result=this->data[cidx];
+		}else if((start+1)==now){
+			/*is next    bar*/
+			this->cidx++;
+			cidx=this->cidx;
+			this->tsec[cidx]=sec;
+			this->data[cidx]=v;
+			this->tmsec[cidx]=msec;
+			bar_slot=cidx+1;
+			result=this->data[cidx];
+		}else if( is_continue(start_slot,0, curr_slot, 0) ) {
+			if(curr_slot == start_slot+2) {
+				/*fix one tick
+				 *update next tick
+				 * */	
+				this->cidx++;
+				cidx=this->cidx;
+				this->data[cidx]=this->data[cidx-1];
+				this->tmsec[cidx]=msec;
+				this->tsec[cidx]=sec;
+
+				/*
+				 * */
+				this->cidx++;
+				cidx=this->cidx;
+				this->data[cidx]=v;
+				this->tmsec[cidx]=msec;
+				this->tsec[cidx]=sec;
+
+				bar_slot=cidx;
+				result=v;
+			} else {
+				LOG_DEBUG<<"curr_slot: "<<curr_slot<<" start_slot: "<<start_slot<<std::endl;
+				assert(curr_slot <= start_slot+2);
+			}
+		}else {
+			this->cidx++;
+			cidx=this->cidx;
+			this->tsec[cidx]=sec;
+			this->data[cidx]=v;
+			this->tmsec[cidx]=msec;
+			bar_slot=cidx+1;
+			result=this->data[cidx];
+		}
+	} else if(cidx!=0 && start==0) {
+		assert(0);
+	}
+	this->csec=sec;
+	this->cmsec=msec;
+
+	this->kdump(v, sec, msec, last_bar_slot, bar_slot, result, HIGH); 
+	return 0;
+};
 	
 int dseries::update_mel(float v, int sec, int msec,period_type ptype, int period){
 				/*判断是否是当前这根k线

@@ -94,6 +94,8 @@ public:
 	///成交通知
 	virtual void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
+	virtual void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
+
 public:
 	///用户登录请求
 	void ReqUserLogin(TThostFtdcBrokerIDType	appId,
