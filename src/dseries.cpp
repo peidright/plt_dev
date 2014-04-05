@@ -64,6 +64,7 @@ int dseries::update_ms(float v, int sec, int msec){
 		  1.
 		  2.
 		*/
+	return 0;
 	again:
 		boost::unique_lock<boost::timed_mutex> lk(this->dmutex,boost::chrono::milliseconds(10));
 		if(lk) {
@@ -531,6 +532,95 @@ again:
 			ret=this->cb(v,sec,msec);
 			goto again;
 		}
+	return 0;
+}
+
+int dseries::kline_update(kdata_type ktype, int t)
+{
+	int start, mstart,cidx,start_slot,curr_slot;
+
+	start=this->tsec[this->cidx];
+	mstart=this->tmsec[this->cidx];
+	cidx=this->cidx;
+	start_slot = get_period_slot(start,mstart,MINUTE ,1);
+	curr_slot=get_period_slot(t,0,MINUTE,1);
+
+	/*sure the contract is in in trading
+	assert(curr_slot < start_slot + 2);
+	assert(curr_slot > start_slot - 1);
+	*/
+	LOG_DEBUG<<"kline update: "<<" start: "<<start<<" curr: "<<t<<std::endl;
+
+	if(curr_slot == start_slot) {
+		return -1;
+	} else if(curr_slot==start_slot+1){
+		switch(ktype){
+			case HIGH:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			case LOW:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			case OPEN:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			case CLOSE:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			default:
+				assert(0);
+		}
+	} else if(curr_slot>start_slot+5){
+		/**/
+		switch(ktype){
+			case HIGH:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			case LOW:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			case OPEN:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			case CLOSE:
+				this->cmsec=0;
+				this->csec=t;
+				this->data[cidx+1]=this->data[cidx];
+				this->tsec[cidx]=t;
+				this->tmsec[cidx]=0;
+				break;
+			default:
+				assert(0);
+		}
+	}
 	return 0;
 }
 

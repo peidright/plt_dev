@@ -3,11 +3,13 @@
 #include <deque>
 #include "help.h"
 #include "quote_io.h"
-CtpQuoter::CtpQuoter(Quoter *quoter,dmgr *pdmgr, string localdir):qsem(0)
+CtpQuoter::CtpQuoter(Quoter *quoter,dmgr *pdmgr,instmgr *pinstmgr, string localdir):qsem(0)
 {
 
 	this->running=1;
 	this->pdmgr=pdmgr;
+	this->g_trading=0;
+	this->pinstmgr=pinstmgr;
 	/*
 	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(TRADE_DIR);
 	this->trade_api=trade_api;
@@ -214,9 +216,28 @@ void CtpQuoter::quote_stm(msg_t &msg)
 	msg.type=QSTOP;
 	if(msg.type == QSTOP) {
 		/*todo free message*/
-		free(msg.data);
+		if(msg.data)
+			free(msg.data);
 	}
 	LOG_DEBUG<<"finish one Market data"<<std::endl;
+}
+
+int CtpQuoter::is_trading(string instn)
+{
+	if(this->g_trading) {
+		return 1;
+	} else {
+		return  this->pinstmgr->is_trading(instn);
+	}
+}
+
+void CtpQuoter::kline_update()
+{
+	for (map<string, md*>::iterator it=this->mds->mds.begin();
+	 	it!=this->mds->mds.end();it++) {
+		it->second->kline_update();
+	}
+	return;
 }
 
 int CtpQuoter::DepthMarketProcess(msg_t &msg)
@@ -310,7 +331,18 @@ loop:
 	}
 }
 
-
+void KlineTimerWorker(CtpQuoter *ctpquoter, int key)
+{
+	/*now only support one third
+	 * */
+	while(ctpquoter->running) {
+		sleep(1);
+		//ctpquoter->tsem.wait();
+		/*::iterator all the contract to update
+		 * */
+		ctpquoter->kline_update();
+	}
+}
 void DepthMarketProcess(CtpQuoter *ctpquoter, int key)
 {
 	/*

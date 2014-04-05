@@ -80,6 +80,7 @@ void CtpTradeSpi::OnFrontConnected()
 	msg->type=TOnFrontConnected;
 	LOG_DEBUG<<"TOnFront Connect DEBUG"<<std::endl;
     	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnFrontConnected"<<std::endl;
 }
 
 void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
@@ -124,29 +125,19 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		this->sessionId = pRspUserLogin->SessionID;
 		this->nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
 		this->login_status=SUCESS;
-
 		frontId = pRspUserLogin->FrontID;
 		sessionId = pRspUserLogin->SessionID;
 		nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
 		sprintf(orderRef, "%d", ++nextOrderRef);
-    cerr<<" 响应 | 登录成功...当前交易日:"
-      <<pRspUserLogin->TradingDay<<endl;     
     }else  {
 		this->login_status=FAIL;
 	}
-	if(pRspInfo->ErrorID==0&&this->confirm==0) {
 		CThostFtdcSettlementInfoConfirmField f;
 		memset(&f, 0, sizeof(f));
 		cout<<"send req settlement confirm"<<endl;
 			//this->ReqSettlementInfoConfirm(&f, ++this->requestId);
 		this->ReqSettlementInfoConfirm();
 		this->confirm=1;
-	}
-	  if(bIsLast) sem.sem_v();
-	*/
-	/*
-	if(pRspInfo)
-		LOG_DEBUG<<pRspInfo->ErrorID<<pRspInfo->ErrorMsg<<std::endl;
 	*/
 	if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
 
@@ -168,7 +159,7 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	} else {
 		LOG_DEBUG<<"err OnRspUserLogin "<<std::endl;
 	}
-
+	LOG_INFO<<"Trade  OnRspUserLogin"<<std::endl;
 }
 
 
@@ -188,17 +179,6 @@ void CtpTradeSpi::OnRspSettlementInfoConfirm(
         CThostFtdcSettlementInfoConfirmField  *pSettlementInfoConfirm, 
         CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {	
-	/*
-	if( !IsErrorRspInfo(pRspInfo) && pSettlementInfoConfirm){
-    cerr<<" 响应 | 结算单..."<<pSettlementInfoConfirm->InvestorID
-      <<"...<"<<pSettlementInfoConfirm->ConfirmDate
-      <<" "<<pSettlementInfoConfirm->ConfirmTime<<">...确认"<<endl;
-	 this->confirm=1;
-    }else {
-	   cerr<<"fail settlement confirm"<<endl;
-	}
-  	if(bIsLast) sem.sem_v();
-	*/
 	if( !IsErrorRspInfo(pRspInfo) && pSettlementInfoConfirm){
 
 	msg_t *msg=new(msg_t);
@@ -223,6 +203,7 @@ void CtpTradeSpi::OnRspSettlementInfoConfirm(
 	else {
 		LOG_DEBUG<<"spi OnRspSettlement err"<<std::endl;
 	}
+	LOG_INFO<<"Trade  OnRspSettlementInfoConfirm"<<std::endl;
 }
 
 
@@ -238,15 +219,6 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, 
          CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 { 	
-	/*
-	if ( !IsErrorRspInfo(pRspInfo) &&  pInstrument){
-    		cerr<<" 响应 | 合约:"<<pInstrument->InstrumentID
-      		<<" 交割月:"<<pInstrument->DeliveryMonth
-      		<<" 多头保证金率:"<<pInstrument->LongMarginRatio
-      		<<" 空头保证金率:"<<pInstrument->ShortMarginRatio<<endl; 
-  	}
-  	if(bIsLast) sem.sem_v();
-	*/
 	if ( !IsErrorRspInfo(pRspInfo) &&  pInstrument){
 
 	msg_t *msg=new(msg_t);
@@ -272,6 +244,7 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	{
 		LOG_DEBUG<<"spi OnRspQryInstruent err"<<std::endl;
 	}
+	LOG_INFO<<"Trade OnRspQryInstrument"<<std::endl;
 }
 
 void CtpTradeSpi::ReqQryTradingAccount()
@@ -282,7 +255,6 @@ void CtpTradeSpi::ReqQryTradingAccount()
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
 	int ret = this->api->ReqQryTradingAccount(&req, ++this->requestId);
 	cerr<<" 请求 | 发送资金查询..."<<((ret == 0)?"成功":"失败")<<endl;
-
 }
 
 
@@ -322,6 +294,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	msg->data=(void*)data;
 	msg->type=TOnRspQryTradingAccount;
 	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnRspQryTradingAccount"<<std::endl;
 }
 
 void CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
@@ -370,6 +343,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 	msg->data=(void*)data;
 	msg->type=TOnRspQryInvestorPosition;
 	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnRspQryInvestorPosition"<<std::endl;
 }
 
 void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
@@ -418,12 +392,6 @@ void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, 
           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	/*
-  if( !IsErrorRspInfo(pRspInfo) && pInputOrder ){
-    cerr<<"响应 | 报单提交成功...报单引用:"<<pInputOrder->OrderRef<<endl;  
-  }
-  if(bIsLast) sem.sem_v();	
-	*/
 	msg_t *msg=new(msg_t);
 	TOnRspOrderInsert_t *data=new(TOnRspOrderInsert_t);
 	data->bIsLast=bIsLast;
@@ -442,6 +410,7 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	msg->data=(void*)data;
 	msg->type=TOnRspOrderInsert;
 	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnRspOrderInsert"<<std::endl;
 }
 
 void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
@@ -471,14 +440,6 @@ void CtpTradeSpi::OnRspOrderAction(
       CThostFtdcInputOrderActionField *pInputOrderAction, 
       CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {	
- /*
-  if (!IsErrorRspInfo(pRspInfo) && pInputOrderAction){
-    cerr<< " 响应 | 撤单成功..."
-      << "交易所:"<<pInputOrderAction->ExchangeID
-      <<" 报单编号:"<<pInputOrderAction->OrderSysID<<endl;
-  }
-  if(bIsLast) sem.sem_v();	
-*/
 	msg_t *msg=new(msg_t);
 	TOnRspOrderAction_t *data=new(TOnRspOrderAction_t);
 	data->bIsLast=bIsLast;
@@ -497,7 +458,7 @@ void CtpTradeSpi::OnRspOrderAction(
 	msg->data=(void*)data;
 	msg->type=TOnRspOrderAction;
 	this->ctptrader->post_msg(msg);
-
+	LOG_INFO<<"Trade OnRspOrderInsert"<<std::endl;
 }
 
 ///报单回报
@@ -522,6 +483,7 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	msg->data=(void*)data;
 	msg->type=TOnRtnOrder;
 	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnRtnOrder"<<std::endl;
 }
 
 ///成交通知
@@ -547,14 +509,11 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	msg->data=(void*)data;
 	msg->type=TOnRtnTrade;
 	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnRtnTrade"<<std::endl;
 }
 
 void CtpTradeSpi::OnFrontDisconnected(int nReason)
 {
-	/*
-	cerr<<" 响应 | 连接中断..." 
-	  << " reason=" << nReason << endl;
-	*/
 	msg_t *msg=new(msg_t);
 	TOnFrontDisconnected_t *data=new(TOnFrontDisconnected_t);
 	data->nReason=nReason;
@@ -562,7 +521,7 @@ void CtpTradeSpi::OnFrontDisconnected(int nReason)
 	msg->data=(void*)data;
 	msg->type=TOnFrontDisconnected;
 	this->ctptrader->post_msg(msg);
-
+	LOG_INFO<<"Trade OnFrontDisconnected:  "<<nReason<<std::endl;
 }
 		
 void CtpTradeSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -579,7 +538,7 @@ void CtpTradeSpi::OnHeartBeatWarning(int nTimeLapse)
 	msg->data=(void*)data;
 	msg->type=TOnHeartBeatWarning;
 	this->ctptrader->post_msg(msg);
-
+	LOG_INFO<<"Trade OnHeartBeatWarning"<<std::endl;
 }
 
 void CtpTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -602,6 +561,7 @@ void CtpTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 	} else {
 		LOG_DEBUG<<"spi OnRspError pRspInfo error"<<std::endl;
 	}
+	LOG_INFO<<"Trade OnRspError"<<std::endl;
 }
 
 bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
@@ -695,5 +655,6 @@ THOST_FTDC_IS_Closed '6'
 	msg->type= TOnRtnInstrumentStatus;
 	LOG_DEBUG<<"OnRtnInstrumentStatus: name"<<pInstrumentStatus->InstrumentID<<" Status:" <<pInstrumentStatus->InstrumentStatus <<std::endl;
     	this->ctptrader->post_msg(msg);
+	LOG_INFO<<"Trade OnRtnInstrumentStatus status: "<<pInstrumentStatus->InstrumentStatus<< " time:"<<pInstrumentStatus->EnterTime<<std::endl;
 	return;
 }

@@ -45,21 +45,23 @@ void log_init()
 {
 	boost::shared_ptr<sinks::synchronous_sink<sinks::text_file_backend> > fsink=logging::add_file_log
         (
-        keywords::file_name="ctp.%Y-%m-%d_%N.log",//文件名
-        keywords::rotation_size=10*1024*1024,       //单个文件限制大小
-        keywords::time_based_rotation=sinks::file::rotation_at_time_point(0,0,0),    //每天重建
+        keywords::file_name="ctp.%Y-%m-%d_%N.log",
+        keywords::rotation_size=10*1024*1024,
+        keywords::time_based_rotation=sinks::file::rotation_at_time_point(0,0,0),
 	keywords::format =  
 	(  
-	 expr::stream  
-	 << "[" <<expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")  
-	 << " " << expr::attr< boost::log::aux::thread::id >("ThreadID")  
-	 << " " << logging::trivial::severity  
-	 << "] " << expr::smessage  
+	 expr::stream
+	 << "[" <<expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S.%f")
+	 << " " << expr::attr< boost::log::aux::thread::id >("ThreadID")
+	 << " " << logging::trivial::severity
+	 << " ] " << expr::smessage
 	)
         );
 
 	fsink->locked_backend()->auto_flush(true);
+
 	logging::core::get()->add_sink(fsink);
+	logging::add_common_attributes(); 
 
 	//logging::add_file_log("sample.log"); 
         //keywords::file_name="%Y-%m-%d_%N.log"

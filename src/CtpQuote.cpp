@@ -96,8 +96,8 @@ void CtpQuoteSpi::OnFrontConnected()
 	msg->len=sizeof(QOnFrontConnected_t);
 	msg->data=new(QOnFrontConnected_t);
 	msg->type=QOnFrontConnected;
-	printf("OnFront Connect DEBUG\n");
     	this->ctpquoter->post_msg(msg);
+	LOG_INFO<<"Quote Connect"<<std::endl;
 #endif
 
 }
@@ -135,6 +135,7 @@ void CtpQuoteSpi::OnFrontDisconnected(int nReason)
 	data->nReason=nReason;
 	msg->data=data;
 	this->ctpquoter->post_msg(msg);
+	LOG_INFO<<"Quote Disconnect"<<std::endl;
 }
 
 void CtpQuoteSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -144,6 +145,8 @@ void CtpQuoteSpi::OnHeartBeatWarning(int nTimeLapse)
 	data->nTimeLapse=nTimeLapse;
 	msg->data=data;
 	this->ctpquoter->post_msg(msg);
+	LOG_INFO<<"Quote OnHeartBeatWarning"<<std::endl;
+
 }
 
 void CtpQuoteSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -162,6 +165,7 @@ void CtpQuoteSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 		}
 		this->ctpquoter->post_msg(msg);
 	}
+	LOG_INFO<<"Quote OnRspError"<<std::endl;
 }
 void CtpQuoteSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -184,6 +188,7 @@ void CtpQuoteSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecifi
 	msg->data=(void*)data;
 	msg->type=QOnRspSubMarketData;
     	this->ctpquoter->post_msg(msg);
+	LOG_INFO<<"Quote OnRspSubMarketData"<<std::endl;
 }
 void CtpQuoteSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -206,6 +211,7 @@ void CtpQuoteSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpeci
 	msg->data=(void*)data;
 	msg->type=QOnRspUnSubMarketData;
     	this->ctpquoter->post_msg(msg);
+	LOG_INFO<<"Quote OnRspUnSubMarketData"<<std::endl;
 }
 
 void CtpQuoteSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -226,10 +232,12 @@ void CtpQuoteSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTh
 	msg->data=(void*)data;
 	msg->type=QOnRspUserLogin;
 	this->ctpquoter->post_msg(msg);
+	LOG_INFO<<"Quote OnRspUserLogin"<<std::endl;
 }
 
 void CtpQuoteSpi::OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
+	LOG_INFO<<"Quote OnRspUserLogout"<<std::endl;
 }
 
 void dump_depthmarketdata(CThostFtdcDepthMarketDataField *dmd)
@@ -289,7 +297,7 @@ typedef struct {
 	msg->type=QOnRtnDepthMarketData;
 	contract=pDepthMarketData->InstrumentID;
 	this->ctpquoter->post_msg(msg,contract);
-
+	LOG_INFO<<"Quote OnRtnDepthMarketData"<<std::endl;
 }
 
 bool CtpQuoteSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

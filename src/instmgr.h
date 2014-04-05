@@ -41,7 +41,16 @@ THOST_FTDC_IS_Closed '6'
 */
 };
 class instmgr {
-	map<string instn, inst *pinst> instmap;
+	public:
+	map<string, inst *> instmap;
+	int is_trading(string instn){
+		if(instmap.find(instn)!=instmap.end()) {
+			return instmap[instn]->is_trading();
+		}else {
+			return 0;
+		}	
+		return 0;
+	};
 };
 
 

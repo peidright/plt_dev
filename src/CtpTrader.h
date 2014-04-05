@@ -8,7 +8,9 @@
 #include "boosthelp.h"
 #include "msgqueue.h"
 #include "mdseries.h"
+#include "instmgr.h"
 class dmgr;
+class instmgr;
 class CtpTradeSpi;
 class CtpTrader{
 public:
@@ -16,9 +18,10 @@ public:
 	CtpTradeSpi * trade_spi;
 	CThostFtdcTraderApi* trade_api;
 	dmgr *pdmgr;
+	instmgr *pinstmgr;
 	string localdir;
 
-	CtpTrader(Trader *trader,dmgr *pdmgr, string localdir);
+	CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir);
 	void trade_stm(msg_t &msg);
 	void post_msg(msg_t *msg);
 

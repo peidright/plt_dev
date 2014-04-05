@@ -9,10 +9,12 @@
 #include "boosthelp.h"
 #include "msgqueue.h"
 #include "mdseries.h"
+#include "instmgr.h"
 
 class CtpTradeSpi;
 class CtpQuoteSpi;
 class dmgr;
+class instmgr;
 
 /*
 typedef struct  {
@@ -28,12 +30,15 @@ public:
 	CtpQuoteSpi *quote_spi;
 	CThostFtdcMdApi *quote_api;
 	dmgr *pdmgr;
+	instmgr *pinstmgr;
 	mdservice *mds;
 	int running;
 	std::deque<msg_t> mqueue;
 	Quoter *quoter;
 
 	boost::interprocess::interprocess_semaphore qsem;
+	//boost::interprocess::interprocess_semaphore tsem;
+
     	boost::timed_mutex qmutex;
 	
 	map<int, boost::timed_mutex *> qmutex_map;
@@ -45,13 +50,16 @@ public:
 	//ctpquoter->qqueue[key].size()<=0)
 
 
-	CtpQuoter(Quoter *quoter,dmgr *pdmgr, string localdir);
+	CtpQuoter(Quoter *quoter,dmgr *pdmgr, instmgr *pinstmgr ,string localdir);
 	CtpQuoter(const CtpQuoter &);
 	int  init(mdservice *mds);
 	void start();
 	void post_msg(msg_t *msg);
 	void post_msg(msg_t *msg, string contract);
 	void quote_stm(msg_t &msg);
+	void kline_update();
+	int is_trading(string contract);
+	int g_trading;
 	int SubscribeMarketData();
 	int DepthMarketProcess(msg_t &msg);
 

@@ -3,6 +3,7 @@
 #include "help.h"
 #include "boost/date_time.hpp"
 #include "log.h"
+#include "tm.h"
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
@@ -97,6 +98,39 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 		    return  0;
 	};
 
+	int mdseries::kline_update() {
+		/*md_uptime,kd_uptime,
+		 *every time md updated, update md_uptime, 
+		 *if now kd_uptime > 1minute of md_uptime.
+		 *    update next bar
+		 *else
+		 *    ignore
+		 * */
+
+		int t=get_time();
+
+		/*
+		if(this->md_uptime!=0) {
+			if(this->kd_uptime==0 || this->lmd_uptime==0) {
+				assert(0);
+			} else {
+				if(t>=this->kd_uptime+60) {
+					if(t+this->lmd_uptime>this->kd_uptime+this->md_uptime+60){
+						this->lmd_uptime=this->lmd_uptime+60;
+						this->md_uptime=this->md_uptime+60;
+						this->kd_uptime=this->kd_uptime+60;
+					} else {
+						this->kd_uptime=this->kd_uptime+60;
+					}
+				} else {
+				}
+			}
+		} else {
+		}
+		*/
+		return 0;
+	}
+
 
 
 
@@ -171,6 +205,16 @@ int md::update(float v, int t1, int t2) {
 		return 0;
 	}
 
+
+int md::kline_update()
+{
+	if(this->mds.find(1)==this->mds.end()) {
+		this->mds[1]->kline_update();
+	}else {
+		assert(0);
+	}
+
+}
 int md::update_timer()
 {
 		/*

@@ -22,6 +22,8 @@
 #include "quote_io.h"
 #include "log.h"
 
+#include "tm.h"
+
 using namespace std;
 
 //请求编号
@@ -45,11 +47,12 @@ CtpQuoter *g_ctp_quoter;
 CtpTrader *g_ctp_trader;
 mdservice *g_mdservice;
 dmgr      *g_dmgr;
+instmgr   *g_instmgr;
 
 int ctp_trade_init(string tradedir)
 {
 		g_trader=new Trader(g_username,g_password,g_brokerid,g_trade_addr);
-		g_ctp_trader=new CtpTrader(g_trader,g_dmgr,tradedir);
+		g_ctp_trader=new CtpTrader(g_trader,g_dmgr,g_instmgr,tradedir);
 		g_ctp_trader->init();
 		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
 		g_ctp_trader->start();
@@ -65,7 +68,7 @@ int ctp_quote_init(string quotedir)
 		char **ppinst;
 
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
-		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,quotedir);
+		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,g_instmgr,quotedir);
 		g_mdservice=new mdservice();
 
 		g_ctp_quoter->init(g_mdservice);
@@ -111,6 +114,8 @@ int ctp_db_init()
 
 	dt->create_tdata_table("IF1404");
 	g_dmgr=new (dmgr);
+	g_instmgr=new(instmgr);
+
 	g_dmgr->regdb("tdata",dt);
 	g_dmgr->regdb("sdata",ds);
 	g_dmgr->regdb("kdata",dk);
@@ -183,10 +188,14 @@ int  ctp_work()
 
 
 int main(int argc, char * argv[]){
+	//tm_test();
+
 	log_init();
 	ctp_work();
 	getchar();
-    	/*
+	LOG_ERROR<<"111"<<std::endl;
+	/*
+
 	   test1();
 	   getchar();
 	   std::string line;

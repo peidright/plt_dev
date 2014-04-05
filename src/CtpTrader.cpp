@@ -4,11 +4,12 @@
 #include <deque>
 #include "help.h"
 
-CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr, string localdir):qsem(0)
+CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir):qsem(0)
 {
 	this->trader=trader;
 	this->pdmgr=pdmgr;
 	this->running=1;
+	this->pinstmgr=pinstmgr;
 	this->localdir=localdir;
 }
 int CtpTrader::init()
@@ -134,6 +135,11 @@ void CtpTrader::trade_stm(msg_t &msg)
 
 			case TOnRtnInstrumentStatus:
 				//(TOnRtnInstrumentStatus_t);
+				LOG_DEBUG<<"OnRtnInstrumentStatus enter "<<
+				" time: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterTime<<
+				" inst: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID<<
+				" reason: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterReason<<
+				" status: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus<<std::endl;
 				msg.type=TSTOP;
 				break;
 			case TReqQryTradingAccount:
@@ -161,7 +167,8 @@ void CtpTrader::trade_stm(msg_t &msg)
 	msg.type=TSTOP;
 	if(msg.type == TSTOP) {
 		/*todo free message,bug fix*/
-		//free(msg.data);
+		if(msg.data)
+			free(msg.data);
 	}
 	LOG_DEBUG<<"finish one Trade data"<<std::endl;
 }

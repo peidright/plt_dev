@@ -19,6 +19,9 @@ typedef enum update_status {
 class mdseries {
 public:
 	int period;/*周期*/    
+	int kd_uptime;
+	int md_uptime;
+	int lmd_uptime;
 	int last_sec;
 	int last_msec;
 	period_type ptype;/*周期类型*/
@@ -31,6 +34,7 @@ public:
 	mdseries(period_type ptype, int period);
 	int updatems(float v, int b1, int b2);
 	int updateme(float v, int b1, int b2);
+	int kline_update();
 };
 
 class md {
@@ -42,6 +46,8 @@ public:
 	dseries             ds;  /*base misc service*/
 	int update(float v, int t1, int t2);
 	int update_timer();
+	int kline_update();
+
 };
 
 class mdservice {
