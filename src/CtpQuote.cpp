@@ -297,7 +297,7 @@ typedef struct {
 	msg->type=QOnRtnDepthMarketData;
 	contract=pDepthMarketData->InstrumentID;
 	this->ctpquoter->post_msg(msg,contract);
-	LOG_INFO<<"Quote OnRtnDepthMarketData"<<std::endl;
+	LOG_INFO<<"Quote OnRtnDepthMarketData name: "<<pDepthMarketData->InstrumentID <<std::endl;
 }
 
 bool CtpQuoteSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

@@ -193,6 +193,7 @@ int md::update(float v, int t1, int t2) {
 							*/
 					}
 				else {
+					/*todo check*/
 					LOG_DEBUG<<"update kdata: ignore and drop the old data"<<std::endl;
 				}
 			}

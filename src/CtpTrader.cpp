@@ -4,6 +4,8 @@
 #include <deque>
 #include "help.h"
 
+#include "instmgr.h";
+
 CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir):qsem(0)
 {
 	this->trader=trader;
@@ -12,6 +14,7 @@ CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string locald
 	this->pinstmgr=pinstmgr;
 	this->localdir=localdir;
 }
+
 int CtpTrader::init()
 {
 	CThostFtdcTraderApi* trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi(this->localdir.c_str());
@@ -39,6 +42,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 {
 	msg_t *mmsg;
 	inst_t *pinst;
+	inst   *ppinst;
 	TThostFtdcInstrumentIDType instId;
 	int ret;
 
@@ -127,12 +131,18 @@ void CtpTrader::trade_stm(msg_t &msg)
 						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
 						this->pdmgr->sync_inst();
 					}
+
+					/*update it into pinstmgr
+					 *todo merge pinstmgr to pdmgr
+					 * */
+					ppinst=new (inst);
+					memcpy(&ppinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
+					this->pinstmgr->update_inst(ppinst->base.InstrumentID, ppinst);
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}
 				msg.type=TSTOP;
 				break;
-
 			case TOnRtnInstrumentStatus:
 				//(TOnRtnInstrumentStatus_t);
 				LOG_DEBUG<<"OnRtnInstrumentStatus enter "<<
@@ -140,6 +150,9 @@ void CtpTrader::trade_stm(msg_t &msg)
 				" inst: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID<<
 				" reason: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterReason<<
 				" status: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus<<std::endl;
+
+				this->pinstmgr->update_inst_status(((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID,  
+						                   ((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus);
 				msg.type=TSTOP;
 				break;
 			case TReqQryTradingAccount:
@@ -175,15 +188,22 @@ void CtpTrader::trade_stm(msg_t &msg)
 
 void trader_loop(CtpTrader *ctptrader, int key)
 {
+	int i=0;
 loop:
 	while(ctptrader->running) {
+		i=i+1;
+		if(i%50==0) {
+			i=0;
+			LOG_INFO<<"trader_loop living"<<std::endl;
+		}
 		ctptrader->qsem.wait();
 		boost::unique_lock<boost::timed_mutex> lk(ctptrader->qmutex,boost::chrono::milliseconds(3));
 		if (lk) {
 			if(ctptrader->mqueue.size()<=0) {
 				/*bug happen*/
-				cout<<"should not be zero qqueue"<<std::endl;
+				LOG_INFO<<"trader_loop should not be zero qqueue"<<std::endl;
 				lk.unlock();
+				continue;
 			}
 			msg_t msg=ctptrader->mqueue[0];
 			printf("trader_loop get this msg\n");
@@ -192,7 +212,7 @@ loop:
 			//continue;
 			ctptrader->trade_stm(msg);
 		} else {
-			cout<<"quote main loop err"<<std::endl;
+			LOG_INFO<<"trader_loop quote main loop err"<<std::endl;
 		}
 	}
 }
@@ -217,4 +237,3 @@ again:
 		goto again;
 	}
 }
-

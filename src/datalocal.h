@@ -56,6 +56,7 @@ class dmgr {
 			/*todo for debug
 			 * */
 			this->need_inst["IF1404"]="IF1404";
+			this->need_inst["cu1407"]="cu1407";
 		}
 		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;return 0;};
 		int init(){
@@ -82,6 +83,9 @@ class dmgr {
 				/*
 				 * */
 				this->new_instmap[instn]=pinst;
+			} else {
+				free(this->instmap[instn]);
+				this->instmap[instn]=pinst;
 			}
 			if(syn) {
 				/*flush it into db;

@@ -235,7 +235,13 @@ void CtpQuoter::kline_update()
 {
 	for (map<string, md*>::iterator it=this->mds->mds.begin();
 	 	it!=this->mds->mds.end();it++) {
-		it->second->kline_update();
+
+		if(this->pinstmgr->is_trading(it->first)) {
+			it->second->kline_update();
+		} else {
+			/*todo */
+			LOG_INFO<<"not trading time: "<<it->first<<std::endl;
+		}
 	}
 	return;
 }
@@ -271,6 +277,7 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 		snprintf((char*)&mdata->pDepthMarketData.TradingDay,9,"%04d%02d%02d",tm1->tm_year+1900,tm1->tm_mon+1, tm1->tm_mday-1);
 		LOG_DEBUG<<"year: "<<tm1->tm_year<<" mon: "<<tm1->tm_mon<< " mday "<<tm1->tm_mday<<std::endl;
 	}
+
 	int  sec=date2time(string(mdata->pDepthMarketData.TradingDay)+" "+ string(mdata->pDepthMarketData.UpdateTime));
 	string contract=mdata->pDepthMarketData.InstrumentID;
 	float  v=(mdata->pDepthMarketData.LastPrice);
@@ -279,6 +286,7 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	/*
 		we should not hold msg->data now.
 	*/
+
 	//mdata->pDepthMarketData->
 	tdata_t *data=new(tdata_t);
 	data->sec=sec;
@@ -350,29 +358,37 @@ void DepthMarketProcess(CtpQuoter *ctpquoter, int key)
 	跟交易相关的信息，都另外用一个状态机处理。
 	loop, 检测是否存在 key, 不存在，sleep ，log.
 	*/
+	int i=0;
 loop:
 	if (ctpquoter->qsem_map.find(key)==ctpquoter->qsem_map.end()) {
 		/*log it */
 		printf("can not find this slot %d, thread sleep 3 and loop null\n",key);
+		LOG_INFO<<"DepthMarketProcess: key null loop"<<key<<std::endl;
+		sleep(3);
 		boost::chrono::milliseconds(10000);
 		goto loop;
 	}
-
 	while(ctpquoter->running) {
+		i=i+1;
+		if(i%50==0) {
+			LOG_INFO<<"DepthMarketProcess living"<<std::endl;
+			i=0;
+		}
 		ctpquoter->qsem_map[key]->wait();
 		boost::unique_lock<boost::timed_mutex> lk(*ctpquoter->qmutex_map[key],boost::chrono::milliseconds(1));
 		if (lk) {
 			if(ctpquoter->mqueue_map[key].size()<=0) {
 				/*bug happen*/
-				cout<<"should not be zero qqueue"<<std::endl;
+				LOG_INFO<<"DepthMarketProcess: should not be zero qqueue"<<std::endl;
 				lk.unlock();
+				continue;
 			}
 			msg_t msg=ctpquoter->mqueue_map[key][0];
 			ctpquoter->mqueue_map[key].pop_front();
 			lk.unlock();
 			ctpquoter->quote_stm(msg);
 		} else {
-			cout<<"depth market process lk err,thread id: "<<key<<std::endl;
+			LOG_INFO<<"depth market process lk err,thread id: "<<key<<std::endl;
 		}
 	}
 }

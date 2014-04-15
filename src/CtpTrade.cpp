@@ -78,7 +78,6 @@ void CtpTradeSpi::OnFrontConnected()
 	msg->len=sizeof(TOnFrontConnected_t);
 	msg->data=new(TOnFrontConnected_t);
 	msg->type=TOnFrontConnected;
-	LOG_DEBUG<<"TOnFront Connect DEBUG"<<std::endl;
     	this->ctptrader->post_msg(msg);
 	LOG_INFO<<"Trade OnFrontConnected"<<std::endl;
 }
@@ -244,7 +243,8 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	{
 		LOG_DEBUG<<"spi OnRspQryInstruent err"<<std::endl;
 	}
-	LOG_INFO<<"Trade OnRspQryInstrument"<<std::endl;
+	LOG_INFO<<"Trade OnRspQryInstrument instid: "<<pInstrument->InstrumentID << " InstrumentName: "<<pInstrument->InstrumentName<<
+	       " productid: "<<pInstrument->ProductID<<" productclass: "<<pInstrument->ProductClass<< " is_trading: "<<pInstrument->IsTrading <<std::endl;
 }
 
 void CtpTradeSpi::ReqQryTradingAccount()
@@ -655,6 +655,6 @@ THOST_FTDC_IS_Closed '6'
 	msg->type= TOnRtnInstrumentStatus;
 	LOG_DEBUG<<"OnRtnInstrumentStatus: name"<<pInstrumentStatus->InstrumentID<<" Status:" <<pInstrumentStatus->InstrumentStatus <<std::endl;
     	this->ctptrader->post_msg(msg);
-	LOG_INFO<<"Trade OnRtnInstrumentStatus status: "<<pInstrumentStatus->InstrumentStatus<< " time:"<<pInstrumentStatus->EnterTime<<std::endl;
+	LOG_INFO<<"Trade OnRtnInstrumentStatus name:"<<pInstrumentStatus->InstrumentID<<" status: "<<pInstrumentStatus->InstrumentStatus<< " time:"<<pInstrumentStatus->EnterTime<<std::endl;
 	return;
 }
