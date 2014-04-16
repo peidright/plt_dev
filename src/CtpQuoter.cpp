@@ -148,14 +148,17 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				msg.type=QReqUserLogin;
 				break;
 			case QOnFrontDisconnected:
+				msg.type=QSTOP;
 				break;
 			case QOnHeartBeatWarning:
 				/*todo err process
 				*/
+				msg.type=QSTOP;
 				break;
 			case QOnRspError:
 				/*todo err process
 				*/
+				msg.type=QSTOP;
 				break;
 			case QReqSubscribeMarketData:
 				this->SubscribeMarketData();
@@ -171,6 +174,7 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				msg.type=QSTOP;
 				break;
 			case QOnRspUnSubMarketData:
+				msg.type=QSTOP;
 				break;
 			case QReqUserLogin:
 				#if 0
@@ -188,11 +192,13 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				(char*)this->quoter->password.c_str());
 				if(ret==0) {
 					printf("quote_stm login msg sended\n");
-					msg.type=QSTOP;
 				}else {
 					/*err process					
 					*/
+					//assert(0);
 				}
+
+				msg.type=QSTOP;
 				break;
 			case QOnRspUserLogin:
 				/*err process
@@ -202,6 +208,7 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				msg.type=QReqSubscribeMarketData;
 				break;
 			case QOnRspUserLogout:
+				msg.type=QSTOP;
 				break;
 			case QOnRtnDepthMarketData:
 				/*以后可能要把行情数据单独用线程来处理
@@ -210,6 +217,8 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				msg.type=QSTOP;
 				break;
 			default:
+				msg.type=QSTOP;
+				LOG_INFO<<"quote stm fatal"<<std::endl;
 				break;
 		}
 	}

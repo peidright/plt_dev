@@ -33,10 +33,12 @@ void quote_test(CtpQuoteSpi *ctpquotespi)
 /*
 void CtpQuoteApi::Init()
 {
+	assert(0);
 }
 int CtpQuoteApi::Join()
 {
-	 return 0;
+	assert(0);
+	return 0;
 }
 
 void CtpQuoteApi::RegisterFensUserInfo(CThostFtdcFensUserInfoField * pFensUserInfo)
@@ -47,30 +49,37 @@ void CtpQuoteApi::RegisterFront(char *pszFrontAddress)
 }
 void CtpQuoteApi::RegisterNameServer(char *pszNsAddress)
 {
+	assert(0);
 }
 void CtpQuoteApi::RegisterSpi(CThostFtdcMdSpi *pSpi)
 {
+	assert(0);
 }
 
 
 void CtpQuoteApi::Release()
 {
+	assert(0);
 }
 int CtpQuoteApi::ReqUserLogin(CThostFtdcReqUserLoginField *pReqUserLoginField, int nRequestID)
 {
+	assert(0);
 	return 0;
 }
 int CtpQuoteApi::ReqUserLogout(CThostFtdcUserLogoutField *pUserLogout, int nRequestID)
 {
+	assert(0);
 	return 0;
 }
 int CtpQuoteApi::SubscribeMarketData(char *ppInstrumentID[], int nCount)
 {
+	assert(0);
 	return 0;
 }
 
 int CtpQuoteApi::UnSubscribeMarketData(char *ppInstrumentID[], int nCount)
 {
+	assert(0);
 	return 0;
 }
  CtpQuoteApi::~CtpQuoteApi()
@@ -121,6 +130,7 @@ int CtpQuoteSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
 	this->login_status=LOGIN;
 	ret = this->api->ReqUserLogin(&req, 1);	
 	if (ret) {
+		LOG_INFO<<"login fail"<<ret<<std::endl;
 		this->login_status=FAIL;
 	}
 	cerr<<"ReqUserLogin send request"<<std::endl;
@@ -134,6 +144,7 @@ void CtpQuoteSpi::OnFrontDisconnected(int nReason)
 	QOnFrontDisconnected_t *data=new( QOnFrontDisconnected_t );
 	data->nReason=nReason;
 	msg->data=data;
+	msg->type=QOnFrontDisconnected;
 	this->ctpquoter->post_msg(msg);
 	LOG_INFO<<"Quote Disconnect"<<std::endl;
 }
@@ -144,6 +155,7 @@ void CtpQuoteSpi::OnHeartBeatWarning(int nTimeLapse)
 	QOnHeartBeatWarning_t *data=new( QOnHeartBeatWarning_t );
 	data->nTimeLapse=nTimeLapse;
 	msg->data=data;
+	msg->type=QOnHeartBeatWarning;
 	this->ctpquoter->post_msg(msg);
 	LOG_INFO<<"Quote OnHeartBeatWarning"<<std::endl;
 
@@ -151,10 +163,10 @@ void CtpQuoteSpi::OnHeartBeatWarning(int nTimeLapse)
 
 void CtpQuoteSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	msg_t *msg=new(msg_t);
-	QOnRspError_t *data=new( QOnRspError_t );
 
 	if ( !this->IsErrorRspInfo(pRspInfo) ) {  
+		msg_t *msg=new(msg_t);
+		QOnRspError_t *data=new( QOnRspError_t );
 		data->bIsLast=bIsLast;
 		data->nRequestID=nRequestID;
 		data->pRspInfo=NULL;
@@ -163,75 +175,80 @@ void CtpQuoteSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 			data->pRspInfo=new(CThostFtdcRspInfoField);
 			memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
 		}
+		/*todo*/
+		msg->type=QOnRspError;
 		this->ctpquoter->post_msg(msg);
 	}
 	LOG_INFO<<"Quote OnRspError"<<std::endl;
 }
 void CtpQuoteSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	msg_t *msg=new(msg_t);
-	QOnRspSubMarketData_t *data=new(QOnRspSubMarketData_t);
 
 	if ( !this->IsErrorRspInfo(pRspInfo) && pSpecificInstrument ) {  
+		msg_t *msg=new(msg_t);
+		QOnRspSubMarketData_t *data=new(QOnRspSubMarketData_t);
 		data->pRspInfo=NULL;
 		memcpy(&data->pSpecificInstrument,pSpecificInstrument,sizeof(CThostFtdcSpecificInstrumentField));
 		if(pRspInfo) {
 			data->pRspInfo=new(CThostFtdcRspInfoField);
 			memcpy(data->pRspInfo, pRspInfo,sizeof(CThostFtdcRspInfoField));
 		}
+		msg->len=sizeof(QOnRspSubMarketData_t);
+		msg->data=(void*)data;
+		msg->type=QOnRspSubMarketData;
+		this->ctpquoter->post_msg(msg);
 	} else {
 		/*todo err process
 		 * */
 	}
 
-	msg->len=sizeof(QOnRspSubMarketData_t);
-	msg->data=(void*)data;
-	msg->type=QOnRspSubMarketData;
-    	this->ctpquoter->post_msg(msg);
 	LOG_INFO<<"Quote OnRspSubMarketData"<<std::endl;
 }
 void CtpQuoteSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	msg_t *msg=new(msg_t);
-	QOnRspUnSubMarketData_t *data=new(QOnRspUnSubMarketData_t);
-	data->bIsLast=bIsLast;
-	data->nRequestID=nRequestID;
 	/*todo bugfix*/
 
 	if ( !this->IsErrorRspInfo(pRspInfo) && pSpecificInstrument ) {  
+		msg_t *msg=new(msg_t);
+		QOnRspUnSubMarketData_t *data=new(QOnRspUnSubMarketData_t);
+		data->bIsLast=bIsLast;
+		data->nRequestID=nRequestID;
+
 		memcpy(&data->pSpecificInstrument,pSpecificInstrument,sizeof(CThostFtdcSpecificInstrumentField));
 		data->pRspInfo=NULL;
 		if(pRspInfo) {
 			data->pRspInfo=new (CThostFtdcRspInfoField);
 			memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
 		}
+		msg->len=sizeof(QOnRspUnSubMarketData_t);
+		msg->data=(void*)data;
+		msg->type=QOnRspUnSubMarketData;
+		this->ctpquoter->post_msg(msg);
 	}
 
-	msg->len=sizeof(QOnRspUnSubMarketData_t);
-	msg->data=(void*)data;
-	msg->type=QOnRspUnSubMarketData;
-    	this->ctpquoter->post_msg(msg);
 	LOG_INFO<<"Quote OnRspUnSubMarketData"<<std::endl;
 }
 
 void CtpQuoteSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	/*bug fix*/
-	msg_t *msg=new(msg_t);
-	QOnRspUserLogin_t *data=new(QOnRspUserLogin_t);
-	data->bIsLast=bIsLast;
-	data->nRequestID=nRequestID;
 
 	if ( !this->IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
-
-		memcpy(&data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+		msg_t *msg=new(msg_t);
+		QOnRspUserLogin_t *data=new(QOnRspUserLogin_t);
+		data->bIsLast=bIsLast;
+		data->nRequestID=nRequestID;
+		data->pRspInfo=NULL;
+		if(pRspInfo) {
+			data->pRspInfo=new(CThostFtdcRspInfoField);
+			memcpy(&data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+		}
 		memcpy(&data->pRspUserLogin,pRspUserLogin,sizeof(pRspUserLogin));
 		msg->len=sizeof(QOnRspUserLogin_t);
-
+		msg->data=(void*)data;
+		msg->type=QOnRspUserLogin;
+		this->ctpquoter->post_msg(msg);
 	}
-	msg->data=(void*)data;
-	msg->type=QOnRspUserLogin;
-	this->ctpquoter->post_msg(msg);
 	LOG_INFO<<"Quote OnRspUserLogin"<<std::endl;
 }
 

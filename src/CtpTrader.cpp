@@ -58,14 +58,17 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TReqUserLogin;
 				break;
 			case TOnFrontDisconnected:
+				msg.type=TSTOP;
 				break;
 			case TOnHeartBeatWarning:
 				/*todo err process
 				*/
+				msg.type=TSTOP;
 				break;
 			case TOnRspError:
 				/*todo err process
 				*/
+				msg.type=TSTOP;
 				break;
 			case TReqSettlementInfoConfirm:
 				/**/
@@ -103,6 +106,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 			case TOnRspUserLogin:
 				LOG_DEBUG<<"TOnRspUserLogin stm"<<std::endl;;
 				msg.type=TReqSettlementInfoConfirm;		
+				/*fix*/
 				msg.data=NULL;
 				break;
 			case TReqQryInstrument:
@@ -156,24 +160,34 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TReqQryTradingAccount:
+				msg.type=TSTOP;
 				break;
 			case TOnRspQryTradingAccount:
+				msg.type=TSTOP;
 				break;
 			case TReqQryInvestorPosition:
+				msg.type=TSTOP;
 				break;
 			case TOnRspQryInvestorPosition:
+				msg.type=TSTOP;
 				break;
 			case TReqOrderInsert:
+				msg.type=TSTOP;
 				break;
 			case TOnRspOrderInsert:
+				msg.type=TSTOP;
 				break;
 			case TReqOrderAction:
+				msg.type=TSTOP;
 				break;
 			case TOnRspOrderAction:
+				msg.type=TSTOP;
 				break;
 			case TOnRtnOrder:
+				msg.type=TSTOP;
 				break;
 			default:
+				msg.type=TSTOP;
 				break;
 		}
 	}

@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////////////////////////////
-///@system 新一代交易所系统
-///@company 上海期货信息技术有限公司
+///@system 脨脗脪禄麓煤陆禄脪脳脣霉脧碌脥鲁
+///@company 脡脧潞拢脝脷禄玫脨脜脧垄录录脢玫脫脨脧脼鹿芦脣戮
 ///@file ThostFtdcMdApi.h
-///@brief 定义了客户端接口
+///@brief 露篓脪氓脕脣驴脥禄搂露脣陆脫驴脷
 ///@history 
-///20060106	赵鸿昊		创建该文件
+///20060106	脮脭潞猫锚禄		麓麓陆篓赂脙脦脛录镁
 /////////////////////////////////////////////////////////////////////////
 
 #if !defined(THOST_FTDCMDAPI_H)
@@ -29,106 +29,106 @@
 class CThostFtdcMdSpi
 {
 public:
-	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
+	///碌卤驴脥禄搂露脣脫毛陆禄脪脳潞贸脤篓陆篓脕垄脝冒脥篓脨脜脕卢陆脫脢卤拢篓禄鹿脦麓碌脟脗录脟掳拢漏拢卢赂脙路陆路篓卤禄碌梅脫脙隆拢
 	virtual void OnFrontConnected(){};
 	
-	///当客户端与交易后台通信连接断开时，该方法被调用。当发生这个情况后，API会自动重新连接，客户端可不做处理。
-	///@param nReason 错误原因
-	///        0x1001 网络读失败
-	///        0x1002 网络写失败
-	///        0x2001 接收心跳超时
-	///        0x2002 发送心跳失败
-	///        0x2003 收到错误报文
+	///碌卤驴脥禄搂露脣脫毛陆禄脪脳潞贸脤篓脥篓脨脜脕卢陆脫露脧驴陋脢卤拢卢赂脙路陆路篓卤禄碌梅脫脙隆拢碌卤路垄脡煤脮芒赂枚脟茅驴枚潞贸拢卢API禄谩脳脭露炉脰脴脨脗脕卢陆脫拢卢驴脥禄搂露脣驴脡虏禄脳枚麓娄脌铆隆拢
+	///@param nReason 麓铆脦贸脭颅脪貌
+	///        0x1001 脥酶脗莽露脕脢搂掳脺
+	///        0x1002 脥酶脗莽脨麓脢搂掳脺
+	///        0x2001 陆脫脢脮脨脛脤酶鲁卢脢卤
+	///        0x2002 路垄脣脥脨脛脤酶脢搂掳脺
+	///        0x2003 脢脮碌陆麓铆脦贸卤篓脦脛
 	virtual void OnFrontDisconnected(int nReason){};
 		
-	///心跳超时警告。当长时间未收到报文时，该方法被调用。
-	///@param nTimeLapse 距离上次接收报文的时间
+	///脨脛脤酶鲁卢脢卤戮炉赂忙隆拢碌卤鲁陇脢卤录盲脦麓脢脮碌陆卤篓脦脛脢卤拢卢赂脙路陆路篓卤禄碌梅脫脙隆拢
+	///@param nTimeLapse 戮脿脌毛脡脧麓脦陆脫脢脮卤篓脦脛碌脛脢卤录盲
 	virtual void OnHeartBeatWarning(int nTimeLapse){};
 	
 
-	///登录请求响应
+	///碌脟脗录脟毛脟贸脧矛脫娄
 	virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///登出请求响应
+	///碌脟鲁枚脟毛脟贸脧矛脫娄
 	virtual void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///错误应答
+	///麓铆脦贸脫娄麓冒
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///订阅行情应答
+	///露漏脭脛脨脨脟茅脫娄麓冒
 	virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///取消订阅行情应答
+	///脠隆脧没露漏脭脛脨脨脟茅脫娄麓冒
 	virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///深度行情通知
+	///脡卯露脠脨脨脟茅脥篓脰陋
 	virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData) {};
 };
 
 class MD_API_EXPORT CThostFtdcMdApi
 {
 public:
-	///创建MdApi
-	///@param pszFlowPath 存贮订阅信息文件的目录，默认为当前目录
-	///@return 创建出的UserApi
+	///麓麓陆篓MdApi
+	///@param pszFlowPath 麓忙脰眉露漏脭脛脨脜脧垄脦脛录镁碌脛脛驴脗录拢卢脛卢脠脧脦陋碌卤脟掳脛驴脗录
+	///@return 麓麓陆篓鲁枚碌脛UserApi
 	///modify for udp marketdata
 	static CThostFtdcMdApi *CreateFtdcMdApi(const char *pszFlowPath = "", const bool bIsUsingUdp=false, const bool bIsMulticast=false);
 	
-	///删除接口对象本身
-	///@remark 不再使用本接口对象时,调用该函数删除接口对象
+	///脡戮鲁媒陆脫驴脷露脭脧贸卤戮脡铆
+	///@remark 虏禄脭脵脢鹿脫脙卤戮陆脫驴脷露脭脧贸脢卤,碌梅脫脙赂脙潞炉脢媒脡戮鲁媒陆脫驴脷露脭脧贸
 	virtual void Release() = 0;
 	
-	///初始化
-	///@remark 初始化运行环境,只有调用后,接口才开始工作
+	///鲁玫脢录禄炉
+	///@remark 鲁玫脢录禄炉脭脣脨脨禄路戮鲁,脰禄脫脨碌梅脫脙潞贸,陆脫驴脷虏脜驴陋脢录鹿陇脳梅
 	virtual void Init() = 0;
 	
-	///等待接口线程结束运行
-	///@return 线程退出代码
+	///碌脠麓媒陆脫驴脷脧脽鲁脤陆谩脢酶脭脣脨脨
+	///@return 脧脽鲁脤脥脣鲁枚麓煤脗毛
 	virtual int Join() = 0;
 	
-	///获取当前交易日
-	///@retrun 获取到的交易日
-	///@remark 只有登录成功后,才能得到正确的交易日
+	///禄帽脠隆碌卤脟掳陆禄脪脳脠脮
+	///@retrun 禄帽脠隆碌陆碌脛陆禄脪脳脠脮
+	///@remark 脰禄脫脨碌脟脗录鲁脡鹿娄潞贸,虏脜脛脺碌脙碌陆脮媒脠路碌脛陆禄脪脳脠脮
 	virtual const char *GetTradingDay() = 0;
 	
-	///注册前置机网络地址
-	///@param pszFrontAddress：前置机网络地址。
-	///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:17001”。 
-	///@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”17001”代表服务器端口号。
+	///脳垄虏谩脟掳脰脙禄煤脥酶脗莽碌脴脰路
+	///@param pszFrontAddress拢潞脟掳脰脙禄煤脥酶脗莽碌脴脰路隆拢
+	///@remark 脥酶脗莽碌脴脰路碌脛赂帽脢陆脦陋拢潞隆掳protocol://ipaddress:port隆卤拢卢脠莽拢潞隆卤tcp://127.0.0.1:17001隆卤隆拢 
+	///@remark 隆掳tcp隆卤麓煤卤铆麓芦脢盲脨颅脪茅拢卢隆掳127.0.0.1隆卤麓煤卤铆路镁脦帽脝梅碌脴脰路隆拢隆卤17001隆卤麓煤卤铆路镁脦帽脝梅露脣驴脷潞脜隆拢
 	virtual void RegisterFront(char *pszFrontAddress) = 0;
 	
-	///注册名字服务器网络地址
-	///@param pszNsAddress：名字服务器网络地址。
-	///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:12001”。 
-	///@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”12001”代表服务器端口号。
-	///@remark RegisterNameServer优先于RegisterFront
+	///脳垄虏谩脙没脳脰路镁脦帽脝梅脥酶脗莽碌脴脰路
+	///@param pszNsAddress拢潞脙没脳脰路镁脦帽脝梅脥酶脗莽碌脴脰路隆拢
+	///@remark 脥酶脗莽碌脴脰路碌脛赂帽脢陆脦陋拢潞隆掳protocol://ipaddress:port隆卤拢卢脠莽拢潞隆卤tcp://127.0.0.1:12001隆卤隆拢 
+	///@remark 隆掳tcp隆卤麓煤卤铆麓芦脢盲脨颅脪茅拢卢隆掳127.0.0.1隆卤麓煤卤铆路镁脦帽脝梅碌脴脰路隆拢隆卤12001隆卤麓煤卤铆路镁脦帽脝梅露脣驴脷潞脜隆拢
+	///@remark RegisterNameServer脫脜脧脠脫脷RegisterFront
 	virtual void RegisterNameServer(char *pszNsAddress) = 0;
 	
-	///注册名字服务器用户信息
-	///@param pFensUserInfo：用户信息。
+	///脳垄虏谩脙没脳脰路镁脦帽脝梅脫脙禄搂脨脜脧垄
+	///@param pFensUserInfo拢潞脫脙禄搂脨脜脧垄隆拢
 	virtual void RegisterFensUserInfo(CThostFtdcFensUserInfoField * pFensUserInfo) = 0;
 	
-	///注册回调接口
-	///@param pSpi 派生自回调接口类的实例
+	///脳垄虏谩禄脴碌梅陆脫驴脷
+	///@param pSpi 脜脡脡煤脳脭禄脴碌梅陆脫驴脷脌脿碌脛脢碌脌媒
 	virtual void RegisterSpi(CThostFtdcMdSpi *pSpi) = 0;
 	
-	///订阅行情。
-	///@param ppInstrumentID 合约ID  
-	///@param nCount 要订阅/退订行情的合约个数
+	///露漏脭脛脨脨脟茅隆拢
+	///@param ppInstrumentID 潞脧脭录ID  
+	///@param nCount 脪陋露漏脭脛/脥脣露漏脨脨脟茅碌脛潞脧脭录赂枚脢媒
 	///@remark 
 	virtual int SubscribeMarketData(char *ppInstrumentID[], int nCount) = 0;
 
-	///退订行情。
-	///@param ppInstrumentID 合约ID  
-	///@param nCount 要订阅/退订行情的合约个数
+	///脥脣露漏脨脨脟茅隆拢
+	///@param ppInstrumentID 潞脧脭录ID  
+	///@param nCount 脪陋露漏脭脛/脥脣露漏脨脨脟茅碌脛潞脧脭录赂枚脢媒
 	///@remark 
 	virtual int UnSubscribeMarketData(char *ppInstrumentID[], int nCount) = 0;
 
-	///用户登录请求
+	///脫脙禄搂碌脟脗录脟毛脟贸
 	virtual int ReqUserLogin(CThostFtdcReqUserLoginField *pReqUserLoginField, int nRequestID) = 0;
 	
 
-	///登出请求
+	///碌脟鲁枚脟毛脟贸
 	virtual int ReqUserLogout(CThostFtdcUserLogoutField *pUserLogout, int nRequestID) = 0;
 protected:
 	~CThostFtdcMdApi(){};

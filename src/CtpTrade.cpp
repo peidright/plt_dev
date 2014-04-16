@@ -558,6 +558,7 @@ void CtpTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 		} else {
 			LOG_DEBUG<<"spi OnRspInfo is NULL"<<std::endl;
 		}
+		this->ctptrader->post_msg(msg);
 	} else {
 		LOG_DEBUG<<"spi OnRspError pRspInfo error"<<std::endl;
 	}
