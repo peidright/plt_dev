@@ -315,8 +315,8 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 	data->lprice=mdata->pDepthMarketData.LowerLimitPrice;
 	data->high=mdata->pDepthMarketData.HighestPrice;
 	data->low=mdata->pDepthMarketData.LowestPrice;
-	data->close=mdata->pDepthMarketData.OpenPrice;
-	data->open=mdata->pDepthMarketData.ClosePrice;
+	data->close=mdata->pDepthMarketData.ClosePrice;
+	data->open=mdata->pDepthMarketData.OpenPrice;
 	data->lastprice=mdata->pDepthMarketData.LastPrice;
 	quote_push(contract,data);
 	//data->avgprice=
