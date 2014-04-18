@@ -2,6 +2,9 @@
 #define MDSERIES_H_
 #include "dseries.h"
 #include "log.h"
+#include "instmgr.h"
+
+class inst;
 
 #include <map>
 using namespace std;
@@ -34,6 +37,18 @@ public:
 	mdseries(period_type ptype, int period);
 	int updatems(float v, int b1, int b2);
 	int updateme(float v, int b1, int b2);
+	int update(float o,float c,float h, float l, int sec, int msec) {
+		if(this->period==1) {
+			//todo 
+			return 0;
+		}
+		assert(this->ptype==MINUTE);
+		high.update(h,sec,msec,HIGH,period);
+		low.update(l,sec,msec,LOW,period);
+		open.update(o,sec,msec,OPEN,period);
+		close.update(c,sec,msec,CLOSE,period);
+		/*todo volume*/
+	}
 	int kline_update();
 };
 
@@ -44,10 +59,21 @@ public:
 	map<int, mdseries*> mds;
 	vector<int>         perids;
 	dseries             ds;  /*base misc service*/
+	inst                *pinst;
+	md() {
+		this->pinst=NULL;
+	}
 	int update(float v, int t1, int t2);
+	int update(float o,float c,float h, float l, int sec, int msec) {
+		/*
+		 * */
+		for(map<int, mdseries*>::iterator it=this->mds.begin(); it!=this->mds.end(); it++) {
+			/**/
+			it->second->update(o,c,h,l,sec,msec);
+		}
+	}
 	int update_timer();
 	int kline_update();
-
 };
 
 class mdservice {
@@ -57,7 +83,7 @@ public:
 	/*todo ¶ÁÐ´Ëø*/
 	int mmd(string contract,int period, int bar);
 	int regmd_period(string contract,period_type ptype, int period);
-	int regmd(string contract);
+	int regmd(string contract, inst *pinst);
 	int update(string contract, float v, int t1, int t2);
 	int update_timer();
 };

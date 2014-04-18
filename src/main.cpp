@@ -65,7 +65,7 @@ int ctp_quote_init(string quotedir)
 {
 		int ret=0;
 		int i,count;
-		char **ppinst;
+		char **ppinstn;
 
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
 		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,g_instmgr,quotedir);
@@ -78,14 +78,15 @@ int ctp_quote_init(string quotedir)
 		 *todo regmd all
 		 * */
 		LOG_DEBUG<<"STP1"<<std::endl;
-		g_ctp_quoter->pdmgr->get_inst_list(&ppinst,&count);
+		g_ctp_quoter->pdmgr->get_inst_list(&ppinstn,&count);
 		for(i=0;i<count;i++) {
 			//regmd
-			g_ctp_quoter->mds->regmd(ppinst[i]);
+			//1.to fix this code, rebuild. 2. if new inst, we need regmd...
+			g_ctp_quoter->mds->regmd(ppinstn[i], g_ctp_quoter->pinstmgr->instmap[ppinstn[i]]);
 
 			//reg one minute k
-			ret=g_ctp_quoter->mds->regmd_period(ppinst[i],MINUTE,1);
-			LOG_DEBUG<<"regmd:"<<ppinst[i]<<" period: 1"<<std::endl;
+			ret=g_ctp_quoter->mds->regmd_period(ppinstn[i],MINUTE,1);
+			LOG_DEBUG<<"regmd:"<<ppinstn[i]<<" period: 1"<<std::endl;
 			assert(ret==0);
 		}
 		LOG_DEBUG<<"STP2"<<std::endl;

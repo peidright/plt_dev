@@ -166,6 +166,7 @@ int md::update(float v, int t1, int t2) {
 		  每次更新，都反馈是否要更新下次线的四个值。
 		*/
 		cerr<<"ds update ms"<<std::endl;
+
 		int status=this->ds.update_ms(v,t1,t2);
 		if(status <0) {
 			/**/
@@ -207,6 +208,7 @@ int md::update(float v, int t1, int t2) {
 	}
 
 
+
 int md::kline_update()
 {
 	if(this->mds.find(1)==this->mds.end()) {
@@ -238,12 +240,21 @@ int mdservice::update(string contract, float v, int t1, int t2){
 		LOG_DEBUG<<"find not contract: "<<contract<<std::endl;
 		return -1;
 	}
+
+	if (this->mds[contract]->pinst==NULL ||
+		!this->mds[contract]->pinst->is_trading()
+	   ) {
+		/*bad struct. put it into md->update*/
+		LOG_INFO<<"not ready:"<<contract<<std::endl;
+		return -1;
+	}
+	
 	ret= this->mds[contract]->update(v,t1,t2);
 	assert(ret==0);
 	return ret;
 };
 
-int mdservice::regmd(string contract){
+int mdservice::regmd(string contract, inst *pinst){
 
 	/*
 		1.check 合约合法性
@@ -253,10 +264,11 @@ int mdservice::regmd(string contract){
 		/*log it, the contract has existed*/
 		return -1;
 	}
-	cerr<<"reg md :"<<contract<<std::endl;
+	LOG_INFO<<"reg md :"<<contract<<std::endl;
 	//assert(0);
 
 	class md *pmd= new class md();
+	pmd->pinst=pinst;
 	this->mds[contract]=pmd;
 	return 0;
 };
@@ -270,7 +282,6 @@ int mdservice::regmd_period(string contract,period_type ptype, int period){
 		return -1;
 	}
 	this->mds[contract]->reg_period(ptype,period);
-
 	return 0;
 }
 
