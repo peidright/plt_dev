@@ -118,14 +118,13 @@ again:
 
 int CtpQuoter::SubscribeMarketData()
 {
-
 	int count,ret;
 	char **ppinst;
 
 	/*todo free ppinst
-	 *
 	 * */
-	this->pdmgr->get_inst_list(&ppinst,&count);
+	int all=0;
+	this->pinstmgr->get_inst_list(&ppinst,&count,all);
 	ret=this->quote_spi->api->SubscribeMarketData(ppinst, count);
 	assert(ret==0);
 	return ret;

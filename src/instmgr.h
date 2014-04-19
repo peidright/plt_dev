@@ -24,7 +24,7 @@ class inst {
 		void copy(inst *pinst) {
 			this->inst_status=pinst->inst_status;
 			this->ignore=pinst->ignore;
-			memcpy(&this->base,&pinst->base,sizeof(CThostFtdcInstrumentField);
+			memcpy(&this->base,&pinst->base,sizeof(CThostFtdcInstrumentField));
 		}
 		int ignore;
 		int is_trading(){
@@ -69,6 +69,8 @@ class instmgr {
 	int last;
 	instmgr(dmgr *pdmgr) {
 		this->pdmgr=pdmgr;
+		this->need_inst["IF1404"]="IF1404";
+		this->need_inst["cu1407"]="cu1407";
 		last=0;
 	}
 	int create_inst_sdata() {

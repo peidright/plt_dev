@@ -25,12 +25,13 @@ public:
 	void exe_cmd(string cmd);
 	int create_tdata_table(string contract);
 	int create_kdata_table(string contract);
+	int create_inst_kdata(string instn);
+#if 0
 	int create_inst_tdata(string instn);
 	int create_inst_sdata(string instn);
-	int create_inst_kdata(string instn);
-
 	int load_inst_sdata( map<string, inst_t * > &instmap );
 	int insert_inst_sdata(inst_t *pinst);
+#endif
 
 	int update_tdata(string contract, deque<struct tdata_s*> &tdataq);
 	int update_kdata(string contract, deque<struct kdata_s*> &kdataq);
@@ -61,75 +62,11 @@ class dmgr {
 		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;return 0;};
 		int init(){
 			LOG_DEBUG<<"Begin"<<std::endl;
-			this->db_map["sdata"]->load_inst_sdata(this->instmap);
 			LOG_DEBUG<<"End"<<std::endl;
-			return 0;
-		};
-		int sync_inst(){
-			for(map<string, inst_t *>::iterator it=new_instmap.begin();it!=new_instmap.end();it++) {
-				/*
-				 * */
-				this->add_inst(it->first,it->second, 1);
-			}	
-			LOG_DEBUG<<"syn inst finished"<<std::endl;
-			this->inst_sync=1;	
 			return 0;
 		};
 		int load_inst(){
 			return 0;
 		};
-		int add_inst(string instn, inst_t *pinst, int syn) {
-			if(this->instmap.find(instn)==this->instmap.end()) {
-				/*
-				 * */
-				this->new_instmap[instn]=pinst;
-			} else {
-				free(this->instmap[instn]);
-				this->instmap[instn]=pinst;
-			}
-			if(syn) {
-				/*flush it into db;
-				 * */
-				this->db_map["tdata"]->create_inst_tdata(instn);
-				this->db_map["sdata"]->create_inst_sdata(instn);
-
-				LOG_DEBUG<<"try syn before:"<<instn.c_str()<<std::endl;
-				this->db_map["sdata"]->insert_inst_sdata(pinst);
-				LOG_DEBUG<<"try syn after:"<<instn.c_str()<<std::endl;
-
-			}
-			return 0;
-		};
-		int get_inst(string instn, inst_t **pinst) {
-			if(this->instmap.find(instn)==this->instmap.end()) {
-				/*
-				 * */
-				(*pinst)=this->new_instmap[instn];
-				/*insert it into table
-				 * */
-			} else {
-				(*pinst)=NULL;
-			}
-			return 0;
-		};
-		int get_inst_list(char ***pppinst, int *count) {
-			assert(0);
-			int i=0;
-			int c=this->instmap.size();
-			(*pppinst)= (char**)new char *[c];
-			for(map<string ,  inst_t *>::iterator it=this->instmap.begin();it!=this->instmap.end();it++) {
-				/**/
-				if((this->need_inst.size()!=0 && this->need_inst.find(it->first)==this->need_inst.end())
-				   ||(this->filter_inst.size()!=0 && this->filter_inst.find(it->first)!=this->filter_inst.end())			
-				) {
-					continue;
-				}
-				(*pppinst)[i]= new char [(it->first.size()+1)];
-				strcpy((*pppinst)[i], it->first.c_str());
-				i=i+1;
-			}
-			(*count)=i;
-			return 0;
-		}
 };
 #endif
