@@ -113,6 +113,7 @@ int datalocal::create_tdata_table(string contract)
 int datalocal::create_inst_tdata(string instn){
 	/*todo err process
 	 * */
+	assert(0);
 	char sqlbuf[256];
 	sprintf(sqlbuf,"create table tdata_%s(open real,close real,high real,low real,uprice real,lprice real,bid1 real,bid2 real,bid3 real, bid4 real, bid5 real,ask1 real,ask2 real,ask3 real,ask4 real,ask5 real,lastprice real,sec integer,msec integer,vol integer)",instn.c_str());
 	this->exe_cmd(sqlbuf);
@@ -123,6 +124,7 @@ int datalocal::create_inst_sdata(string instn){
 	/*todo err process
 		struct CThostFtdcInstrumentField
 	 */
+	assert(0);
 	char sqlbuf[1024];
 	sprintf(sqlbuf,"create table sdata_inst(InstrumentID char(32),ExchangeID char(32),InstrumentName char(32),ExchangeInstID char(32),ProductID char(32),ProductClass char(1),DeliveryYear int,DeliveryMonth int,MaxMarketOrderVolume int,MinMarketOrderVolume int,MaxLimitOrderVolume int,MinLimitOrderVolume int,VolumeMultiple int,PriceTick float,CreateDate char(32),OpenDate char(32),ExpirDate char(32),StartDelivDate char(32),EndDelivDate char(32),InstLifePhase char(1),IsTrading int,PositionType char(1) ,PositionDateType char(1),LongMarginRatio float,ShortMarginRatio float,MaxMarginSideAlgorithm char(1))");
 	this->exe_cmd(sqlbuf);
@@ -132,6 +134,7 @@ int datalocal::create_inst_sdata(string instn){
 int datalocal::load_inst_sdata( map<string , inst_t * > &instmap )
 {
 	/**/
+	assert(0);
 	int ret=0;
 	vector<map<string,string> > rows;
 	datalocal::exe_cmd("select * from sdata_inst", rows);
@@ -176,6 +179,7 @@ int datalocal::load_inst_sdata( map<string , inst_t * > &instmap )
 int datalocal::insert_inst_sdata(inst_t *pinst)
 {
 	/**/
+	assert(0);
 	char sqlbuf[2048];
 	sprintf(sqlbuf,"insert into sdata_inst values (\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%d\',\'%f\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%d\',\'%d\', \'%d\',\'%d\', \'%f\',\'%f\',\'%d\')",pinst->base.InstrumentID,pinst->base.ExchangeID,pinst->base.InstrumentName,pinst->base.ExchangeInstID,pinst->base.ProductID,pinst->base.ProductClass,pinst->base.DeliveryYear,pinst->base.DeliveryMonth,pinst->base.MaxMarketOrderVolume,pinst->base.MinMarketOrderVolume,pinst->base.MaxLimitOrderVolume,pinst->base.MinLimitOrderVolume,pinst->base.VolumeMultiple,pinst->base.PriceTick,pinst->base.CreateDate,pinst->base.OpenDate,pinst->base.ExpireDate,pinst->base.StartDelivDate,pinst->base.EndDelivDate,pinst->base.InstLifePhase,pinst->base.IsTrading,pinst->base.PositionType,pinst->base.PositionDateType,pinst->base.LongMarginRatio,pinst->base.ShortMarginRatio,pinst->base.MaxMarginSideAlgorithm);
 	LOG_DEBUG<<"strlen:"<<strlen(sqlbuf)<<std::endl;

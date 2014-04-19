@@ -71,7 +71,7 @@ public:
 			mnum[cidx]++;
 			tsec[cidx]=sec;
 			tsec[cidx]=msec;
-			switch(kdata_type) {
+			switch(ktype) {
 				case HIGH:
 					data[cidx]=std::max<float>(data[cidx],v);
 					break;

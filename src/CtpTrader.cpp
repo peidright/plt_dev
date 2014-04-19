@@ -127,6 +127,9 @@ void CtpTrader::trade_stm(msg_t &msg)
 				//TOnRspQryInstrument_t;
 				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
 					//LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
+
+
+					/*
 					pinst=new (inst_t);
 					memset(pinst,0x0, sizeof(inst_t));
 					memcpy(&pinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
@@ -134,14 +137,23 @@ void CtpTrader::trade_stm(msg_t &msg)
 					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
 						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
 						this->pdmgr->sync_inst();
-					}
+					}*/
+
 
 					/*update it into pinstmgr
 					 *todo merge pinstmgr to pdmgr
 					 * */
-					ppinst=new (inst);
+					ppinst=new inst();
+					ppinst->ignore=1;
 					memcpy(&ppinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
 					this->pinstmgr->update_inst(ppinst->base.InstrumentID, ppinst);
+					
+					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
+						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
+						//this->pdmgr->sync_inst();
+						this->pinstmgr->is_last();
+					}
+
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}

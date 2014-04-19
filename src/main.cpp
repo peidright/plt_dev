@@ -70,15 +70,15 @@ int ctp_quote_init(string quotedir)
 		g_quoter=new Quoter(g_username,g_password,g_brokerid,g_quote_addr);
 		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,g_instmgr,quotedir);
 		g_mdservice=new mdservice();
-
 		g_ctp_quoter->init(g_mdservice);
 
 
 		/*
 		 *todo regmd all
 		 * */
-		LOG_DEBUG<<"STP1"<<std::endl;
-		g_ctp_quoter->pdmgr->get_inst_list(&ppinstn,&count);
+
+		/*-1=get old, 1=get new, 0=get all*/
+		g_ctp_quoter->pinstmgr->get_inst_list(&ppinstn,&count, 0);
 		for(i=0;i<count;i++) {
 			//regmd
 			//1.to fix this code, rebuild. 2. if new inst, we need regmd...
@@ -89,22 +89,13 @@ int ctp_quote_init(string quotedir)
 			LOG_DEBUG<<"regmd:"<<ppinstn[i]<<" period: 1"<<std::endl;
 			assert(ret==0);
 		}
-		LOG_DEBUG<<"STP2"<<std::endl;
-
-
 
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
 		}
 		g_quote_tg.add_thread(new boost::thread(quote_loop,g_ctp_quoter));
-		LOG_DEBUG<<"STP3"<<std::endl;
-
 		g_ctp_quoter->start();
-		LOG_DEBUG<<"STP4"<<std::endl;
 		g_io_tg.add_thread(new boost::thread(quote_io_work));
-		LOG_DEBUG<<"quote_io loop begin"<<std::endl;
-		LOG_DEBUG<<"STP5"<<std::endl;
-
 }
 
 int ctp_db_init()
@@ -115,7 +106,8 @@ int ctp_db_init()
 
 	dt->create_tdata_table("IF1404");
 	g_dmgr=new (dmgr);
-	g_instmgr=new(instmgr);
+	g_instmgr=new instmgr(g_dmgr);
+	g_instmgr->load_inst();
 
 	g_dmgr->regdb("tdata",dt);
 	g_dmgr->regdb("sdata",ds);
@@ -130,7 +122,6 @@ int ctp_db_init()
 	}
 
 	g_quote_io.reg_dmgr(g_dmgr);
-
 	return 0;
 }
 
@@ -142,7 +133,7 @@ int ctp_stragte_init()
 int ctp_wait_loop()
 {
 	while(1){
-		sleep(1);
+		sleep(10);
 		cerr<<" main loop sleep 1"<<std::endl;
 	}
 	return 0;
@@ -171,46 +162,37 @@ int  ctp_work()
 		LOG_DEBUG<<"TRADE_INIT"<<std::endl;
 		ctp_quote_init(QUOTE_DIR);
 		LOG_DEBUG<<"QUOTE_INIT"<<std::endl;
-
 		ctp_stragte_init();
 		//ctp_debug_plug();
 		ctp_wait_loop();
 
-#if 0
-		msg_t *msg=new(msg_t);
-		msg->len=sizeof(QOnFrontConnected_t);
-		msg->data=new(QOnFrontConnected_t);
-		msg->type=QOnFrontConnected;
-		printf("OnFront Connect DEBUG\n");
-    		g_ctp_quoter->post_msg(msg);
-#endif
 		return 0;
 }
 
 
 int main(int argc, char * argv[]){
-	//tm_test();
 
 	log_init();
 	ctp_work();
 	getchar();
-	LOG_ERROR<<"111"<<std::endl;
-	/*
-
-	   test1();
-	   getchar();
-	   std::string line;
-	   boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
-	   while (std::cin)
-	   {
-	   break;
-	   std::getline(std::cin, line);
-	   boost::smatch matches;
-	   if (boost::regex_match(line, matches, pat))
-	   std::cout << matches[2] << std::endl;
-	   }
-	   ntpdate();
-	   luajit_demo();
-	*/
 	return 0;
 }
+
+/*
+   tm_test();
+   test1();
+   getchar();
+   std::string line;
+   boost::regex pat( "^Subject: (Re: |Aw: )*(.*)" );
+   while (std::cin)
+   {
+   break;
+   std::getline(std::cin, line);
+   boost::smatch matches;
+   if (boost::regex_match(line, matches, pat))
+   std::cout << matches[2] << std::endl;
+   }
+   ntpdate();
+   luajit_demo();
+   */
+

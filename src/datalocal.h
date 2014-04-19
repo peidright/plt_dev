@@ -113,6 +113,7 @@ class dmgr {
 			return 0;
 		};
 		int get_inst_list(char ***pppinst, int *count) {
+			assert(0);
 			int i=0;
 			int c=this->instmap.size();
 			(*pppinst)= (char**)new char *[c];

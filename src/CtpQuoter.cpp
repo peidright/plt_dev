@@ -371,7 +371,6 @@ void DepthMarketProcess(CtpQuoter *ctpquoter, int key)
 loop:
 	if (ctpquoter->qsem_map.find(key)==ctpquoter->qsem_map.end()) {
 		/*log it */
-		printf("can not find this slot %d, thread sleep 3 and loop null\n",key);
 		LOG_INFO<<"DepthMarketProcess: key null loop"<<key<<std::endl;
 		sleep(3);
 		boost::chrono::milliseconds(10000);
