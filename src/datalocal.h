@@ -12,6 +12,7 @@
 using namespace std;
 struct kdata_s;
 struct tdata_s;
+class  quote_io;
 class datalocal {
 public:
 	string dbn;
@@ -43,7 +44,7 @@ class dmgr {
 		map<string , datalocal * > db_map;
 		map<string ,  inst_t *> instmap;
 		map<string ,  inst_t *> qinstmap;
-
+		quote_io *pquote_io;
 		map<string,string> filter_inst;
 		map<string,string> need_inst;
 

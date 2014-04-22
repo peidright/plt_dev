@@ -1,6 +1,6 @@
 #include "quote_io.h"
 
-quote_io g_quote_io;
+//quote_io *g_quote_io;
 void quote_io::quote_kdata_push(string contract, kdata_t *data)
 {
 	if(this->kdata_map.find(contract)==this->kdata_map.end()) {
@@ -86,7 +86,7 @@ void quote_io::quote_io_work()
 }
 
 void quote_push(string contract ,tdata_t *data){
-	g_quote_io.quote_tdata_push(contract, data);
+	g_quote_io->quote_tdata_push(contract, data);
 }
 
 void quote_io_work() 
@@ -94,7 +94,7 @@ void quote_io_work()
 	while(1) {
 
 		//LOG_DEBUG<<"quote_io loop"<<std::endl;
-		g_quote_io.quote_io_work();
+		g_quote_io->quote_io_work();
 		sleep(1);
 	}
 }

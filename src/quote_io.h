@@ -52,14 +52,14 @@ typedef struct kdata_s {
 	/*为避免库耦合，暂时直接写出字段。以后为了效率，再考虑耦合*/
 	int sec;
 	int msec;
-	int close;
-	int open;
-	int uprice;
-	int lprice;
-	int highprice;
-	int lowprice;
-	int lastprice;
-	int avgprice;
+	float close;
+	float open;
+	float high;
+	float low;
+	float uprice;
+	float lprice;
+	float lastprice;
+	float avgprice;
 	int vol;
 }kdata_t;
 typedef struct kdata_io_s {
@@ -86,7 +86,7 @@ public:
 	void quote_tdata_work();
 	void quote_io_work();
 };
-extern quote_io g_quote_io;
+extern quote_io *g_quote_io;
 
 void quote_push(string contract ,tdata_t *data);
 void quote_io_work();

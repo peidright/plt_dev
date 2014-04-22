@@ -43,6 +43,7 @@ boost::thread_group g_trade_tg;
 boost::thread_group g_io_tg;
 Quoter *g_quoter;
 Trader *g_trader;
+quote_io *g_quote_io;
 CtpQuoter *g_ctp_quoter;
 CtpTrader *g_ctp_trader;
 mdservice *g_mdservice;
@@ -100,6 +101,8 @@ int ctp_quote_init(string quotedir)
 
 int ctp_db_init()
 {
+	g_quote_io=new quote_io;
+
 	datalocal *dt=new datalocal("datadir",g_db_tdata);
 	datalocal *ds=new datalocal("datadir",g_db_sdata);
 	datalocal *dk=new datalocal("datadir",g_db_kdata);
@@ -108,7 +111,7 @@ int ctp_db_init()
 	g_dmgr=new (dmgr);
 	g_instmgr=new instmgr(g_dmgr);
 	g_instmgr->load_inst();
-
+	g_dmgr->pquote_io=g_quote_io;
 	g_dmgr->regdb("tdata",dt);
 	g_dmgr->regdb("sdata",ds);
 	g_dmgr->regdb("kdata",dk);
@@ -121,7 +124,7 @@ int ctp_db_init()
 		printf("%s\n",g_product_list[i].c_str());
 	}
 
-	g_quote_io.reg_dmgr(g_dmgr);
+	g_quote_io->reg_dmgr(g_dmgr);
 	return 0;
 }
 

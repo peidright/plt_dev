@@ -73,6 +73,12 @@ class instmgr {
 		this->need_inst["cu1407"]="cu1407";
 		last=0;
 	}
+	int create_inst_kdata(string instn) {
+		char sqlbuf[1024];
+		sprintf(sqlbuf, "create table kdata_%s(open float, close float, high float, low float, vol int,sec int,msec int);",instn.c_str());
+		this->pdmgr->db_map["kdata"]->exe_cmd(sqlbuf);
+		return 0;
+	}
 	int create_inst_sdata() {
 		char sqlbuf[1024];
 		sprintf(sqlbuf,"create table sdata_inst(InstrumentID char(32),ExchangeID char(32),InstrumentName char(32),ExchangeInstID char(32),ProductID char(32),ProductClass char(1),DeliveryYear int,DeliveryMonth int,MaxMarketOrderVolume int,MinMarketOrderVolume int,MaxLimitOrderVolume int,MinLimitOrderVolume int,VolumeMultiple int,PriceTick float,CreateDate char(32),OpenDate char(32),ExpirDate char(32),StartDelivDate char(32),EndDelivDate char(32),InstLifePhase char(1),IsTrading int,PositionType char(1) ,PositionDateType char(1),LongMarginRatio float,ShortMarginRatio float,MaxMarginSideAlgorithm char(1))");
@@ -195,8 +201,17 @@ class instmgr {
 		 * */
 		if(statusmap.find(product)==statusmap.end()) {
 			LOG_INFO<<"can not find product: "<<product<<std::endl;
+			statusmap[product]=status;
+		} else {
+			if(statusmap[product]==THOST_FTDC_IS_Continous &&
+			   status==THOST_FTDC_IS_NoTrading) {
+				/*close*/
+			} else if(statusmap[product]==THOST_FTDC_IS_NoTrading &&
+				  status==THOST_FTDC_IS_Continous) {
+				/*open*/
+			}
+			statusmap[product]=status;
 		}
-		statusmap[product]=status;
 		return 0;
 	}
 

@@ -7,6 +7,8 @@
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
+class dmgr;
+
 
 
 update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int n2,period_type ptype) {
@@ -97,7 +99,16 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 
 		    return  0;
 	};
-
+	/*
+	int mdseries::flush(string instn, dmgr *pdmgr)
+		flush it to quote_io
+		return 0;
+	};
+	int mdseries::load(string instn, dmgr *pdmgr){
+		flush it to quote_io
+		return 0;
+	};
+	*/
 	int mdseries::kline_update() {
 		/*md_uptime,kd_uptime,
 		 *every time md updated, update md_uptime, 
@@ -207,6 +218,23 @@ int md::update(float v, int t1, int t2) {
 		return 0;
 	}
 
+int md::flush(string instn, dmgr *pdmgr)
+{
+	/*copy msg to quote_io
+	 *update dserice
+	 * */
+
+
+	return 0;
+}
+
+
+int md::load(string instn, dmgr *pdmgr)
+{
+	/**/
+
+	return 0;
+}
 
 
 int md::kline_update()
@@ -290,5 +318,18 @@ int mdservice::update_timer() {
 			每1秒运行一次。
 			如果当前是xx周期的开始，填补默认行情。
 		*/
+	return 0;
+}
+int mdservice::flush(string instn, dmgr *pdmgr)
+{
+	/*copy msg to quote_io
+	 *update dserice
+	 * */
+	return 0;
+}
+
+
+int mdservice::load(string instn,dmgr *pdmgr)
+{
 	return 0;
 }
