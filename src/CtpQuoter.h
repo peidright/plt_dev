@@ -24,7 +24,6 @@ typedef struct  {
 }msg_t;
 */
 
-
 class CtpQuoter{
 public:
 	CtpQuoteSpi *quote_spi;
@@ -35,6 +34,15 @@ public:
 	int running;
 	std::deque<msg_t> mqueue;
 	Quoter *quoter;
+	int status;
+	int is_sub(){
+		return status;
+	}
+
+	int set_status(int status) {
+		this->status=status;
+		return 0;
+	}
 
 	boost::interprocess::interprocess_semaphore qsem;
 	//boost::interprocess::interprocess_semaphore tsem;

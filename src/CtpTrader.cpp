@@ -150,10 +150,8 @@ void CtpTrader::trade_stm(msg_t &msg)
 					
 					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
 						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
-						//this->pdmgr->sync_inst();
-						this->pinstmgr->is_last();
+						this->pinstmgr->set_last(1);
 					}
-
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}

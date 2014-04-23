@@ -102,7 +102,7 @@ class instmgr {
 		return 0;
 	}
 	int load_inst() {
-		//assert(0);
+		/*todo may be we should use a old_instmap*/
 		int ret=0;
 		vector<map<string,string> > rows;
 		this->pdmgr->db_map["sdata"]->exe_cmd("select * from sdata_inst", rows);
@@ -151,6 +151,7 @@ class instmgr {
 			 * */
 			statusmap[pinst->base.ProductID]=THOST_FTDC_IS_NoTrading;
 		}
+		LOG_DEBUG<< "instmgr load_inst total: "<<instmap.size()<<std::endl;
 		return 0;
 	}
 
@@ -225,8 +226,10 @@ class instmgr {
 	}
 
 	int is_last() {
-		this->last=1;
-		return 0;
+		return this->last;
+	}
+	int set_last(int last) {
+		this->last=last;
 	}
 
 	int update_inst(string instn, inst *pinst) {
@@ -237,6 +240,10 @@ class instmgr {
 			/*syn it into db
 			 * */
 			this->insert_inst(pinst);
+			/*flush it into db;
+			 * */
+			this->create_inst_tdata(instn);
+			this->create_inst_sdata();
 		}else {
 			/*todo need refreash?, read==write？check, copy?
 			free(instmap[instn]);
@@ -246,13 +253,9 @@ class instmgr {
 			return 0;
 		}	
 		if(statusmap.find(pinst->base.ProductID)==statusmap.end()) {
+			LOG_INFO<<"can not find product: "<<instn<<std::endl;
 			statusmap[pinst->base.ProductID]=THOST_FTDC_IS_NoTrading;
 		}
-
-		/*flush it into db;
-		 * */
-		this->create_inst_tdata(instn);
-		this->create_inst_sdata();
 		return 0;
 	}
 };

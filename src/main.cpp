@@ -89,7 +89,7 @@ int ctp_quote_init(string quotedir)
 			ret=g_ctp_quoter->mds->regmd_period(ppinstn[i],MINUTE,1);
 			LOG_DEBUG<<"regmd:"<<ppinstn[i]<<" period: 1"<<std::endl;
 			assert(ret==0);
-			g_ctp_quoter->mds->loadmd_period(instn, period, pdmgr);
+			g_ctp_quoter->mds->loadmd_period(ppinstn[i], 1, g_dmgr);
 		}
 
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
@@ -110,12 +110,13 @@ int ctp_db_init()
 
 	dt->create_tdata_table("IF1404");
 	g_dmgr=new (dmgr);
-	g_instmgr=new instmgr(g_dmgr);
-	g_instmgr->load_inst();
-	g_dmgr->pquote_io=g_quote_io;
 	g_dmgr->regdb("tdata",dt);
 	g_dmgr->regdb("sdata",ds);
 	g_dmgr->regdb("kdata",dk);
+
+	g_instmgr=new instmgr(g_dmgr);
+	g_instmgr->load_inst();
+	g_dmgr->pquote_io=g_quote_io;
 	g_dmgr->init();
 
 	vector<map<string,string> > rows;
@@ -159,17 +160,38 @@ int ctp_debug_plug()
 
 int  ctp_work()
 {
-
+		int i=0;
 		ctp_db_init();
 		LOG_DEBUG<<"DB_INIT"<<std::endl;
 		ctp_trade_init(TRADE_DIR);
-		LOG_DEBUG<<"TRADE_INIT"<<std::endl;
+		
+		while(g_instmgr->is_last()==0) {
+			LOG_DEBUG<<"wait for instmgr is_last"<<std::endl;
+			sleep(10);
+			i++;
+			if(i%3==0) {
+				LOG_DEBUG<<"for debug set last"<<std::endl;
+				g_instmgr->set_last(1);
+			}
+		}
+		LOG_DEBUG<<"TRADE_FINISHED"<<std::endl;
+		i=0;
 		ctp_quote_init(QUOTE_DIR);
-		LOG_DEBUG<<"QUOTE_INIT"<<std::endl;
+		while(g_ctp_quoter->is_sub()==0) {
+			LOG_DEBUG<<"wait for sub market is_last"<<std::endl;
+			sleep(10);
+			i++;
+			if(i%3==0) {
+				LOG_DEBUG<<"for debug set status"<<std::endl;
+				g_ctp_quoter->set_status(1);
+			}
+
+		}
+		LOG_DEBUG<<"QUOTE_FINISHED"<<std::endl;
+
 		ctp_stragte_init();
 		//ctp_debug_plug();
 		ctp_wait_loop();
-
 		return 0;
 }
 

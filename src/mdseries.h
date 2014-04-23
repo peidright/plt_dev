@@ -181,12 +181,12 @@ public:
 	int regmd_period(string contract,period_type ptype, int period);
 	int loadmd_period(string instn, int period, dmgr *pdmgr) {
 		/*todo err*/
-		if(mds.find(inst)==mds.end()) {
+		if(mds.find(instn)==mds.end()){
 			return -1;
 		}
 		mds[instn]->load_period(instn, period, pdmgr);
 		return 0;
-	}
+	};
 
 	int regmd(string contract, inst *pinst);
 	int update(string contract, float v, int t1, int t2);

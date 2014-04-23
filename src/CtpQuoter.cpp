@@ -169,6 +169,8 @@ void CtpQuoter::quote_stm(msg_t &msg)
 				LOG_DEBUG<<"sub md: "<<((QOnRspSubMarketData_t*)msg.data)->pSpecificInstrument.InstrumentID<<std::endl;
 				if(((QOnRspSubMarketData_t*)msg.data)->bIsLast) {
 					LOG_DEBUG<<"sub md: finished"<<std::endl;
+					/**/
+					this->set_status(1);
 				}
 				msg.type=QSTOP;
 				break;
