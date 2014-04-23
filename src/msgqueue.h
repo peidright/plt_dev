@@ -13,7 +13,11 @@
 #include "boosthelp.h"
 
 
+
 enum msgtype {
+	TChange,
+	KChange,
+	TMessage,
 	TSTOP,
 	TSTART,
 	TOnFrontConnected,
@@ -204,5 +208,17 @@ typedef struct {
 	CThostFtdcDepthMarketDataField pDepthMarketData;
 }QOnRtnDepthMarketData_t;
 
+typedef struct  {
+	int subtype;
+	float v;
+}TChange_t;
+
+typedef struct  {
+	int subtype;
+	float o;
+	float c;
+	float h;
+	float l;
+}KChange_t;
 
 #endif
