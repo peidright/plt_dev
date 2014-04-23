@@ -89,6 +89,7 @@ int ctp_quote_init(string quotedir)
 			ret=g_ctp_quoter->mds->regmd_period(ppinstn[i],MINUTE,1);
 			LOG_DEBUG<<"regmd:"<<ppinstn[i]<<" period: 1"<<std::endl;
 			assert(ret==0);
+			g_ctp_quoter->mds->loadmd_period(instn, period, pdmgr);
 		}
 
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){

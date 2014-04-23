@@ -114,7 +114,7 @@ public:
 		int sec, msec,vol;
 		float open,close,high,low;
 		char sqlbuf[1024];
-		snprintf(sqlbuf,1024,"select * from kdata_%s order by sec desc limit 10000",instn.c_str());
+		snprintf(sqlbuf,1024,"select * from kdata_%s order by sec asc limit 10000",instn.c_str());
 		vector<map<string,string> > result;
 		pdmgr->db_map["kdata"]->exe_cmd("sqlbuf", result);
 		
@@ -140,6 +140,14 @@ public:
 
 class md {
 public:
+	int load_period(string instn, int period, dmgr *pdmgr) {
+		if(mds.find(period)==mds.end()) {
+			/*todo*/
+			return -1;
+		}
+		mds[period]->load(instn,pdmgr);
+		return 0;
+	}
 	int reg_period(period_type ptype, int period);
 	int drivemd();
 	map<int, mdseries*> mds;
@@ -171,6 +179,15 @@ public:
 	/*todo ¶ÁÐ´Ëø*/
 	int mmd(string contract,int period, int bar);
 	int regmd_period(string contract,period_type ptype, int period);
+	int loadmd_period(string instn, int period, dmgr *pdmgr) {
+		/*todo err*/
+		if(mds.find(inst)==mds.end()) {
+			return -1;
+		}
+		mds[instn]->load_period(instn, period, pdmgr);
+		return 0;
+	}
+
 	int regmd(string contract, inst *pinst);
 	int update(string contract, float v, int t1, int t2);
 	int update_timer();

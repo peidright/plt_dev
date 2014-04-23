@@ -21,20 +21,6 @@ int get_period_slot(int sec,int msec, period_type ptype,int period){
 
 dseries::dseries(){
 	/*
-	static const int MAX_DSERIES_SIZE=100000;
-	float data[MAX_DSERIES_SIZE];
-	int   tsec[MAX_DSERIES_SIZE];
-	int   tmsec[MAX_DSERIES_SIZE];
-	timed_mutex dmutex;
-	typedef int (*updatecb)(float ,int,int);
-	updatecb cb;
-	int eidx;
-	int bidx;
-	int cidx;
-	int esec,emsec;
-    	int csec,cmsec;
-	int bsec,bmsec;
-	period_type ptype;
 	*/
 	eidx=0;
 	bidx=0;
