@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////////////////////////////
-///@system 新一代交易所系统
-///@company 上海期货信息技术有限公司
+///@system 脨脗脪禄麓煤陆禄脪脳脣霉脧碌脥鲁
+///@company 脡脧潞拢脝脷禄玫脨脜脧垄录录脢玫脫脨脧脼鹿芦脣戮
 ///@file ThostFtdcTraderApi.h
-///@brief 定义了客户端接口
+///@brief 露篓脪氓脕脣驴脥禄搂露脣陆脫驴脷
 ///@history 
-///20060106	赵鸿昊		创建该文件
+///20060106	脮脭潞猫锚禄		麓麓陆篓赂脙脦脛录镁
 /////////////////////////////////////////////////////////////////////////
 
 #if !defined(THOST_FTDCTRADERAPI_H)
@@ -29,442 +29,442 @@
 class CThostFtdcTraderSpi
 {
 public:
-	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
+	///碌卤驴脥禄搂露脣脫毛陆禄脪脳潞贸脤篓陆篓脕垄脝冒脥篓脨脜脕卢陆脫脢卤拢篓禄鹿脦麓碌脟脗录脟掳拢漏拢卢赂脙路陆路篓卤禄碌梅脫脙隆拢
 	virtual void OnFrontConnected(){};
 	
-	///当客户端与交易后台通信连接断开时，该方法被调用。当发生这个情况后，API会自动重新连接，客户端可不做处理。
-	///@param nReason 错误原因
-	///        0x1001 网络读失败
-	///        0x1002 网络写失败
-	///        0x2001 接收心跳超时
-	///        0x2002 发送心跳失败
-	///        0x2003 收到错误报文
+	///碌卤驴脥禄搂露脣脫毛陆禄脪脳潞贸脤篓脥篓脨脜脕卢陆脫露脧驴陋脢卤拢卢赂脙路陆路篓卤禄碌梅脫脙隆拢碌卤路垄脡煤脮芒赂枚脟茅驴枚潞贸拢卢API禄谩脳脭露炉脰脴脨脗脕卢陆脫拢卢驴脥禄搂露脣驴脡虏禄脳枚麓娄脌铆隆拢
+	///@param nReason 麓铆脦贸脭颅脪貌
+	///        0x1001 脥酶脗莽露脕脢搂掳脺
+	///        0x1002 脥酶脗莽脨麓脢搂掳脺
+	///        0x2001 陆脫脢脮脨脛脤酶鲁卢脢卤
+	///        0x2002 路垄脣脥脨脛脤酶脢搂掳脺
+	///        0x2003 脢脮碌陆麓铆脦贸卤篓脦脛
 	virtual void OnFrontDisconnected(int nReason){};
 		
-	///心跳超时警告。当长时间未收到报文时，该方法被调用。
-	///@param nTimeLapse 距离上次接收报文的时间
+	///脨脛脤酶鲁卢脢卤戮炉赂忙隆拢碌卤鲁陇脢卤录盲脦麓脢脮碌陆卤篓脦脛脢卤拢卢赂脙路陆路篓卤禄碌梅脫脙隆拢
+	///@param nTimeLapse 戮脿脌毛脡脧麓脦陆脫脢脮卤篓脦脛碌脛脢卤录盲
 	virtual void OnHeartBeatWarning(int nTimeLapse){};
 	
-	///客户端认证响应
+	///驴脥禄搂露脣脠脧脰陇脧矛脫娄
 	virtual void OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 	
 
-	///登录请求响应
+	///碌脟脗录脟毛脟贸脧矛脫娄
 	virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///登出请求响应
+	///碌脟鲁枚脟毛脟贸脧矛脫娄
 	virtual void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///用户口令更新请求响应
+	///脫脙禄搂驴脷脕卯赂眉脨脗脟毛脟贸脧矛脫娄
 	virtual void OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///资金账户口令更新请求响应
+	///脳脢陆冒脮脣禄搂驴脷脕卯赂眉脨脗脟毛脟贸脧矛脫娄
 	virtual void OnRspTradingAccountPasswordUpdate(CThostFtdcTradingAccountPasswordUpdateField *pTradingAccountPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///报单录入请求响应
+	///卤篓碌楼脗录脠毛脟毛脟贸脧矛脫娄
 	virtual void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///预埋单录入请求响应
+	///脭陇脗帽碌楼脗录脠毛脟毛脟贸脧矛脫娄
 	virtual void OnRspParkedOrderInsert(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///预埋撤单录入请求响应
+	///脭陇脗帽鲁路碌楼脗录脠毛脟毛脟贸脧矛脫娄
 	virtual void OnRspParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///报单操作请求响应
+	///卤篓碌楼虏脵脳梅脟毛脟贸脧矛脫娄
 	virtual void OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///查询最大报单数量响应
+	///虏茅脩炉脳卯麓贸卤篓碌楼脢媒脕驴脧矛脫娄
 	virtual void OnRspQueryMaxOrderVolume(CThostFtdcQueryMaxOrderVolumeField *pQueryMaxOrderVolume, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///投资者结算结果确认响应
+	///脥露脳脢脮脽陆谩脣茫陆谩鹿没脠路脠脧脧矛脫娄
 	virtual void OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///删除预埋单响应
+	///脡戮鲁媒脭陇脗帽碌楼脧矛脫娄
 	virtual void OnRspRemoveParkedOrder(CThostFtdcRemoveParkedOrderField *pRemoveParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///删除预埋撤单响应
+	///脡戮鲁媒脭陇脗帽鲁路碌楼脧矛脫娄
 	virtual void OnRspRemoveParkedOrderAction(CThostFtdcRemoveParkedOrderActionField *pRemoveParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询报单响应
+	///脟毛脟贸虏茅脩炉卤篓碌楼脧矛脫娄
 	virtual void OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询成交响应
+	///脟毛脟贸虏茅脩炉鲁脡陆禄脧矛脫娄
 	virtual void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询投资者持仓响应
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽鲁脰虏脰脧矛脫娄
 	virtual void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询资金账户响应
+	///脟毛脟贸虏茅脩炉脳脢陆冒脮脣禄搂脧矛脫娄
 	virtual void OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询投资者响应
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽脧矛脫娄
 	virtual void OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询交易编码响应
+	///脟毛脟贸虏茅脩炉陆禄脪脳卤脿脗毛脧矛脫娄
 	virtual void OnRspQryTradingCode(CThostFtdcTradingCodeField *pTradingCode, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询合约保证金率响应
+	///脟毛脟贸虏茅脩炉潞脧脭录卤拢脰陇陆冒脗脢脧矛脫娄
 	virtual void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询合约手续费率响应
+	///脟毛脟贸虏茅脩炉潞脧脭录脢脰脨酶路脩脗脢脧矛脫娄
 	virtual void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询交易所响应
+	///脟毛脟贸虏茅脩炉陆禄脪脳脣霉脧矛脫娄
 	virtual void OnRspQryExchange(CThostFtdcExchangeField *pExchange, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询合约响应
+	///脟毛脟贸虏茅脩炉潞脧脭录脧矛脫娄
 	virtual void OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询行情响应
+	///脟毛脟贸虏茅脩炉脨脨脟茅脧矛脫娄
 	virtual void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询投资者结算结果响应
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽陆谩脣茫陆谩鹿没脧矛脫娄
 	virtual void OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询转帐银行响应
+	///脟毛脟贸虏茅脩炉脳陋脮脢脪酶脨脨脧矛脫娄
 	virtual void OnRspQryTransferBank(CThostFtdcTransferBankField *pTransferBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询投资者持仓明细响应
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽鲁脰虏脰脙梅脧赂脧矛脫娄
 	virtual void OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询客户通知响应
+	///脟毛脟贸虏茅脩炉驴脥禄搂脥篓脰陋脧矛脫娄
 	virtual void OnRspQryNotice(CThostFtdcNoticeField *pNotice, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询结算信息确认响应
+	///脟毛脟贸虏茅脩炉陆谩脣茫脨脜脧垄脠路脠脧脧矛脫娄
 	virtual void OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询投资者持仓明细响应
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽鲁脰虏脰脙梅脧赂脧矛脫娄
 	virtual void OnRspQryInvestorPositionCombineDetail(CThostFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///查询保证金监管系统经纪公司资金账户密钥响应
+	///虏茅脩炉卤拢脰陇陆冒录脿鹿脺脧碌脥鲁戮颅录脥鹿芦脣戮脳脢陆冒脮脣禄搂脙脺脭驴脧矛脫娄
 	virtual void OnRspQryCFMMCTradingAccountKey(CThostFtdcCFMMCTradingAccountKeyField *pCFMMCTradingAccountKey, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询仓单折抵信息响应
+	///脟毛脟贸虏茅脩炉虏脰碌楼脮脹碌脰脨脜脧垄脧矛脫娄
 	virtual void OnRspQryEWarrantOffset(CThostFtdcEWarrantOffsetField *pEWarrantOffset, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询投资者品种/跨品种保证金响应
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽脝路脰脰/驴莽脝路脰脰卤拢脰陇陆冒脧矛脫娄
 	virtual void OnRspQryInvestorProductGroupMargin(CThostFtdcInvestorProductGroupMarginField *pInvestorProductGroupMargin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询交易所保证金率响应
+	///脟毛脟贸虏茅脩炉陆禄脪脳脣霉卤拢脰陇陆冒脗脢脧矛脫娄
 	virtual void OnRspQryExchangeMarginRate(CThostFtdcExchangeMarginRateField *pExchangeMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询交易所调整保证金率响应
+	///脟毛脟贸虏茅脩炉陆禄脪脳脣霉碌梅脮没卤拢脰陇陆冒脗脢脧矛脫娄
 	virtual void OnRspQryExchangeMarginRateAdjust(CThostFtdcExchangeMarginRateAdjustField *pExchangeMarginRateAdjust, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询转帐流水响应
+	///脟毛脟贸虏茅脩炉脳陋脮脢脕梅脣庐脧矛脫娄
 	virtual void OnRspQryTransferSerial(CThostFtdcTransferSerialField *pTransferSerial, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询银期签约关系响应
+	///脟毛脟贸虏茅脩炉脪酶脝脷脟漏脭录鹿脴脧碌脧矛脫娄
 	virtual void OnRspQryAccountregister(CThostFtdcAccountregisterField *pAccountregister, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///错误应答
+	///麓铆脦贸脫娄麓冒
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///报单通知
+	///卤篓碌楼脥篓脰陋
 	virtual void OnRtnOrder(CThostFtdcOrderField *pOrder) {};
 
-	///成交通知
+	///鲁脡陆禄脥篓脰陋
 	virtual void OnRtnTrade(CThostFtdcTradeField *pTrade) {};
 
-	///报单录入错误回报
+	///卤篓碌楼脗录脠毛麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///报单操作错误回报
+	///卤篓碌楼虏脵脳梅麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///合约交易状态通知
+	///潞脧脭录陆禄脪脳脳麓脤卢脥篓脰陋
 	virtual void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus) {};
 
-	///交易通知
+	///陆禄脪脳脥篓脰陋
 	virtual void OnRtnTradingNotice(CThostFtdcTradingNoticeInfoField *pTradingNoticeInfo) {};
 
-	///提示条件单校验错误
+	///脤谩脢戮脤玫录镁碌楼脨拢脩茅麓铆脦贸
 	virtual void OnRtnErrorConditionalOrder(CThostFtdcErrorConditionalOrderField *pErrorConditionalOrder) {};
 
-	///请求查询签约银行响应
+	///脟毛脟贸虏茅脩炉脟漏脭录脪酶脨脨脧矛脫娄
 	virtual void OnRspQryContractBank(CThostFtdcContractBankField *pContractBank, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询预埋单响应
+	///脟毛脟贸虏茅脩炉脭陇脗帽碌楼脧矛脫娄
 	virtual void OnRspQryParkedOrder(CThostFtdcParkedOrderField *pParkedOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询预埋撤单响应
+	///脟毛脟贸虏茅脩炉脭陇脗帽鲁路碌楼脧矛脫娄
 	virtual void OnRspQryParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询交易通知响应
+	///脟毛脟贸虏茅脩炉陆禄脪脳脥篓脰陋脧矛脫娄
 	virtual void OnRspQryTradingNotice(CThostFtdcTradingNoticeField *pTradingNotice, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询经纪公司交易参数响应
+	///脟毛脟贸虏茅脩炉戮颅录脥鹿芦脣戮陆禄脪脳虏脦脢媒脧矛脫娄
 	virtual void OnRspQryBrokerTradingParams(CThostFtdcBrokerTradingParamsField *pBrokerTradingParams, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///请求查询经纪公司交易算法响应
+	///脟毛脟贸虏茅脩炉戮颅录脥鹿芦脣戮陆禄脪脳脣茫路篓脧矛脫娄
 	virtual void OnRspQryBrokerTradingAlgos(CThostFtdcBrokerTradingAlgosField *pBrokerTradingAlgos, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///银行发起银行资金转期货通知
+	///脪酶脨脨路垄脝冒脪酶脨脨脳脢陆冒脳陋脝脷禄玫脥篓脰陋
 	virtual void OnRtnFromBankToFutureByBank(CThostFtdcRspTransferField *pRspTransfer) {};
 
-	///银行发起期货资金转银行通知
+	///脪酶脨脨路垄脝冒脝脷禄玫脳脢陆冒脳陋脪酶脨脨脥篓脰陋
 	virtual void OnRtnFromFutureToBankByBank(CThostFtdcRspTransferField *pRspTransfer) {};
 
-	///银行发起冲正银行转期货通知
+	///脪酶脨脨路垄脝冒鲁氓脮媒脪酶脨脨脳陋脝脷禄玫脥篓脰陋
 	virtual void OnRtnRepealFromBankToFutureByBank(CThostFtdcRspRepealField *pRspRepeal) {};
 
-	///银行发起冲正期货转银行通知
+	///脪酶脨脨路垄脝冒鲁氓脮媒脝脷禄玫脳陋脪酶脨脨脥篓脰陋
 	virtual void OnRtnRepealFromFutureToBankByBank(CThostFtdcRspRepealField *pRspRepeal) {};
 
-	///期货发起银行资金转期货通知
+	///脝脷禄玫路垄脝冒脪酶脨脨脳脢陆冒脳陋脝脷禄玫脥篓脰陋
 	virtual void OnRtnFromBankToFutureByFuture(CThostFtdcRspTransferField *pRspTransfer) {};
 
-	///期货发起期货资金转银行通知
+	///脝脷禄玫路垄脝冒脝脷禄玫脳脢陆冒脳陋脪酶脨脨脥篓脰陋
 	virtual void OnRtnFromFutureToBankByFuture(CThostFtdcRspTransferField *pRspTransfer) {};
 
-	///系统运行时期货端手工发起冲正银行转期货请求，银行处理完毕后报盘发回的通知
+	///脧碌脥鲁脭脣脨脨脢卤脝脷禄玫露脣脢脰鹿陇路垄脝冒鲁氓脮媒脪酶脨脨脳陋脝脷禄玫脟毛脟贸拢卢脪酶脨脨麓娄脌铆脥锚卤脧潞贸卤篓脜脤路垄禄脴碌脛脥篓脰陋
 	virtual void OnRtnRepealFromBankToFutureByFutureManual(CThostFtdcRspRepealField *pRspRepeal) {};
 
-	///系统运行时期货端手工发起冲正期货转银行请求，银行处理完毕后报盘发回的通知
+	///脧碌脥鲁脭脣脨脨脢卤脝脷禄玫露脣脢脰鹿陇路垄脝冒鲁氓脮媒脝脷禄玫脳陋脪酶脨脨脟毛脟贸拢卢脪酶脨脨麓娄脌铆脥锚卤脧潞贸卤篓脜脤路垄禄脴碌脛脥篓脰陋
 	virtual void OnRtnRepealFromFutureToBankByFutureManual(CThostFtdcRspRepealField *pRspRepeal) {};
 
-	///期货发起查询银行余额通知
+	///脝脷禄玫路垄脝冒虏茅脩炉脪酶脨脨脫脿露卯脥篓脰陋
 	virtual void OnRtnQueryBankBalanceByFuture(CThostFtdcNotifyQueryAccountField *pNotifyQueryAccount) {};
 
-	///期货发起银行资金转期货错误回报
+	///脝脷禄玫路垄脝冒脪酶脨脨脳脢陆冒脳陋脝脷禄玫麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///期货发起期货资金转银行错误回报
+	///脝脷禄玫路垄脝冒脝脷禄玫脳脢陆冒脳陋脪酶脨脨麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///系统运行时期货端手工发起冲正银行转期货错误回报
+	///脧碌脥鲁脭脣脨脨脢卤脝脷禄玫露脣脢脰鹿陇路垄脝冒鲁氓脮媒脪酶脨脨脳陋脝脷禄玫麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnRepealBankToFutureByFutureManual(CThostFtdcReqRepealField *pReqRepeal, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///系统运行时期货端手工发起冲正期货转银行错误回报
+	///脧碌脥鲁脭脣脨脨脢卤脝脷禄玫露脣脢脰鹿陇路垄脝冒鲁氓脮媒脝脷禄玫脳陋脪酶脨脨麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnRepealFutureToBankByFutureManual(CThostFtdcReqRepealField *pReqRepeal, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///期货发起查询银行余额错误回报
+	///脝脷禄玫路垄脝冒虏茅脩炉脪酶脨脨脫脿露卯麓铆脦贸禄脴卤篓
 	virtual void OnErrRtnQueryBankBalanceByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, CThostFtdcRspInfoField *pRspInfo) {};
 
-	///期货发起冲正银行转期货请求，银行处理完毕后报盘发回的通知
+	///脝脷禄玫路垄脝冒鲁氓脮媒脪酶脨脨脳陋脝脷禄玫脟毛脟贸拢卢脪酶脨脨麓娄脌铆脥锚卤脧潞贸卤篓脜脤路垄禄脴碌脛脥篓脰陋
 	virtual void OnRtnRepealFromBankToFutureByFuture(CThostFtdcRspRepealField *pRspRepeal) {};
 
-	///期货发起冲正期货转银行请求，银行处理完毕后报盘发回的通知
+	///脝脷禄玫路垄脝冒鲁氓脮媒脝脷禄玫脳陋脪酶脨脨脟毛脟贸拢卢脪酶脨脨麓娄脌铆脥锚卤脧潞贸卤篓脜脤路垄禄脴碌脛脥篓脰陋
 	virtual void OnRtnRepealFromFutureToBankByFuture(CThostFtdcRspRepealField *pRspRepeal) {};
 
-	///期货发起银行资金转期货应答
+	///脝脷禄玫路垄脝冒脪酶脨脨脳脢陆冒脳陋脝脷禄玫脫娄麓冒
 	virtual void OnRspFromBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///期货发起期货资金转银行应答
+	///脝脷禄玫路垄脝冒脝脷禄玫脳脢陆冒脳陋脪酶脨脨脫娄麓冒
 	virtual void OnRspFromFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///期货发起查询银行余额应答
+	///脝脷禄玫路垄脝冒虏茅脩炉脪酶脨脨脫脿露卯脫娄麓冒
 	virtual void OnRspQueryBankAccountMoneyByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///银行发起银期开户通知
+	///脪酶脨脨路垄脝冒脪酶脝脷驴陋禄搂脥篓脰陋
 	virtual void OnRtnOpenAccountByBank(CThostFtdcOpenAccountField *pOpenAccount) {};
 
-	///银行发起银期销户通知
+	///脪酶脨脨路垄脝冒脪酶脝脷脧煤禄搂脥篓脰陋
 	virtual void OnRtnCancelAccountByBank(CThostFtdcCancelAccountField *pCancelAccount) {};
 
-	///银行发起变更银行账号通知
+	///脪酶脨脨路垄脝冒卤盲赂眉脪酶脨脨脮脣潞脜脥篓脰陋
 	virtual void OnRtnChangeAccountByBank(CThostFtdcChangeAccountField *pChangeAccount) {};
 };
 
 class TRADER_API_EXPORT CThostFtdcTraderApi
 {
 public:
-	///创建TraderApi
-	///@param pszFlowPath 存贮订阅信息文件的目录，默认为当前目录
-	///@return 创建出的UserApi
+	///麓麓陆篓TraderApi
+	///@param pszFlowPath 麓忙脰眉露漏脭脛脨脜脧垄脦脛录镁碌脛脛驴脗录拢卢脛卢脠脧脦陋碌卤脟掳脛驴脗录
+	///@return 麓麓陆篓鲁枚碌脛UserApi
 	static CThostFtdcTraderApi *CreateFtdcTraderApi(const char *pszFlowPath = "");
 	
-	///删除接口对象本身
-	///@remark 不再使用本接口对象时,调用该函数删除接口对象
+	///脡戮鲁媒陆脫驴脷露脭脧贸卤戮脡铆
+	///@remark 虏禄脭脵脢鹿脫脙卤戮陆脫驴脷露脭脧贸脢卤,碌梅脫脙赂脙潞炉脢媒脡戮鲁媒陆脫驴脷露脭脧贸
 	virtual void Release() = 0;
 	
-	///初始化
-	///@remark 初始化运行环境,只有调用后,接口才开始工作
+	///鲁玫脢录禄炉
+	///@remark 鲁玫脢录禄炉脭脣脨脨禄路戮鲁,脰禄脫脨碌梅脫脙潞贸,陆脫驴脷虏脜驴陋脢录鹿陇脳梅
 	virtual void Init() = 0;
 	
-	///等待接口线程结束运行
-	///@return 线程退出代码
+	///碌脠麓媒陆脫驴脷脧脽鲁脤陆谩脢酶脭脣脨脨
+	///@return 脧脽鲁脤脥脣鲁枚麓煤脗毛
 	virtual int Join() = 0;
 	
-	///获取当前交易日
-	///@retrun 获取到的交易日
-	///@remark 只有登录成功后,才能得到正确的交易日
+	///禄帽脠隆碌卤脟掳陆禄脪脳脠脮
+	///@retrun 禄帽脠隆碌陆碌脛陆禄脪脳脠脮
+	///@remark 脰禄脫脨碌脟脗录鲁脡鹿娄潞贸,虏脜脛脺碌脙碌陆脮媒脠路碌脛陆禄脪脳脠脮
 	virtual const char *GetTradingDay() = 0;
 	
-	///注册前置机网络地址
-	///@param pszFrontAddress：前置机网络地址。
-	///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:17001”。 
-	///@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”17001”代表服务器端口号。
+	///脳垄虏谩脟掳脰脙禄煤脥酶脗莽碌脴脰路
+	///@param pszFrontAddress拢潞脟掳脰脙禄煤脥酶脗莽碌脴脰路隆拢
+	///@remark 脥酶脗莽碌脴脰路碌脛赂帽脢陆脦陋拢潞隆掳protocol://ipaddress:port隆卤拢卢脠莽拢潞隆卤tcp://127.0.0.1:17001隆卤隆拢 
+	///@remark 隆掳tcp隆卤麓煤卤铆麓芦脢盲脨颅脪茅拢卢隆掳127.0.0.1隆卤麓煤卤铆路镁脦帽脝梅碌脴脰路隆拢隆卤17001隆卤麓煤卤铆路镁脦帽脝梅露脣驴脷潞脜隆拢
 	virtual void RegisterFront(char *pszFrontAddress) = 0;
 	
-	///注册名字服务器网络地址
-	///@param pszNsAddress：名字服务器网络地址。
-	///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:12001”。 
-	///@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”12001”代表服务器端口号。
-	///@remark RegisterNameServer优先于RegisterFront
+	///脳垄虏谩脙没脳脰路镁脦帽脝梅脥酶脗莽碌脴脰路
+	///@param pszNsAddress拢潞脙没脳脰路镁脦帽脝梅脥酶脗莽碌脴脰路隆拢
+	///@remark 脥酶脗莽碌脴脰路碌脛赂帽脢陆脦陋拢潞隆掳protocol://ipaddress:port隆卤拢卢脠莽拢潞隆卤tcp://127.0.0.1:12001隆卤隆拢 
+	///@remark 隆掳tcp隆卤麓煤卤铆麓芦脢盲脨颅脪茅拢卢隆掳127.0.0.1隆卤麓煤卤铆路镁脦帽脝梅碌脴脰路隆拢隆卤12001隆卤麓煤卤铆路镁脦帽脝梅露脣驴脷潞脜隆拢
+	///@remark RegisterNameServer脫脜脧脠脫脷RegisterFront
 	virtual void RegisterNameServer(char *pszNsAddress) = 0;
 	
-	///注册名字服务器用户信息
-	///@param pFensUserInfo：用户信息。
+	///脳垄虏谩脙没脳脰路镁脦帽脝梅脫脙禄搂脨脜脧垄
+	///@param pFensUserInfo拢潞脫脙禄搂脨脜脧垄隆拢
 	virtual void RegisterFensUserInfo(CThostFtdcFensUserInfoField * pFensUserInfo) = 0;
 	
-	///注册回调接口
-	///@param pSpi 派生自回调接口类的实例
+	///脳垄虏谩禄脴碌梅陆脫驴脷
+	///@param pSpi 脜脡脡煤脳脭禄脴碌梅陆脫驴脷脌脿碌脛脢碌脌媒
 	virtual void RegisterSpi(CThostFtdcTraderSpi *pSpi) = 0;
 	
-	///订阅私有流。
-	///@param nResumeType 私有流重传方式  
-	///        THOST_TERT_RESTART:从本交易日开始重传
-	///        THOST_TERT_RESUME:从上次收到的续传
-	///        THOST_TERT_QUICK:只传送登录后私有流的内容
-	///@remark 该方法要在Init方法前调用。若不调用则不会收到私有流的数据。
+	///露漏脭脛脣陆脫脨脕梅隆拢
+	///@param nResumeType 脣陆脫脨脕梅脰脴麓芦路陆脢陆  
+	///        THOST_TERT_RESTART:麓脫卤戮陆禄脪脳脠脮驴陋脢录脰脴麓芦
+	///        THOST_TERT_RESUME:麓脫脡脧麓脦脢脮碌陆碌脛脨酶麓芦
+	///        THOST_TERT_QUICK:脰禄麓芦脣脥碌脟脗录潞贸脣陆脫脨脕梅碌脛脛脷脠脻
+	///@remark 赂脙路陆路篓脪陋脭脷Init路陆路篓脟掳碌梅脫脙隆拢脠么虏禄碌梅脫脙脭貌虏禄禄谩脢脮碌陆脣陆脫脨脕梅碌脛脢媒戮脻隆拢
 	virtual void SubscribePrivateTopic(THOST_TE_RESUME_TYPE nResumeType) = 0;
 	
-	///订阅公共流。
-	///@param nResumeType 公共流重传方式  
-	///        THOST_TERT_RESTART:从本交易日开始重传
-	///        THOST_TERT_RESUME:从上次收到的续传
-	///        THOST_TERT_QUICK:只传送登录后公共流的内容
-	///@remark 该方法要在Init方法前调用。若不调用则不会收到公共流的数据。
+	///露漏脭脛鹿芦鹿虏脕梅隆拢
+	///@param nResumeType 鹿芦鹿虏脕梅脰脴麓芦路陆脢陆  
+	///        THOST_TERT_RESTART:麓脫卤戮陆禄脪脳脠脮驴陋脢录脰脴麓芦
+	///        THOST_TERT_RESUME:麓脫脡脧麓脦脢脮碌陆碌脛脨酶麓芦
+	///        THOST_TERT_QUICK:脰禄麓芦脣脥碌脟脗录潞贸鹿芦鹿虏脕梅碌脛脛脷脠脻
+	///@remark 赂脙路陆路篓脪陋脭脷Init路陆路篓脟掳碌梅脫脙隆拢脠么虏禄碌梅脫脙脭貌虏禄禄谩脢脮碌陆鹿芦鹿虏脕梅碌脛脢媒戮脻隆拢
 	virtual void SubscribePublicTopic(THOST_TE_RESUME_TYPE nResumeType) = 0;
 
-	///客户端认证请求
+	///驴脥禄搂露脣脠脧脰陇脟毛脟贸
 	virtual int ReqAuthenticate(CThostFtdcReqAuthenticateField *pReqAuthenticateField, int nRequestID) = 0;
 
-	///用户登录请求
+	///脫脙禄搂碌脟脗录脟毛脟贸
 	virtual int ReqUserLogin(CThostFtdcReqUserLoginField *pReqUserLoginField, int nRequestID) = 0;
 	
 
-	///登出请求
+	///碌脟鲁枚脟毛脟贸
 	virtual int ReqUserLogout(CThostFtdcUserLogoutField *pUserLogout, int nRequestID) = 0;
 
-	///用户口令更新请求
+	///脫脙禄搂驴脷脕卯赂眉脨脗脟毛脟贸
 	virtual int ReqUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, int nRequestID) = 0;
 
-	///资金账户口令更新请求
+	///脳脢陆冒脮脣禄搂驴脷脕卯赂眉脨脗脟毛脟贸
 	virtual int ReqTradingAccountPasswordUpdate(CThostFtdcTradingAccountPasswordUpdateField *pTradingAccountPasswordUpdate, int nRequestID) = 0;
 
-	///报单录入请求
+	///卤篓碌楼脗录脠毛脟毛脟贸
 	virtual int ReqOrderInsert(CThostFtdcInputOrderField *pInputOrder, int nRequestID) = 0;
 
-	///预埋单录入请求
+	///脭陇脗帽碌楼脗录脠毛脟毛脟贸
 	virtual int ReqParkedOrderInsert(CThostFtdcParkedOrderField *pParkedOrder, int nRequestID) = 0;
 
-	///预埋撤单录入请求
+	///脭陇脗帽鲁路碌楼脗录脠毛脟毛脟贸
 	virtual int ReqParkedOrderAction(CThostFtdcParkedOrderActionField *pParkedOrderAction, int nRequestID) = 0;
 
-	///报单操作请求
+	///卤篓碌楼虏脵脳梅脟毛脟贸
 	virtual int ReqOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, int nRequestID) = 0;
 
-	///查询最大报单数量请求
+	///虏茅脩炉脳卯麓贸卤篓碌楼脢媒脕驴脟毛脟贸
 	virtual int ReqQueryMaxOrderVolume(CThostFtdcQueryMaxOrderVolumeField *pQueryMaxOrderVolume, int nRequestID) = 0;
 
-	///投资者结算结果确认
+	///脥露脳脢脮脽陆谩脣茫陆谩鹿没脠路脠脧
 	virtual int ReqSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, int nRequestID) = 0;
 
-	///请求删除预埋单
+	///脟毛脟贸脡戮鲁媒脭陇脗帽碌楼
 	virtual int ReqRemoveParkedOrder(CThostFtdcRemoveParkedOrderField *pRemoveParkedOrder, int nRequestID) = 0;
 
-	///请求删除预埋撤单
+	///脟毛脟贸脡戮鲁媒脭陇脗帽鲁路碌楼
 	virtual int ReqRemoveParkedOrderAction(CThostFtdcRemoveParkedOrderActionField *pRemoveParkedOrderAction, int nRequestID) = 0;
 
-	///请求查询报单
+	///脟毛脟贸虏茅脩炉卤篓碌楼
 	virtual int ReqQryOrder(CThostFtdcQryOrderField *pQryOrder, int nRequestID) = 0;
 
-	///请求查询成交
+	///脟毛脟贸虏茅脩炉鲁脡陆禄
 	virtual int ReqQryTrade(CThostFtdcQryTradeField *pQryTrade, int nRequestID) = 0;
 
-	///请求查询投资者持仓
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽鲁脰虏脰
 	virtual int ReqQryInvestorPosition(CThostFtdcQryInvestorPositionField *pQryInvestorPosition, int nRequestID) = 0;
 
-	///请求查询资金账户
+	///脟毛脟贸虏茅脩炉脳脢陆冒脮脣禄搂
 	virtual int ReqQryTradingAccount(CThostFtdcQryTradingAccountField *pQryTradingAccount, int nRequestID) = 0;
 
-	///请求查询投资者
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽
 	virtual int ReqQryInvestor(CThostFtdcQryInvestorField *pQryInvestor, int nRequestID) = 0;
 
-	///请求查询交易编码
+	///脟毛脟贸虏茅脩炉陆禄脪脳卤脿脗毛
 	virtual int ReqQryTradingCode(CThostFtdcQryTradingCodeField *pQryTradingCode, int nRequestID) = 0;
 
-	///请求查询合约保证金率
+	///脟毛脟贸虏茅脩炉潞脧脭录卤拢脰陇陆冒脗脢
 	virtual int ReqQryInstrumentMarginRate(CThostFtdcQryInstrumentMarginRateField *pQryInstrumentMarginRate, int nRequestID) = 0;
 
-	///请求查询合约手续费率
+	///脟毛脟贸虏茅脩炉潞脧脭录脢脰脨酶路脩脗脢
 	virtual int ReqQryInstrumentCommissionRate(CThostFtdcQryInstrumentCommissionRateField *pQryInstrumentCommissionRate, int nRequestID) = 0;
 
-	///请求查询交易所
+	///脟毛脟贸虏茅脩炉陆禄脪脳脣霉
 	virtual int ReqQryExchange(CThostFtdcQryExchangeField *pQryExchange, int nRequestID) = 0;
 
-	///请求查询合约
+	///脟毛脟贸虏茅脩炉潞脧脭录
 	virtual int ReqQryInstrument(CThostFtdcQryInstrumentField *pQryInstrument, int nRequestID) = 0;
 
-	///请求查询行情
+	///脟毛脟贸虏茅脩炉脨脨脟茅
 	virtual int ReqQryDepthMarketData(CThostFtdcQryDepthMarketDataField *pQryDepthMarketData, int nRequestID) = 0;
 
-	///请求查询投资者结算结果
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽陆谩脣茫陆谩鹿没
 	virtual int ReqQrySettlementInfo(CThostFtdcQrySettlementInfoField *pQrySettlementInfo, int nRequestID) = 0;
 
-	///请求查询转帐银行
+	///脟毛脟贸虏茅脩炉脳陋脮脢脪酶脨脨
 	virtual int ReqQryTransferBank(CThostFtdcQryTransferBankField *pQryTransferBank, int nRequestID) = 0;
 
-	///请求查询投资者持仓明细
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽鲁脰虏脰脙梅脧赂
 	virtual int ReqQryInvestorPositionDetail(CThostFtdcQryInvestorPositionDetailField *pQryInvestorPositionDetail, int nRequestID) = 0;
 
-	///请求查询客户通知
+	///脟毛脟贸虏茅脩炉驴脥禄搂脥篓脰陋
 	virtual int ReqQryNotice(CThostFtdcQryNoticeField *pQryNotice, int nRequestID) = 0;
 
-	///请求查询结算信息确认
+	///脟毛脟贸虏茅脩炉陆谩脣茫脨脜脧垄脠路脠脧
 	virtual int ReqQrySettlementInfoConfirm(CThostFtdcQrySettlementInfoConfirmField *pQrySettlementInfoConfirm, int nRequestID) = 0;
 
-	///请求查询投资者持仓明细
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽鲁脰虏脰脙梅脧赂
 	virtual int ReqQryInvestorPositionCombineDetail(CThostFtdcQryInvestorPositionCombineDetailField *pQryInvestorPositionCombineDetail, int nRequestID) = 0;
 
-	///请求查询保证金监管系统经纪公司资金账户密钥
+	///脟毛脟贸虏茅脩炉卤拢脰陇陆冒录脿鹿脺脧碌脥鲁戮颅录脥鹿芦脣戮脳脢陆冒脮脣禄搂脙脺脭驴
 	virtual int ReqQryCFMMCTradingAccountKey(CThostFtdcQryCFMMCTradingAccountKeyField *pQryCFMMCTradingAccountKey, int nRequestID) = 0;
 
-	///请求查询仓单折抵信息
+	///脟毛脟贸虏茅脩炉虏脰碌楼脮脹碌脰脨脜脧垄
 	virtual int ReqQryEWarrantOffset(CThostFtdcQryEWarrantOffsetField *pQryEWarrantOffset, int nRequestID) = 0;
 
-	///请求查询投资者品种/跨品种保证金
+	///脟毛脟贸虏茅脩炉脥露脳脢脮脽脝路脰脰/驴莽脝路脰脰卤拢脰陇陆冒
 	virtual int ReqQryInvestorProductGroupMargin(CThostFtdcQryInvestorProductGroupMarginField *pQryInvestorProductGroupMargin, int nRequestID) = 0;
 
-	///请求查询交易所保证金率
+	///脟毛脟贸虏茅脩炉陆禄脪脳脣霉卤拢脰陇陆冒脗脢
 	virtual int ReqQryExchangeMarginRate(CThostFtdcQryExchangeMarginRateField *pQryExchangeMarginRate, int nRequestID) = 0;
 
-	///请求查询交易所调整保证金率
+	///脟毛脟贸虏茅脩炉陆禄脪脳脣霉碌梅脮没卤拢脰陇陆冒脗脢
 	virtual int ReqQryExchangeMarginRateAdjust(CThostFtdcQryExchangeMarginRateAdjustField *pQryExchangeMarginRateAdjust, int nRequestID) = 0;
 
-	///请求查询转帐流水
+	///脟毛脟贸虏茅脩炉脳陋脮脢脕梅脣庐
 	virtual int ReqQryTransferSerial(CThostFtdcQryTransferSerialField *pQryTransferSerial, int nRequestID) = 0;
 
-	///请求查询银期签约关系
+	///脟毛脟贸虏茅脩炉脪酶脝脷脟漏脭录鹿脴脧碌
 	virtual int ReqQryAccountregister(CThostFtdcQryAccountregisterField *pQryAccountregister, int nRequestID) = 0;
 
-	///请求查询签约银行
+	///脟毛脟贸虏茅脩炉脟漏脭录脪酶脨脨
 	virtual int ReqQryContractBank(CThostFtdcQryContractBankField *pQryContractBank, int nRequestID) = 0;
 
-	///请求查询预埋单
+	///脟毛脟贸虏茅脩炉脭陇脗帽碌楼
 	virtual int ReqQryParkedOrder(CThostFtdcQryParkedOrderField *pQryParkedOrder, int nRequestID) = 0;
 
-	///请求查询预埋撤单
+	///脟毛脟贸虏茅脩炉脭陇脗帽鲁路碌楼
 	virtual int ReqQryParkedOrderAction(CThostFtdcQryParkedOrderActionField *pQryParkedOrderAction, int nRequestID) = 0;
 
-	///请求查询交易通知
+	///脟毛脟贸虏茅脩炉陆禄脪脳脥篓脰陋
 	virtual int ReqQryTradingNotice(CThostFtdcQryTradingNoticeField *pQryTradingNotice, int nRequestID) = 0;
 
-	///请求查询经纪公司交易参数
+	///脟毛脟贸虏茅脩炉戮颅录脥鹿芦脣戮陆禄脪脳虏脦脢媒
 	virtual int ReqQryBrokerTradingParams(CThostFtdcQryBrokerTradingParamsField *pQryBrokerTradingParams, int nRequestID) = 0;
 
-	///请求查询经纪公司交易算法
+	///脟毛脟贸虏茅脩炉戮颅录脥鹿芦脣戮陆禄脪脳脣茫路篓
 	virtual int ReqQryBrokerTradingAlgos(CThostFtdcQryBrokerTradingAlgosField *pQryBrokerTradingAlgos, int nRequestID) = 0;
 
-	///期货发起银行资金转期货请求
+	///脝脷禄玫路垄脝冒脪酶脨脨脳脢陆冒脳陋脝脷禄玫脟毛脟贸
 	virtual int ReqFromBankToFutureByFuture(CThostFtdcReqTransferField *pReqTransfer, int nRequestID) = 0;
 
-	///期货发起期货资金转银行请求
+	///脝脷禄玫路垄脝冒脝脷禄玫脳脢陆冒脳陋脪酶脨脨脟毛脟贸
 	virtual int ReqFromFutureToBankByFuture(CThostFtdcReqTransferField *pReqTransfer, int nRequestID) = 0;
 
-	///期货发起查询银行余额请求
+	///脝脷禄玫路垄脝冒虏茅脩炉脪酶脨脨脫脿露卯脟毛脟贸
 	virtual int ReqQueryBankAccountMoneyByFuture(CThostFtdcReqQueryAccountField *pReqQueryAccount, int nRequestID) = 0;
 protected:
 	~CThostFtdcTraderApi(){};
