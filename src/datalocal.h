@@ -51,23 +51,9 @@ class dmgr {
 		map<string ,  inst_t *> new_instmap;
 		int cstatus;
 		int inst_sync;
-		dmgr(){
-			this->cstatus=0;
-			this->inst_sync=0;
-
-			/*todo for debug
-			 * */
-			this->need_inst["IF1404"]="IF1404";
-			this->need_inst["cu1407"]="cu1407";
-		}
-		int regdb(string dbname, datalocal *dl){/*err process*/ this->db_map[dbname]=dl;return 0;};
-		int init(){
-			LOG_DEBUG<<"Begin"<<std::endl;
-			LOG_DEBUG<<"End"<<std::endl;
-			return 0;
-		};
-		int load_inst(){
-			return 0;
-		};
+		dmgr();
+		int regdb(string dbname, datalocal *dl);
+		int init();
+		int load_inst();
 };
 #endif

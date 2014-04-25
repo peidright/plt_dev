@@ -15,7 +15,7 @@ char orderRef[13];
 
 
 //Trader *trader= Trader(string username,string password,string brokerid,string trade_addr);
-#if 1
+#if 0
 string g_username="00000071";
 string g_password="123456";
 string g_brokerid="1017";
@@ -23,8 +23,8 @@ string g_trade_addr="tcp://ctpmn1-front1.citicsf.com:51205";
 string g_quote_addr="tcp://ctpmn1-front1.citicsf.com:51213";
 
 #else
-string g_username="00104526";
-string g_password="225613";
+string g_username="00203796";
+string g_password="229673";
 string g_brokerid="6000";
 string g_trade_addr="tcp://180.166.132.66:41205";
 string g_quote_addr="tcp://180.166.132.66:41213";

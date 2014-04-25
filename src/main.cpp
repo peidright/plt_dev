@@ -112,7 +112,8 @@ int ctp_db_init()
 	datalocal *ds=new datalocal("datadir",g_db_sdata);
 	datalocal *dk=new datalocal("datadir",g_db_kdata);
 
-	dt->create_tdata_table("IF1404");
+	//dt->create_tdata_table("IF1405");
+
 	g_dmgr=new (dmgr);
 	g_dmgr->regdb("tdata",dt);
 	g_dmgr->regdb("sdata",ds);
@@ -167,6 +168,8 @@ int  ctp_work()
 		int i=0;
 		ctp_db_init();
 		LOG_DEBUG<<"DB_INIT"<<std::endl;
+		ctp_wait_loop();
+
 		ctp_trade_init(TRADE_DIR);
 		
 		while(g_instmgr->is_last()==0) {
@@ -203,14 +206,15 @@ int  ctp_work()
 
 int main(int argc, char * argv[]){
 
-	strategy_demo();
-	ctp_wait_loop();
+	//strategy_demo();
+	//ctp_wait_loop();
 	//python_demo();
-	exit(0);
+	//exit(0);
 	/*
+     *
+	*/
 	log_init();
 	ctp_work();
-	*/
 	getchar();
 	return 0;
 }

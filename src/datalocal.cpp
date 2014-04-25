@@ -17,7 +17,7 @@
 int callback(void *,int count, char **row,char **titles)
 {
 	for(int i=0;i<count;i++){
-		cout<<"title= "<<titles[i]<<"value= "<<row[i]<<endl;
+		//cout<<"title= "<<titles[i]<<"value= "<<row[i]<<endl;
 	}
 	return 0;
 }
@@ -33,9 +33,8 @@ datalocal::datalocal(string dir,string dbname)
 	//ret = sqlite3_open("file:memdb1?mode=memory&cache=shared", &this->db); 
 	ret = sqlite3_open(path.c_str(), &this->db); 
 	if(ret==-1) {
-		cout<<"localdb create error"<<endl; 
+		LOG_DEBUG<<"localdb create error"<<endl; 
 	} else {
-		cout<<"localdb init ok"<<endl;
 	}
 
 	ret = sqlite3_exec(this->db, "drop  table trader", 0,0, &error );
@@ -43,6 +42,7 @@ datalocal::datalocal(string dir,string dbname)
 	assert(ret==SQLITE_OK);
 	if(ret!=SQLITE_OK) {
 		printf("%s\n",error);
+        LOG_DEBUG<<"sql create table trade err:"<<error<<std::endl;
 	}
 
 	ret=sqlite3_exec(this->db,"insert into trader values ('aaa','bbb')",callback,NULL,&error);
@@ -52,7 +52,7 @@ datalocal::datalocal(string dir,string dbname)
 	ret=sqlite3_exec(this->db, "drop table instrument",0,0,&error);
 	ret=sqlite3_exec(this->db,"create table instrument(name char(32), product char(32), status  interger ,ctime integer)",0,0,&error);
 	if(ret!=SQLITE_OK) {
-		printf("%s\n",error);
+        LOG_DEBUG<<"sql create table trade instrument err:"<<error<<std::endl;
 	}
 
 	/*create schema */
@@ -62,20 +62,16 @@ datalocal::datalocal(string dir,string dbname)
 	ret=sqlite3_exec(this->db,"insert into contractschema values('IF1404','m')",callback,NULL,&error);
 	assert(ret== SQLITE_OK);
 
+    /*todo
 	vector<map<string,string> > result;
 	this->exe_cmd("select contract,ctype from contractschema", result);
-
-	/*create all table*/
 	for (vector<map<string,string> >::iterator it=result.begin();it!=result.end();it++) {
 		char sqlbuf[256];
 		memset(sqlbuf,0x0,256);
-		cout<<"sql1:begin"<<endl;
 		sprintf(sqlbuf,"create table contract_%s(cprice real,oprice real,hprice real,lprice real,aprice real,bidprice real,askprice real,lastprice real,udtime integer,volume integer,turnover integer)",(*it)["contract"].c_str());
-		cout<<"sql1£º"<<sqlbuf<<endl;
 		this->exe_cmd(sqlbuf);
-		cout<<"sql1:end"<<endl;
-	}
-	cout<<"sql2:end"<<endl;
+	}*/
+
 	ret=sqlite3_exec(this->db, "insert into instrument values('IF1404','m',1,1380629713)",0,0,&error);
 	//ret=sqlite3_exec(this->db,"drop table ",0,0,&error);
 	//sqlite3_close(this->db);
@@ -201,7 +197,6 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 		this->exe_cmd("BEGIN;");
 		//this->exe_cmd("VACUUM;");
 	}
-	LOG_DEBUG<<"update tdata begin"<<std::endl;
 
 	for(deque<struct tdata_s*>::iterator it=tdataq.begin();it!=tdataq.end();it++) {
 		/**/
@@ -214,14 +209,11 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 		} else {
 			//LOG_DEBUG<<"MAX FLOAT not equal"<<(*it)->bid4<<"  "<<  std::numeric_limits<float>::infinity() <<std::endl;
 		}
-		LOG_DEBUG<<sqlbuf<<std::endl;
 	}
 
 	if(size > 10) {
 		this->exe_cmd("COMMIT;");
 	}
-
-	LOG_DEBUG<<"update tdata end, size: "<<size<<std::endl;
 	return 0;
 }
 int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
@@ -254,7 +246,7 @@ int datalocal::create_kdata_table(string contract)
 int get_product_callback(void *arg,int count, char **row,char **titles)
 {
 	for(int i=0;i<count;i++){
-		cout<<"title= "<<titles[i]<<"value= "<<row[i]<<endl;
+		//cout<<"title= "<<titles[i]<<"value= "<<row[i]<<endl;
 	}
 	return 0;
 }
@@ -264,7 +256,7 @@ int general_callback(void *arg, int count, char **row, char **titles)
 	map<string,string> m;
 
 	for(int i=0;i<count;i++){
-		cout<<"title= "<<titles[i]<<" "<<"value= "<<row[i]<<endl;
+		//cout<<"title= "<<titles[i]<<" "<<"value= "<<row[i]<<endl;
 		m[titles[i]]=row[i];
 	}
 	v->push_back(m);
@@ -283,7 +275,6 @@ void datalocal:: get_product_list(vector<string> &product_list)
 		(*rows_it)["name"];
 		product_list.push_back((*rows_it)["name"]);
 	}
-	
 }
 
 void datalocal::init_product_list(vector<string> product_list)
@@ -301,11 +292,6 @@ void datalocal::init_product(string product)
 		           closeprice integer,openprice  interger,uprice integer,lprice integer,\
 				   highprice integer,lowprice integer,lastprice integer,\
 				   avgprice integer,vol integer,bid1 integer,ask1 integer",rows);
-    /*product_day (day, openprice,closeprice,highprice,lowprice,
-	  product_instant (day,seconds,openprice, closeprice, lastprice,lowprice,highprice,avgprice,vol,bid1,ask1,uprice,lprice,tvol,tavgprice)
-	  product_xxxxxxx  (???)
-	*/	
-	
 }
 
 void datalocal::exe_cmd(string cmd, vector<map<string,string> > &rows)
@@ -321,9 +307,9 @@ void datalocal::exe_cmd(string cmd, vector<map<string,string> > &rows)
 	}
 	for(rows_it=rows.begin();rows_it!=rows.end();rows_it++) {
 		for(rows_map_it=rows_it->begin();rows_map_it!=rows_it->end();rows_map_it++) {
-			LOG_DEBUG<<" ; "<<rows_map_it->first<<"=="<<rows_map_it->second;
+			//LOG_DEBUG<<" ; "<<rows_map_it->first<<"=="<<rows_map_it->second;
 		}
-		LOG_DEBUG<<std::endl;
+		//LOG_DEBUG<<std::endl;
 	}
 }
 
@@ -350,3 +336,23 @@ datalocal::~datalocal()
 }
 
 
+dmgr::dmgr(){
+    this->cstatus=0;
+    this->inst_sync=0;
+
+    /*todo for debug
+     * */
+    this->need_inst["IF1404"]="IF1404";
+    this->need_inst["cu1407"]="cu1407";
+}
+int dmgr::regdb(string dbname, datalocal *dl){
+    /*err process*/ 
+    this->db_map[dbname]=dl;
+    return 0;
+};
+int dmgr::init(){
+    return 0;
+};
+int dmgr::load_inst(){
+    return 0;
+};
