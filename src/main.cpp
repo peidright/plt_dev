@@ -61,7 +61,6 @@ int ctp_trade_init(string tradedir)
 		g_ctp_trader->init();
 		g_trade_tg.add_thread(new boost::thread(trader_loop,g_ctp_trader,0));
 		g_ctp_trader->start();
-		LOG_DEBUG<<"g_ctp_trader started"<<std::endl;
 		return 0;
 }
 
@@ -121,15 +120,20 @@ int ctp_db_init()
 
 	g_instmgr=new instmgr(g_dmgr);
 	g_instmgr->load_inst();
+    LOG_DEBUG<<"g_instmgr finished"<<std::endl;
+
 	g_dmgr->pquote_io=g_quote_io;
 	g_dmgr->init();
 
+    LOG_DEBUG<<"g_dmgr    finished"<<std::endl;
+    
+    /*
 	vector<map<string,string> > rows;
 	dt->exe_cmd("select name from sqlite_master where type='table'",rows);
 	dt->get_product_list(g_product_list);
 		for(int i=0;i<g_product_list.size();i++) {
 		printf("%s\n",g_product_list[i].c_str());
-	}
+	}*/
 
 	g_quote_io->reg_dmgr(g_dmgr);
 	return 0;
@@ -167,10 +171,10 @@ int  ctp_work()
 {
 		int i=0;
 		ctp_db_init();
-		LOG_DEBUG<<"DB_INIT"<<std::endl;
-		ctp_wait_loop();
-
+		LOG_DEBUG<<"CTP_DB_INIT finished"<<std::endl;
 		ctp_trade_init(TRADE_DIR);
+		LOG_DEBUG<<"CTP_TRADE_INIT finished"<<std::endl;
+		ctp_wait_loop();
 		
 		while(g_instmgr->is_last()==0) {
 			LOG_DEBUG<<"wait for instmgr is_last"<<std::endl;

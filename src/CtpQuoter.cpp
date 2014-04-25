@@ -84,12 +84,12 @@ again:
 		this->mqueue_map[my_hash(contract)].push_back(*msg);
 		this->qsem_map[my_hash(contract)]->post();
 		printf("post msg\n");	
-		lk.unlock();
 	}else {
 		/*
 		   do some warnning
 		*/
-
+		lk.unlock();
+		LOG_DEBUG<<"ctpquoter post_msg again"<<std::endl;
 		goto again;
 	}
 }

@@ -21,8 +21,6 @@ int CtpTrader::init()
 	this->trade_api=trade_api;
 	CtpTradeSpi* trade_spi = new CtpTradeSpi(trade_api,this);
 	this->trade_spi = trade_spi;
-	cout<<"begin api"<<endl;
-
 	return 0;
 }
 
@@ -33,7 +31,7 @@ int CtpTrader::start()
 	trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);			  // 注册私有流
 	trade_api->RegisterFront((char*)this->trader->trade_addr.c_str());	// 注册交易前置地址
 	trade_api->Init();
-	cout<<"start trade api"<<endl;
+    LOG_DEBUG<<"CtpTrader init()"<<std::endl;
 	return 0;
 }
 
@@ -104,7 +102,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnRspUserLogin:
-				LOG_DEBUG<<"TOnRspUserLogin stm"<<std::endl;;
+				LOG_DEBUG<<"trade rsplogin stm"<<std::endl;
 				msg.type=TReqSettlementInfoConfirm;		
 				/*fix*/
 				msg.data=NULL;
@@ -113,7 +111,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				/*two case, if msg.data==NULL, query all the Instrument
 				 *else 
 				 * */
-				LOG_DEBUG<<"send TReqQryInstrument"<<std::endl;
+				LOG_DEBUG<<"trade qryInstrument stm"<<std::endl;
 				memset(&instId,0x0,sizeof(TThostFtdcInstrumentIDType));
 				this->trade_spi->ReqQryInstrument(instId);
 				msg.type=TSTOP;
@@ -123,6 +121,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				 *2.if is last,..
 				 * */
 				msg.type=TSTOP;
+				LOG_DEBUG<<"trade rsp_qryInstrument stm"<<std::endl;
 				//CThostFtdcInstrumentField pInstrument;
 				//TOnRspQryInstrument_t;
 				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
@@ -159,12 +158,14 @@ void CtpTrader::trade_stm(msg_t &msg)
 				break;
 			case TOnRtnInstrumentStatus:
 				//(TOnRtnInstrumentStatus_t);
+				LOG_DEBUG<<"trade rtn_Instrument stm"<<std::endl;
+                /*
 				LOG_DEBUG<<"OnRtnInstrumentStatus enter "<<
 				" time: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterTime<<
 				" inst: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID<<
 				" reason: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterReason<<
 				" status: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus<<std::endl;
-
+                */
 				this->pinstmgr->update_inst_status(((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID,  
 						                   ((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus);
 				msg.type=TSTOP;
@@ -213,10 +214,10 @@ void CtpTrader::trade_stm(msg_t &msg)
 void trader_loop(CtpTrader *ctptrader, int key)
 {
 	int i=0;
-loop:
+    LOG_DEBUG<<"CtpTrader trader_loop working"<<std::endl;
 	while(ctptrader->running) {
 		i=i+1;
-		if(i%50==0) {
+		if(i%100==0) {
 			i=0;
 			LOG_INFO<<"trader_loop living"<<std::endl;
 		}
@@ -230,10 +231,8 @@ loop:
 				continue;
 			}
 			msg_t msg=ctptrader->mqueue[0];
-			printf("trader_loop get this msg\n");
 			ctptrader->mqueue.pop_front();
 			lk.unlock();
-			//continue;
 			ctptrader->trade_stm(msg);
 		} else {
 			LOG_INFO<<"trader_loop quote main loop err"<<std::endl;
@@ -251,13 +250,14 @@ again:
 	if(lk) {
 		this->mqueue.push_back(*msg);
 		this->qsem.post();
-		LOG_DEBUG<<"post_msg func"<<std::endl;
 		//?lk.unlock();
 	}else {
 		/*
 		   do some warnning
 		*/
-		LOG_DEBUG<<"post_msg again"<<std::endl;
+        lk.unlock();
+		LOG_DEBUG<<"ctptrader post_msg again"<<std::endl;
+
 		goto again;
 	}
 }
