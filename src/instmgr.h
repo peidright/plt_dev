@@ -31,7 +31,7 @@ class instmgr {
 	dmgr *pdmgr;
 	int last;
 	instmgr(dmgr *pdmgr);
-	int create_inst_kdata(string instn);
+	int create_inst_kdata(string instn,int period);
 	int create_inst_sdata();
 	int create_inst_tdata(string instn);
 	int insert_inst(inst *pinst);

@@ -369,6 +369,7 @@ void DepthMarketProcess(CtpQuoter *ctpquoter, int key)
 	loop, 检测是否存在 key, 不存在，sleep ，log.
 	*/
 	int i=0;
+	LOG_DEBUG<<"depth market start,thread id: "<<key<<std::endl;
 loop:
 	if (ctpquoter->qsem_map.find(key)==ctpquoter->qsem_map.end()) {
 		/*log it */
@@ -379,7 +380,7 @@ loop:
 	}
 	while(ctpquoter->running) {
 		i=i+1;
-		if(i%50==0) {
+		if(i%100==0) {
 			LOG_INFO<<"DepthMarketProcess living"<<std::endl;
 			i=0;
 		}

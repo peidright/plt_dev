@@ -67,19 +67,19 @@ vector<CThostFtdcTradeField*> tradeList;
 
 void CtpTradeSpi::OnFrontConnected()
 {
-	/*
-	sem.sem_v();
-	this->ReqUserLogin((char*)this->trader->brokerid.c_str(),
-		(char*)this->trader->username.c_str(),
-		(char*)this->trader->password.c_str()
-		);
-	*/
-	msg_t *msg=new(msg_t);
-	msg->len=sizeof(TOnFrontConnected_t);
-	msg->data=new(TOnFrontConnected_t);
-	msg->type=TOnFrontConnected;
-    	this->ctptrader->post_msg(msg);
-	LOG_INFO<<"Trade OnFrontConnected"<<std::endl;
+    /*
+       sem.sem_v();
+       this->ReqUserLogin((char*)this->trader->brokerid.c_str(),
+       (char*)this->trader->username.c_str(),
+       (char*)this->trader->password.c_str()
+       );
+       */
+    msg_t *msg=new(msg_t);
+    msg->len=sizeof(TOnFrontConnected_t);
+    msg->data=new(TOnFrontConnected_t);
+    msg->type=TOnFrontConnected;
+    this->ctptrader->post_msg(msg);
+    //LOG_INFO<<"Trade OnFrontConnected"<<std::endl;
 }
 
 void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
@@ -116,46 +116,46 @@ void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
 void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	/*
-	if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
-		this->frontId = pRspUserLogin->FrontID;
-		this->sessionId = pRspUserLogin->SessionID;
-		this->nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
-		this->login_status=SUCESS;
-		frontId = pRspUserLogin->FrontID;
-		sessionId = pRspUserLogin->SessionID;
-		nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
-		sprintf(orderRef, "%d", ++nextOrderRef);
-    }else  {
-		this->login_status=FAIL;
-	}
-		CThostFtdcSettlementInfoConfirmField f;
-		memset(&f, 0, sizeof(f));
-		cout<<"send req settlement confirm"<<endl;
-			//this->ReqSettlementInfoConfirm(&f, ++this->requestId);
-		this->ReqSettlementInfoConfirm();
-		this->confirm=1;
-	*/
-	if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
+    /*
+       if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
+       this->frontId = pRspUserLogin->FrontID;
+       this->sessionId = pRspUserLogin->SessionID;
+       this->nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
+       this->login_status=SUCESS;
+       frontId = pRspUserLogin->FrontID;
+       sessionId = pRspUserLogin->SessionID;
+       nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
+       sprintf(orderRef, "%d", ++nextOrderRef);
+       }else  {
+       this->login_status=FAIL;
+       }
+       CThostFtdcSettlementInfoConfirmField f;
+       memset(&f, 0, sizeof(f));
+       cout<<"send req settlement confirm"<<endl;
+    //this->ReqSettlementInfoConfirm(&f, ++this->requestId);
+    this->ReqSettlementInfoConfirm();
+    this->confirm=1;
+    */
+    if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
 
-	msg_t *msg=new(msg_t);
-	TOnRspUserLogin_t *data=new(TOnRspUserLogin_t);
-	data->bIsLast=bIsLast;
-	data->nRequestID=nRequestID;
-	data->pRspInfo=NULL;
-	if(pRspInfo) {
-		data->pRspInfo=new(CThostFtdcRspInfoField);
-		memcpy(data->pRspInfo,pRspInfo,sizeof(pRspInfo));
-	}
-	memcpy(&data->pRspUserLogin,pRspUserLogin,sizeof(pRspUserLogin));
-	msg->len=sizeof(TOnRspUserLogin_t);
-	msg->data=(void*)data;
-	msg->type=TOnRspUserLogin;
-	this->ctptrader->post_msg(msg);
-	LOG_DEBUG<<"spi OnRspUserLogin post msg"<<std::endl;
-	} else {
-		LOG_DEBUG<<"err OnRspUserLogin "<<std::endl;
-	}
+        msg_t *msg=new(msg_t);
+        TOnRspUserLogin_t *data=new(TOnRspUserLogin_t);
+        data->bIsLast=bIsLast;
+        data->nRequestID=nRequestID;
+        data->pRspInfo=NULL;
+        if(pRspInfo) {
+            data->pRspInfo=new(CThostFtdcRspInfoField);
+            memcpy(data->pRspInfo,pRspInfo,sizeof(pRspInfo));
+        }
+        memcpy(&data->pRspUserLogin,pRspUserLogin,sizeof(pRspUserLogin));
+        msg->len=sizeof(TOnRspUserLogin_t);
+        msg->data=(void*)data;
+        msg->type=TOnRspUserLogin;
+        this->ctptrader->post_msg(msg);
+        //LOG_DEBUG<<"spi OnRspUserLogin post msg"<<std::endl;
+    } else {
+        LOG_DEBUG<<"err OnRspUserLogin "<<std::endl;
+    }
 }
 
 
@@ -227,7 +227,7 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
             data->pRspInfo=new(CThostFtdcRspInfoField);
             memcpy(data->pRspInfo,pRspInfo,sizeof(pRspInfo));
         } else {
-            LOG_DEBUG<<"spi OnRspQryInstruent NULL pRspInfo"<<std::endl;
+            //LOG_DEBUG<<"spi OnRspQryInstruent NULL pRspInfo"<<std::endl;
         }
 
         memcpy(&data->pInstrument,pInstrument,sizeof(*pInstrument));

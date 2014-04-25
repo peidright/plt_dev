@@ -39,4 +39,5 @@ using namespace keywords;
 
 
 extern void log_init();
+//http://blog.csdn.net/jiafu1115/article/details/20048543
 #endif

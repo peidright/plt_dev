@@ -92,7 +92,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 					(char*)this->trader->username.c_str(),
 				(char*)this->trader->password.c_str());
 				if(ret==0) {
-					LOG_DEBUG<<"trade_stm login msg sended\n" <<std::endl;
+					//LOG_DEBUG<<"trade_stm login msg sended\n" <<std::endl;
 					msg.type=TSTOP;
 				}else {
 					LOG_DEBUG<<"trade_stm login msg sended fail\n" <<std::endl;
@@ -127,30 +127,23 @@ void CtpTrader::trade_stm(msg_t &msg)
 				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
 					//LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
 
+                    /*update it into pinstmgr
+                     *todo merge pinstmgr to pdmgr
+                     * */
+                    if((( TOnRspQryInstrument_t*)msg.data)->pInstrument.ProductClass==THOST_FTDC_PC_Futures){
 
-					/*
-					pinst=new (inst_t);
-					memset(pinst,0x0, sizeof(inst_t));
-					memcpy(&pinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
-					this->pdmgr->add_inst(pinst->base.InstrumentID,pinst,0);
-					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
-						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
-						this->pdmgr->sync_inst();
-					}*/
+                        ppinst=new inst();
+                        ppinst->ignore=1;
+                        memcpy(&ppinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
+                        this->pinstmgr->update_inst(ppinst->base.InstrumentID, ppinst);
 
-
-					/*update it into pinstmgr
-					 *todo merge pinstmgr to pdmgr
-					 * */
-					ppinst=new inst();
-					ppinst->ignore=1;
-					memcpy(&ppinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
-					this->pinstmgr->update_inst(ppinst->base.InstrumentID, ppinst);
-					
-					if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
-						LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
-						this->pinstmgr->set_last(1);
-					}
+                        if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
+                            LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
+                            this->pinstmgr->set_last(1);
+                        }
+                    }else {
+                        LOG_DEBUG<<"Not Futures:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
+                    }
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}
@@ -208,7 +201,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 		if(msg.data)
 			free(msg.data);
 	}
-	LOG_DEBUG<<"finish one Trade data"<<std::endl;
+	//LOG_DEBUG<<"finish one Trade data"<<std::endl;
 }
 
 void trader_loop(CtpTrader *ctptrader, int key)

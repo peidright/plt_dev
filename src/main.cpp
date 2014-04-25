@@ -75,8 +75,6 @@ int ctp_quote_init(string quotedir)
 		g_ctp_quoter=new CtpQuoter(g_quoter,g_dmgr,g_instmgr,quotedir);
 		g_mdservice=new mdservice();
 		g_ctp_quoter->init(g_mdservice);
-
-
 		/*
 		 *todo regmd all
 		 * */
@@ -90,10 +88,10 @@ int ctp_quote_init(string quotedir)
 
 			//reg one minute k
 			ret=g_ctp_quoter->mds->regmd_period(ppinstn[i],MINUTE,1);
-			LOG_DEBUG<<"regmd:"<<ppinstn[i]<<" period: 1"<<std::endl;
 			assert(ret==0);
 			g_ctp_quoter->mds->loadmd_period(ppinstn[i], 1, g_dmgr);
 		}
+		LOG_DEBUG<<"ctp_quote_init get all inst and reg all the md"<<std::endl;
 
 		for (i=0;i< CTP_WORK_THREAD_NUM;i++){
 			g_quote_tg.add_thread(new boost::thread(DepthMarketProcess,g_ctp_quoter,i));
@@ -119,6 +117,8 @@ int ctp_db_init()
 	g_dmgr->regdb("kdata",dk);
 
 	g_instmgr=new instmgr(g_dmgr);
+    g_instmgr->create_inst_sdata();
+
 	g_instmgr->load_inst();
     LOG_DEBUG<<"g_instmgr finished"<<std::endl;
 
