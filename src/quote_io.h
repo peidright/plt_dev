@@ -61,6 +61,8 @@ typedef struct kdata_s {
 	float lastprice;
 	float avgprice;
 	int vol;
+    int   mnum;
+    int period;
 }kdata_t;
 typedef struct kdata_io_s {
 	int lsec;

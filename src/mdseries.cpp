@@ -99,16 +99,112 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 
 		    return  0;
 	};
-	/*
-	int mdseries::flush(string instn, dmgr *pdmgr)
-		flush it to quote_io
+
+	int mdseries::flush(string instn,dmgr *pdmgr) {
+		/*flush it to quote_io
+		 * step:
+		 * 1.lock todo
+		 * 2.syn
+		 * 3.iterator it to flush
+		 * */
+		/*
+		int last_sec,last_msec;
+		char sqlbuf[1024];
+		snprintf(sqlbuf,1024,"select sec,msec from kdata_%s order by sec desc limit 1",instn.c_str());
+		assert(high.cdix==low.cidx);
+		assert(open.cidx==close.cidx);
+		assert(open.cidx==high.cidx);
+		vector<map<string,string> > result;
+		this->pdmgr->db_map["kdata"]->exe_cmd("sqlbuf", result);
+		if(result.size()==0) {
+			last_sec=0;
+			last_msec=0;
+		} else {
+			last_sec=atoi(result[0]["sec"].c_str());
+			last_msec=atoi(result[0]["msec"].c_str());
+		}
+
+		/*lock
+		 * */
+
+		/*iterator
+		 * */
+		int iterator_idx=0;
+		int open,close,high,low,mnum;
+		kdata_t *pkdata;
+		for(iterator_idx=0; iterator_idx<=this->open.cidx; iterator_idx++) {
+			if(this->open.data[iterator_idx]==0) {
+				LOG_INFO<<"debug"<<std::endl;
+				continue;
+			}
+			if(this->close.csec <= last_sec) {
+				continue;
+			}
+			open=this->open.data[iterator_idx];
+			close=this->close.data[iterator_idx];
+			high=this->high.data[iterator_idx];
+			low=this->low.data[iterator_idx];
+            mnum=this->close.mnum[iterator_idx];
+
+			/*syn or not?
+			 * */
+			pkdata=new (kdata_t);
+			pkdata->close=close;
+			pkdata->open=open;
+			pkdata->high=high;
+			pkdata->low=low;
+            pkdata->mnum=mnum;
+            pkdata->period=period;
+			pdmgr->pquote_io->quote_kdata_push(instn, pkdata);
+		}
 		return 0;
 	};
-	int mdseries::load(string instn, dmgr *pdmgr){
-		flush it to quote_io
+	int mdseries::load(string instn,dmgr *pdmgr){
+		/*flush it to quote_io
+		 * */
+		int sec, msec,vol,mnum;
+		float open,close,high,low;
+		char sqlbuf[1024];
+		snprintf(sqlbuf,1024,"select * from kdata_1_%s order by sec asc limit 10000",instn.c_str());
+		vector<map<string,string> > result;
+		pdmgr->db_map["kdata"]->exe_cmd(sqlbuf, result);
+        LOG_DEBUG<<instn<<" md load size:"<<result.size()<<std::endl;
+		
+		/**/
+		for(vector<map<string,string> >::iterator it=result.begin();it!=result.end();it++) {
+			open=atof((*it)["open"].c_str());
+			close=atof((*it)["close"].c_str());
+			high=atof((*it)["high"].c_str());
+			low=atof((*it)["low"].c_str());
+			sec=atoi((*it)["sec"].c_str());
+			msec=atoi((*it)["msec"].c_str());
+			vol=atoi((*it)["vol"].c_str());
+            mnum=atoi((*it)["mnum"].c_str());
+			this->open.update(open, sec,  msec,OPEN,period,1);
+			this->close.update(close, sec,  msec,CLOSE,period,1);
+			this->high.update(high, sec,  msec,HIGH,period,1);
+			this->low.update(low, sec,  msec,LOW,period,1);
+			/*todo vol*/
+		}
 		return 0;
 	};
-	*/
+
+	int mdseries::update(float o,float c,float h, float l, int sec, int msec,int is_new) {
+		if(this->period==1) {
+			//todo 
+			return 0;
+		}
+		assert(this->ptype==MINUTE);
+
+		high.update(h,sec,msec,HIGH,period,is_new);
+		low.update(l,sec,msec,LOW,period,is_new);
+		open.update(o,sec,msec,OPEN,period,is_new);
+		close.update(c,sec,msec,CLOSE,period,is_new);
+		/*todo volume*/
+        return 0;
+	}
+
+
 	int mdseries::kline_update() {
 		/*md_uptime,kd_uptime,
 		 *every time md updated, update md_uptime, 
@@ -160,7 +256,7 @@ int md::reg_period(period_type ptype, int period) {
 			//log it
 			return -1;
 		}
-	    	mdseries *pmds= new mdseries(ptype,period);
+	    mdseries *pmds= new mdseries(ptype,period);
 		this->perids.push_back(period);
 		this->mds[period]=pmds;
 		return 0;
@@ -169,6 +265,8 @@ int md::drivemd() {
 		/*行情驱动,更新各个周期*/
 	return 0;
 };
+
+
 	
 int md::update(float v, int t1, int t2) {
 		/*1.更新 ds
@@ -179,30 +277,70 @@ int md::update(float v, int t1, int t2) {
 		cerr<<"ds update ms"<<std::endl;
 
 		int status=this->ds.update_ms(v,t1,t2);
+        int idx_prev;
+        int idx_next;
+        float o,c,h,l;
+        int sec,msec;
 		if(status <0) {
 			/**/
 			assert(0);
 		}else {
-#if 1
+#if 0
 			cerr<<"update ms finished, return first"<<std::endl;
 			return 0;
 #endif
 			if(this->mds.find(1)!=this->mds.end()) {
 				if( (t1 > this->mds[1]->last_sec) || 
 						(t1== this->mds[1]->last_sec && (t2 >this->mds[1]->last_msec)) ) { 
+                        cout<<"idx_o:"<<this->mds[1]->open.cidx<<std::endl;
+                        cout<<"idx_h:"<<this->mds[1]->high.cidx<<std::endl;
+                        cout<<"idx_l:"<<this->mds[1]->low.cidx<<std::endl;
+                        cout<<"idx_c:"<<this->mds[1]->close.cidx<<std::endl;
 
-
-						this->mds[1]->open.update_me(v,t1,t2,OPEN,MIRCO,1);
-						this->mds[1]->close.update_me(v,t1,t2,CLOSE,MIRCO,1);
-						this->mds[1]->high.update_me(v,t1,t2,HIGH,MIRCO,1);
-						this->mds[1]->low.update_me(v,t1,t2,LOW,MIRCO,1);
+                        assert(this->mds[1]->open.cidx==this->mds[1]->close.cidx);
+                        assert(this->mds[1]->high.cidx==this->mds[1]->close.cidx);
+                        assert(this->mds[1]->low.cidx==this->mds[1]->close.cidx);
+                        idx_prev=this->mds[1]->close.cidx;
+						this->mds[1]->open.update_me(v,t1,t2,OPEN,MINUTE,1);
+						this->mds[1]->close.update_me(v,t1,t2,CLOSE,MINUTE,1);
+						this->mds[1]->high.update_me(v,t1,t2,HIGH,MINUTE,1);
+						this->mds[1]->low.update_me(v,t1,t2,LOW,MINUTE,1);
 						this->mds[1]->last_msec=t2;
 						this->mds[1]->last_sec=t1;
+
+                        cout<<"idx_o:"<<this->mds[1]->open.cidx<<std::endl;
+                        cout<<"idx_h:"<<this->mds[1]->high.cidx<<std::endl;
+                        cout<<"idx_l:"<<this->mds[1]->low.cidx<<std::endl;
+                        cout<<"idx_c:"<<this->mds[1]->close.cidx<<std::endl;
+
+
+                        assert(this->mds[1]->open.cidx==this->mds[1]->close.cidx);
+                        assert(this->mds[1]->high.cidx==this->mds[1]->close.cidx);
+                        assert(this->mds[1]->low.cidx==this->mds[1]->close.cidx);
+                        idx_next=this->mds[1]->close.cidx;
+
 						//todo lock bug
 						//todo update v
 						/*	
-							for(vector<int>::iterator it=perids.begin();it!=perids.end();it++) 
-							*/
+						 for(vector<int>::iterator it=perids.begin();it!=perids.end();it++) 
+						 */
+                        assert(idx_next<=idx_prev+1);
+                        o=this->mds[1]->open.data[idx_next];
+                        c=this->mds[1]->close.data[idx_next];
+                        h=this->mds[1]->high.data[idx_next];
+                        l=this->mds[1]->low.data[idx_next];
+                        sec=t1;
+                        msec=t2;
+	                    //this->update(o,c,h,l,sec,msec,idx_next-idx_prev);
+                        if(idx_next !=idx_prev) {
+                            o=this->mds[1]->open.data[idx_prev];
+                            c=this->mds[1]->close.data[idx_prev];
+                            h=this->mds[1]->high.data[idx_prev];
+                            l=this->mds[1]->low.data[idx_prev];
+                            sec=this->mds[1]->close.tsec[idx_prev];
+                            msec=this->mds[1]->close.tmsec[idx_prev];;
+                            LOG_DEBUG<<"candle data"<<" open:"<<o<<" close:"<<c<<" high:"<<h<<" low:"<<l<<" sec:"<<sec<<" msec:"<<msec<<std::endl;
+                        }
 					}
 				else {
 					/*todo check*/
@@ -231,7 +369,9 @@ int md::flush(string instn, dmgr *pdmgr)
 
 int md::load(string instn, dmgr *pdmgr)
 {
-	/**/
+	/*
+    not load any data
+    */
 
 	return 0;
 }

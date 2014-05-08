@@ -220,6 +220,7 @@ int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
 {
 	int ret;
 	char *errmsg;
+    char sqlbuf[2048];
 	int size=kdataq.size();
 	if(size > 10){
 		ret = sqlite3_exec(this->db, "BEGIN;", 0, 0, &errmsg);
@@ -228,6 +229,9 @@ int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
 
 	for(deque<struct kdata_s*>::iterator it=kdataq.begin();it!=kdataq.end();it++) {
 		/**/
+        sprintf(sqlbuf,"insert table kdata_%d_%s('%f','%f','%f','%f','%d','%d','%d','%d')",(*it)->period,contract.c_str(), (*it)->open,(*it)->close,
+                (*it)->high,(*it)->low,(*it)->vol,(*it)->mnum,(*it)->sec,(*it)->msec);
+        this->exe_cmd(sqlbuf);
 	}
 	if(size > 10) {
 		ret = sqlite3_exec(this->db, "COMMIT;", 0, 0, &errmsg);
@@ -343,7 +347,7 @@ dmgr::dmgr(){
     /*todo for debug
      * */
     this->need_inst["IF1404"]="IF1404";
-    this->need_inst["cu1407"]="cu1407";
+    this->need_inst["ag1412"]="ag1412";
 }
 int dmgr::regdb(string dbname, datalocal *dl){
     /*err process*/ 

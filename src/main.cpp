@@ -81,6 +81,7 @@ int ctp_quote_init(string quotedir)
 
 		/*-1=get old, 1=get new, 0=get all*/
 		g_ctp_quoter->pinstmgr->get_inst_list(&ppinstn,&count, 0);
+        LOG_DEBUG<<"get_inst_list count:"<<count<<std::endl;
 		for(i=0;i<count;i++) {
 			//regmd
 			//1.to fix this code, rebuild. 2. if new inst, we need regmd...
@@ -174,11 +175,11 @@ int  ctp_work()
 		LOG_DEBUG<<"CTP_DB_INIT finished"<<std::endl;
 		ctp_trade_init(TRADE_DIR);
 		LOG_DEBUG<<"CTP_TRADE_INIT finished"<<std::endl;
-		ctp_wait_loop();
+
 		
 		while(g_instmgr->is_last()==0) {
 			LOG_DEBUG<<"wait for instmgr is_last"<<std::endl;
-			sleep(10);
+			sleep(1);
 			i++;
 			if(i%3==0) {
 				LOG_DEBUG<<"for debug set last"<<std::endl;
@@ -188,6 +189,7 @@ int  ctp_work()
 		LOG_DEBUG<<"TRADE_FINISHED"<<std::endl;
 		i=0;
 		ctp_quote_init(QUOTE_DIR);
+		ctp_wait_loop();
 		while(g_ctp_quoter->is_sub()==0) {
 			LOG_DEBUG<<"wait for sub market is_last"<<std::endl;
 			sleep(10);

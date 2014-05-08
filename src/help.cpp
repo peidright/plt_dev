@@ -169,15 +169,15 @@ int date2time(string dat)
 	//ptime pt(time_from_string(dat)); 
 	tm tm1 = to_tm(pt);
  	time_t tt = mktime(&tm1);
-	LOG_DEBUG<<"str: " <<dat<<" time"<<to_simple_string(pt) <<std::endl;
+	//LOG_DEBUG<<"str: " <<dat<<" time"<<to_simple_string(pt) <<std::endl;
 	return (int)tt;
 	} catch (...) {
-		cerr<<"err dat is"<<" "<<dat<<std::endl;
+		LOG_DEBUG<<"err dat is"<<" "<<dat<<std::endl;
 		assert(0);
 	}
 	/*
 	catch ( const exception& e ) {
-		cout << e.what() << endl;
+		LOG_DEBUG << e.what() << endl;
 	}
 	*/
 }

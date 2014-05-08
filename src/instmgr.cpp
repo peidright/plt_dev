@@ -34,14 +34,15 @@ int inst::is_trading(){
 instmgr::instmgr(dmgr *pdmgr) {
     this->pdmgr=pdmgr;
     this->need_inst["IF1404"]="IF1404";
-    this->need_inst["cu1407"]="cu1407";
+    //this->need_inst["cu1407"]="cu1407";
+    this->need_inst["ag1412"]="ag1412";
     last=0;
 }
 
 
 int instmgr::create_inst_kdata(string instn, int period) {
     char sqlbuf[1024];
-    sprintf(sqlbuf, "create table kdata_%d_%s(open float, close float, high float, low float, vol int,sec int,msec int)",period,instn.c_str());
+    sprintf(sqlbuf, "create table kdata_%d_%s(open float, close float, high float, low float, vol int,mnum int,sec int,msec int)",period,instn.c_str());
 
     //sprintf(sqlbuf,"create table sdata_inst(InstrumentID char(32),ExchangeID char(32),InstrumentName char(32),ExchangeInstID char(32),ProductID char(32),ProductClass char(1),DeliveryYear int,DeliveryMonth int,MaxMarketOrderVolume int,MinMarketOrderVolume int,MaxLimitOrderVolume int,MinLimitOrderVolume int,VolumeMultiple int,PriceTick float,CreateDate char(32),OpenDate char(32),ExpirDate char(32),StartDelivDate char(32),EndDelivDate char(32),InstLifePhase char(1),IsTrading int,PositionType char(1) ,PositionDateType char(1),LongMarginRatio float,ShortMarginRatio float,MaxMarginSideAlgorithm char(1))");[2014-04-25 15:01:24.961142 0x00007f6dec97b700 debug ] [ file:datalocal.cpp ][ line:323 ]sqlstr :create table kdata_1_SP jm1405&jm1409(open float, close float, high float, low float, vol int,sec int,msec int); exe err: near "jm1405": syntax error
     this->pdmgr->db_map["kdata"]->exe_cmd(sqlbuf);

@@ -229,7 +229,7 @@ void CtpQuoter::quote_stm(msg_t &msg)
 		if(msg.data)
 			free(msg.data);
 	}
-	LOG_DEBUG<<"finish one Market data"<<std::endl;
+	//LOG_DEBUG<<"finish one Market data"<<std::endl;
 }
 
 int CtpQuoter::is_trading(string instn)

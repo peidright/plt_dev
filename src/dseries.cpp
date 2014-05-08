@@ -5,6 +5,7 @@
 int get_period_slot(int sec,int msec, period_type ptype,int period){
 	int factor=1;
 	sec=msec>0?(sec+1):sec;
+
 	switch(ptype){
 	case MIRCO:
 		factor=factor*1;
@@ -39,8 +40,8 @@ int dseries::dump()
 {
 	/*
 	*/
-	if(this->cidx>1) {
-	LOG_DEBUG<<"price:"<<this->data[this->cidx-1]<< " time: "<<this->tsec[this->cidx-1]<<" mtime: "<<this->tmsec[this->cidx-1] <<"idx is:"<<this->cidx-1<<std::endl;
+	if(this->cidx>=1) {
+	LOG_DEBUG<<"tick data"<<" price:"<<this->data[this->cidx-1]<< " time: "<<this->tsec[this->cidx-1]<<" mtime: "<<this->tmsec[this->cidx-1] <<"idx is:"<<this->cidx-1<<std::endl;
 	}
 	return 0;
 }
@@ -126,6 +127,8 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 	now=60*(sec/60);
 	start_slot = get_period_slot(start,mstart, ptype,period);
 	curr_slot=get_period_slot(sec,msec,ptype,period);
+    LOG_DEBUG<<"ptype:"<<ptype<<" period:"<<period<<std::endl;
+    LOG_DEBUG<<"meh start_slot:curr_slot  "<<start_slot<<":"<<curr_slot<<std::endl;
 	bar_slot=cidx;
 	last_bar_slot=cidx;
 	if(start_slot==0 && cidx==0) {
@@ -135,6 +138,7 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 		this->tmsec[cidx]=msec;
 		bar_slot=cidx;
 		result=v;
+        LOG_DEBUG<<"case1"<<std::endl;
 	}else if(cidx==0 && start_slot!=0){
 		//init, first tick
 		if(start_slot==curr_slot) {
@@ -144,6 +148,8 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tsec[cidx]=sec;
 			bar_slot=cidx;
 			result = this->data[cidx];
+        LOG_DEBUG<<"case2"<<std::endl;
+
 		}else if((start_slot+1)==curr_slot){
 			/*update next bar*/
 			this->cidx++;
@@ -153,6 +159,8 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tmsec[cidx]=msec;
 			bar_slot=cidx+1;
 			result=this->data[cidx];
+        LOG_DEBUG<<"case3"<<std::endl;
+
 		}else if( is_continue(start_slot,0, curr_slot, 0)) {
 			if(curr_slot == start_slot+2) {
 				/*fix one tick
@@ -174,6 +182,9 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 
 				bar_slot=cidx;
 				result=v;
+
+        LOG_DEBUG<<"case4"<<start_slot<<":"<<curr_slot<<std::endl;
+
 			} else {
 				LOG_DEBUG<<"curr_slot: "<<curr_slot<<" start_slot: "<<start_slot<<std::endl;
 				assert(curr_slot <= start_slot+2);
@@ -187,6 +198,8 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tmsec[cidx]=msec;
 			bar_slot=cidx+1;
 			result=this->data[cidx];
+        LOG_DEBUG<<"case5"<<std::endl;
+
 		}
 	} else if(cidx!=0 && start_slot!=0) {
 		/*当cidx为非零值得时候，这个cidx必然是已经有有实际报价，
@@ -199,7 +212,8 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tmsec[cidx]=msec;
 			bar_slot=cidx;
 			result=this->data[cidx];
-		}else if((start+1)==now){
+            LOG_DEBUG<<"case6"<<std::endl;
+		}else if((start_slot+1)==curr_slot){
 			/*is next    bar*/
 			this->cidx++;
 			cidx=this->cidx;
@@ -208,11 +222,15 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tmsec[cidx]=msec;
 			bar_slot=cidx+1;
 			result=this->data[cidx];
+        LOG_DEBUG<<"case7"<<std::endl;
+
 		}else if( is_continue(start_slot,0, curr_slot, 0) ) {
 			if(curr_slot == start_slot+2) {
 				/*fix one tick
 				 *update next tick
 				 * */	
+        LOG_DEBUG<<"case8"<<std::endl;
+
 				this->cidx++;
 				cidx=this->cidx;
 				this->data[cidx]=this->data[cidx-1];
@@ -234,6 +252,8 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 				assert(curr_slot <= start_slot+2);
 			}
 		}else {
+        LOG_DEBUG<<"case9"<<std::endl;
+
 			this->cidx++;
 			cidx=this->cidx;
 			this->tsec[cidx]=sec;
@@ -352,6 +372,7 @@ int dseries::update_meo(float v, int sec, int msec,period_type ptype, int period
 
 			start_slot = get_period_slot(start,mstart, ptype,period);
 			curr_slot=get_period_slot(sec,msec,ptype,period);
+            LOG_DEBUG<<"meo start_slot:curr_slot  "<<start_slot<<":"<<curr_slot<<std::endl;
 			if(start_slot==0 && cidx==0) {
 				/*如果当前是刚开始。	  
 				*/
@@ -359,30 +380,70 @@ int dseries::update_meo(float v, int sec, int msec,period_type ptype, int period
 				this->tsec[cidx]=sec;
 				this->tmsec[cidx]=msec;
 			}else if(cidx==0 && start_slot!=0){
-	           /*如果是第一根k线，
-			      1.是否是最新的数据
-				  2.取max值。
-			   */
-
-			} else if(cidx!=0 && start_slot==0) {
-			   /*当cidx为非零值得时候，这个cidx必然是已经有有实际报价，
-			     或者timer定时器已经发生过!
-			   */
 				if(start_slot==curr_slot) {
-					/*如果是同一分钟,不是open*/
-				    //this->data[cidx]=std::max<float>(this->data[cidx],v);
 				}else if((start_slot+1)==curr_slot){
-					/*如果是新的一分钟*/
 					this->cidx++;
 					cidx=this->cidx;
 					this->tsec[cidx]=sec;
 					this->tmsec[cidx]=msec;
 					this->data[cidx]=v;
-				}else if(1/*是同一时间段*/) {
-					/*有可能要考虑补全间隙*/
+				}else if(is_continue(start_slot,0, curr_slot, 0)) {
+                    if(curr_slot == start_slot+2) {
+                        /*fix one tick
+                         *update next tick
+                         * */	
+                        this->cidx++;
+                        cidx=this->cidx;
+                        this->data[cidx]=this->data[cidx-1];
+                        this->tmsec[cidx]=msec;
+                        this->tsec[cidx]=sec;
 
+                        this->cidx++;
+                        cidx=this->cidx;
+                        this->data[cidx]=v;
+                        this->tmsec[cidx]=msec;
+                        this->tsec[cidx]=sec;
+                    } else {
+                        assert(curr_slot <= start_slot+2);
+                    }
 				}else {
-					/*不再考虑补全间隙*/
+					this->cidx++;
+					cidx=this->cidx;
+					this->tsec[cidx]=sec;
+					this->tmsec[cidx]=msec;
+					this->data[cidx]=v;
+				}
+			} else if(cidx!=0 && start_slot==0) {
+			   /*当cidx为非零值得时候，这个cidx必然是已经有有实际报价，
+			     或者timer定时器已经发生过!
+			   */
+				if(start_slot==curr_slot) {
+				}else if((start_slot+1)==curr_slot){
+					this->cidx++;
+					cidx=this->cidx;
+					this->tsec[cidx]=sec;
+					this->tmsec[cidx]=msec;
+					this->data[cidx]=v;
+				}else if(is_continue(start_slot,0, curr_slot, 0)) {
+                    if(curr_slot == start_slot+2) {
+                        /*fix one tick
+                         *update next tick
+                         * */	
+                        this->cidx++;
+                        cidx=this->cidx;
+                        this->data[cidx]=this->data[cidx-1];
+                        this->tmsec[cidx]=msec;
+                        this->tsec[cidx]=sec;
+
+                        this->cidx++;
+                        cidx=this->cidx;
+                        this->data[cidx]=v;
+                        this->tmsec[cidx]=msec;
+                        this->tsec[cidx]=sec;
+                    } else {
+                        assert(curr_slot <= start_slot+2);
+                    }
+				}else {
 					this->cidx++;
 					cidx=this->cidx;
 					this->tsec[cidx]=sec;
@@ -390,7 +451,40 @@ int dseries::update_meo(float v, int sec, int msec,period_type ptype, int period
 					this->data[cidx]=v;
 				}
 			}else if (cidx!=0 && start_slot!=0) {
-				//ignore
+                if(start_slot==curr_slot) {
+                    //ignore
+                }else if((start_slot+1)==curr_slot){
+                    this->cidx++;
+                    cidx=this->cidx;
+                    this->tsec[cidx]=sec;
+                    this->tmsec[cidx]=msec;
+                    this->data[cidx]=v;
+                }else if(is_continue(start_slot,0, curr_slot, 0)) {
+                    if(curr_slot == start_slot+2) {
+                        /*fix one tick
+                         *update next tick
+                         * */	
+                        this->cidx++;
+                        cidx=this->cidx;
+                        this->data[cidx]=this->data[cidx-1];
+                        this->tmsec[cidx]=msec;
+                        this->tsec[cidx]=sec;
+
+                        this->cidx++;
+                        cidx=this->cidx;
+                        this->data[cidx]=v;
+                        this->tmsec[cidx]=msec;
+                        this->tsec[cidx]=sec;
+                    } else {
+                        assert(curr_slot <= start_slot+2);
+                    }
+                }else {
+                    this->cidx++;
+                    cidx=this->cidx;
+                    this->tsec[cidx]=sec;
+                    this->tmsec[cidx]=msec;
+                    this->data[cidx]=v;
+                }
 			}
 			this->csec=sec;
 			this->cmsec=msec;
@@ -640,5 +734,52 @@ again:
 	}
 	return 0;
 
+}
+
+int dseries::update(float v,int sec, int msec,kdata_type ktype,int period, int is_new){
+    if(sec <= csec) {
+        /*todo waring assert*/
+        assert(sec>csec);
+    }
+
+    if(mnum[cidx]==0 && cidx==0) {
+        data[cidx]=v;
+        tsec[cidx]=sec;
+        tmsec[cidx]=msec;
+        mnum[cidx]=1;
+    } else if(mnum[cidx]==period && is_new) {
+        cidx++;
+        data[cidx]=v;
+        tsec[cidx]=sec;
+        tmsec[cidx]=msec;
+        mnum[cidx]=1;
+    } else if((mnum[cidx]<period) || (mnum[cidx]==period && is_new==0)){
+        if(is_new) {
+            mnum[cidx]++;
+        }
+        tsec[cidx]=sec;
+        tsec[cidx]=msec;
+        switch(ktype) {
+            case HIGH:
+                data[cidx]=std::max<float>(data[cidx],v);
+                break;
+            case LOW:
+                data[cidx]=std::min<float>(data[cidx],v);
+                break;
+            case OPEN:
+                if(mnum[cidx]==1) {
+                }
+                break;
+            case CLOSE:
+                if(mnum[cidx]==period-1) {
+                }
+                break;
+            default:
+                assert(0);
+                break;
+        }
+
+    }
+    return 0;
 }
 

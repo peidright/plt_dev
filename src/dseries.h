@@ -49,53 +49,7 @@ public:
 	int update_me(float v, int sec, int msec,kdata_type type,period_type ptype, int period);
 	int update_other(float v, int sec, int msec, period_type ptype,kdata_type ktype,int period);
 	int kline_update(kdata_type ktype, int t);
-	int update(float v,int sec, int msec,kdata_type ktype,int period){
-		if(sec <= csec) {
-			/*todo waring assert*/
-			assert(sec>csec);
-		}
-
-		if(mnum[cidx]==0 && cidx==0) {
-			data[cidx]=v;
-			tsec[cidx]=sec;
-			tmsec[cidx]=msec;
-			mnum[cidx]=1;
-		} else if(mnum[cidx]==period) {
-			cidx++;
-			data[cidx]=v;
-			tsec[cidx]=sec;
-			tmsec[cidx]=msec;
-			mnum[cidx]=1;
-		} else {
-			assert(mnum[cidx]<period);
-			mnum[cidx]++;
-			tsec[cidx]=sec;
-			tsec[cidx]=msec;
-			switch(ktype) {
-				case HIGH:
-					data[cidx]=std::max<float>(data[cidx],v);
-					break;
-				case LOW:
-					data[cidx]=std::min<float>(data[cidx],v);
-					break;
-				case OPEN:
-					if(mnum[cidx]==1) {
-					}
-					break;
-				case CLOSE:
-					if(mnum[cidx]==period-1) {
-					}
-					break;
-				default:
-					assert(0);
-					break;
-			}
-
-		}
-		return 0;
-	}
-
-
+	int update(float v,int sec, int msec,kdata_type ktype,int period, int is_new);
 	int dump();
 	int kdump(int v, int sec, int msec, int current_slot, int last_slot, int result, kdata_type type);
 
