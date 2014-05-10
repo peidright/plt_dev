@@ -48,6 +48,7 @@ void CtpTrader::trade_stm(msg_t &msg)
     char orderid[64];
     TOnRtnOrder_t *OnRtnOrder;
     TOnRtnTrade_t *OnRtnTrade;
+    position_t *position;
 
     int orderref;
     int requestid;
@@ -248,7 +249,7 @@ void CtpTrader::trade_stm(msg_t &msg)
                 //update req
                 //update Order
                 //update position
-                //
+                //append Trade to position for recheck
                 OnRtnTrade=(TOnRtnTrade_t*)msg.data;
                 snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnTrade->pTrade.ExchangeID,OnRtnTrade->pTrade.OrderSysID);
                 if(this->orderid2reqid.find(orderid)!=this->orderid2reqid.end()) {
@@ -263,7 +264,14 @@ void CtpTrader::trade_stm(msg_t &msg)
                     //this->orderid2order[orderid]->
                 }else {
                 }
-                if(this->position.find(OnRtnTrade->pTrade.InstrumentID)!=this->position.end() {
+                if(this->position.find(OnRtnTrade->pTrade.InstrumentID)!=this->position.end()){
+                    /*
+                     * todo if existed in vector
+                     * */
+                    //position_t *position;
+                    //CThostFtdcInvestorPositionField base;
+                    //OnRtnTrade->pTrade.
+                    
                 }else {
                     this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
                 }

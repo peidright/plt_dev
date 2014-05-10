@@ -27,6 +27,7 @@ public:
     map<string, string> orderid2reqid;
     map<string, ordreq_t*> reqid2req;
     map<string, order_t*> orderid2order;
+    
 	CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir);
 	void trade_stm(msg_t &msg);
 	void post_msg(msg_t *msg);
