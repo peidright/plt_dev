@@ -9,6 +9,7 @@
 #include "msgqueue.h"
 #include "mdseries.h"
 #include "instmgr.h"
+#include "position.h"
 class dmgr;
 class instmgr;
 class CtpTradeSpi;
@@ -20,11 +21,15 @@ public:
 	dmgr *pdmgr;
 	instmgr *pinstmgr;
 	string localdir;
-
+    map<string, position_t*> position;
+    map<string, int> reqid2strategyid;
+    map<string, string> reqid2orderid;
+    map<string, string> orderid2reqid;
+    map<string, ordreq_t*> reqid2req;
+    map<string, order_t*> orderid2order;
 	CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir);
 	void trade_stm(msg_t &msg);
 	void post_msg(msg_t *msg);
-
 
 	int init();
 	int start();
@@ -32,7 +37,7 @@ public:
 	int running;
 	std::deque<msg_t> mqueue;
 	boost::interprocess::interprocess_semaphore qsem;
-    	boost::timed_mutex qmutex;
+    boost::timed_mutex qmutex;
 	//map<int, boost::timed_mutex *> qmutex_map;
 	//map<int, boost::interprocess::interprocess_semaphore* > qsem_map;
 	//map<int, std::deque<msg_t> > mqueue_map;

@@ -148,19 +148,18 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tsec[cidx]=sec;
 			bar_slot=cidx;
 			result = this->data[cidx];
-        LOG_DEBUG<<"case2"<<std::endl;
+            LOG_DEBUG<<"case2"<<std::endl;
 
 		}else if((start_slot+1)==curr_slot){
 			/*update next bar*/
 			this->cidx++;
 			cidx=this->cidx;
-			this->tsec[cidx]=now;
+			this->tsec[cidx]=sec;
 			this->data[cidx]=v;
 			this->tmsec[cidx]=msec;
 			bar_slot=cidx+1;
 			result=this->data[cidx];
-        LOG_DEBUG<<"case3"<<std::endl;
-
+            LOG_DEBUG<<"case3"<<std::endl;
 		}else if( is_continue(start_slot,0, curr_slot, 0)) {
 			if(curr_slot == start_slot+2) {
 				/*fix one tick
@@ -222,21 +221,18 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 			this->tmsec[cidx]=msec;
 			bar_slot=cidx+1;
 			result=this->data[cidx];
-        LOG_DEBUG<<"case7"<<std::endl;
-
+            LOG_DEBUG<<"case7"<<std::endl;
 		}else if( is_continue(start_slot,0, curr_slot, 0) ) {
 			if(curr_slot == start_slot+2) {
 				/*fix one tick
 				 *update next tick
 				 * */	
-        LOG_DEBUG<<"case8"<<std::endl;
-
+                LOG_DEBUG<<"case8"<<std::endl;
 				this->cidx++;
 				cidx=this->cidx;
 				this->data[cidx]=this->data[cidx-1];
 				this->tmsec[cidx]=msec;
 				this->tsec[cidx]=sec;
-
 				/*
 				 * */
 				this->cidx++;

@@ -42,7 +42,16 @@ void CtpTrader::trade_stm(msg_t &msg)
 	inst_t *pinst;
 	inst   *ppinst;
 	TThostFtdcInstrumentIDType instId;
+    position_t *position;
 	int ret;
+    char reqid[64];
+    char orderid[64];
+    TOnRtnOrder_t *OnRtnOrder;
+    TOnRtnTrade_t *OnRtnTrade;
+
+    int orderref;
+    int requestid;
+
 
 	while(msg.type!=TSTOP) {
 		switch(msg.type) {
@@ -164,32 +173,102 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TReqQryTradingAccount:
+                //TReqQryTradingAccount_t
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryTradingAccount:
+                LOG_DEBUG<<"CurrMargin:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.CurrMargin<<
+                           " Available:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.Available<<std::endl;
 				msg.type=TSTOP;
 				break;
 			case TReqQryInvestorPosition:
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryInvestorPosition:
+                if(this->positions.find(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID)
+                        ==this->positions.end()) {
+                    position=new (position_t);
+                    memcpy(&position->base, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
+                            sizeof(struct CThostFtdcInvestorPositionField));
+                    postions[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]=position;
+                }else {
+                    memcpy(&postions[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID].base, 
+                            &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
+                            sizeof(struct CThostFtdcInvestorPositionField));
+                }
+                LOG_DEBUG<<"Inst position:"<<((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID<<" yp:"<<
+                        ((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.YdPosition<<" p:"<<
+                        ((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.Position<<std::endl;
+                            
 				msg.type=TSTOP;
 				break;
 			case TReqOrderInsert:
+                //CThostFtdcInputOrderField *pInputOrder, 
 				msg.type=TSTOP;
 				break;
 			case TOnRspOrderInsert:
+                /*reqid2req map, status
+                 * */
 				msg.type=TSTOP;
 				break;
 			case TReqOrderAction:
+                /*
+                 * */
 				msg.type=TSTOP;
 				break;
 			case TOnRspOrderAction:
+                /*fix status
+                 * */
 				msg.type=TSTOP;
 				break;
 			case TOnRtnOrder:
+                //TOnRtnOrder_t;
+                OnRtnOrder=(TOnRtnOrder_t*)msg.data;
+                orderref=atoi(OnRtnOrder->pOrder.OrderRef);
+                requestid=OnRtnOrder->pOrder.RequestID;
+                snprintf(reqid,sizeof(reqid),"%d_%d",requestid,orderref);
+                snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnOrder->pOrder.ExchangeID, OnRtnOrder->pOrder.OrderSysID);
+
+                if(this->orderid2order.find(orderid)!=this->orderid2order.end()) {
+                    memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
+                    this->orderid2order[orderid]->uptime=time(NULL);
+                } else {
+                    this->reqid2req[reqid]=new (order_t);
+                    memcpy(&this->reqid2req[reqid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
+                    this->orderid2order[orderid]->uptime=time(NULL);
+                    //assert(0);
+                }
+                /*todo err check*/
+                this->orderid2reqid[orderid]=reqid;
+                this->reqid2orderid[reqid]=orderid;
 				msg.type=TSTOP;
 				break;
+            case TOnRtnTrade:
+                //TOnRtnTrade_t;
+                //update req
+                //update Order
+                //update position
+                //
+                OnRtnTrade=(TOnRtnTrade_t*)msg.data;
+                snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnTrade->pTrade.ExchangeID,OnRtnTrade->pTrade.OrderSysID);
+                if(this->orderid2reqid.find(orderid)!=this->orderid2reqid.end()) {
+                    if(this->reqid2req.find(this->orderid2reqid[orderid])!=this->reqid2req.end()) {
+                        //this->reqid2req[this->orderid2reqid[orderid]]->base.
+                    }else {
+                    }
+                }else {
+                    //todo some check
+                }
+                if(this->orderid2order.find(orderid)!=this->orderid2order.end()) {
+                    //this->orderid2order[orderid]->
+                }else {
+                }
+                if(this->position.find(OnRtnTrade->pTrade.InstrumentID)!=this->position.end() {
+                }else {
+                    this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
+                }
+                msg.type=TSTOP;
+                breka;
 			default:
 				msg.type=TSTOP;
 				break;

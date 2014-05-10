@@ -15,21 +15,25 @@
 
 char MapDirection(char src, bool toOrig=true){
   if(toOrig){
-    if('b'==src||'B'==src){src='0';}else if('s'==src||'S'==src){src='1';}
+    if('b'==src||'B'==src){src=THOST_FTDC_D_Buy;}else if('s'==src||'S'==src){src=THOST_FTDC_D_Sell;} else {assert(0);}
   }else{
-    if('0'==src){src='B';}else if('1'==src){src='S';}
+    if(THOST_FTDC_D_Buy==src){src='B';}else if(THOST_FTDC_D_Sell==src){src='S';} else {assert(0);}
   }
   return src;
 }
+
+
 char MapOffset(char src, bool toOrig=true){
   if(toOrig){
-    if('o'==src||'O'==src){src='0';}
-    else if('c'==src||'C'==src){src='1';}
-    else if('j'==src||'J'==src){src='3';}
+    if('o'==src||'O'==src){src=THOST_FTDC_OF_Open;}
+    else if('c'==src||'C'==src){src=THOST_FTDC_OF_Close;}
+    else if('j'==src||'J'==src){src='THOST_FTDC_OF_CloseToday;}
+    else {assert(0);}
   }else{
-    if('0'==src){src='O';}
-    else if('1'==src){src='C';}
-    else if('3'==src){src='J';}
+    if(THOST_FTDC_OF_Open==src){src='O';}
+    else if('THOST_FTDC_OF_Close==src){src='C';}
+    else if(THOST_FTDC_OF_CloseToday==src){src='J';}
+    else {assert(0);}
   }
   return src;
 }
@@ -93,7 +97,7 @@ void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
 	strcpy(req.UserID, vUserId);  strcpy(userId, vUserId); 
 	strcpy(req.Password, vPasswd);
 	this->login_status=LOGIN;
-	int ret = this->api->ReqUserLogin(&req, ++this->requestId);
+	int ret = this->api->ReqUserLogin(&req, this->get_request_id());
     	
 	if (ret) {
 		this->login_status=FAIL;
@@ -107,7 +111,7 @@ void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
 	strcpy(req.UserID, vUserId);  //strcpy(userId, vUserId); 
 	strcpy(req.Password, vPasswd);
 	this->login_status=LOGIN;
-	ret = this->api->ReqUserLogin(&req, ++this->requestId);	
+	ret = this->api->ReqUserLogin(&req, this->get_request_id());
 	if (ret) {
 		this->login_status=FAIL;
 	}
@@ -125,14 +129,14 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
        frontId = pRspUserLogin->FrontID;
        sessionId = pRspUserLogin->SessionID;
        nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
-       sprintf(orderRef, "%d", ++nextOrderRef);
+       sprintf(orderRef, "%d", this->get_next_ref());
        }else  {
        this->login_status=FAIL;
        }
        CThostFtdcSettlementInfoConfirmField f;
        memset(&f, 0, sizeof(f));
        cout<<"send req settlement confirm"<<endl;
-    //this->ReqSettlementInfoConfirm(&f, ++this->requestId);
+    //this->ReqSettlementInfoConfirm(&f, this->get_request_id());
     this->ReqSettlementInfoConfirm();
     this->confirm=1;
     */
@@ -166,7 +170,7 @@ void CtpTradeSpi::ReqSettlementInfoConfirm(const char * brokerid, const char *us
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
-	int ret = this->api->ReqSettlementInfoConfirm(&req, ++this->requestId);
+	int ret = this->api->ReqSettlementInfoConfirm(&req, this->get_request_id());
 	assert(ret==0);
 }
 
@@ -208,7 +212,7 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
     	strcpy(req.InstrumentID, instId);//为空表示查询所有合约
-	int ret = this->api->ReqQryInstrument(&req, ++this->requestId);
+	int ret = this->api->ReqQryInstrument(&req, this->get_request_id());
 	assert(ret==0);
 }
 
@@ -249,7 +253,7 @@ void CtpTradeSpi::ReqQryTradingAccount()
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
-	int ret = this->api->ReqQryTradingAccount(&req, ++this->requestId);
+	int ret = this->api->ReqQryTradingAccount(&req, this->get_request_id());
     assert(ret==0);
 }
 
@@ -300,7 +304,7 @@ void CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
 	strcpy(req.InstrumentID, this->ctptrader->trader->username.c_str());	
-	int ret = this->api->ReqQryInvestorPosition(&req, ++this->requestId);
+	int ret = this->api->ReqQryInvestorPosition(&req, this->get_request_id());
     assert(ret==0);
 }
 
@@ -343,47 +347,77 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 }
 
 void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
-    TThostFtdcDirectionType dir, TThostFtdcCombOffsetFlagType kpp,
+    TThostFtdcDirectionType dir, char kpp,
     TThostFtdcPriceType price,   TThostFtdcVolumeType vol)
 {
-    /*
-       CThostFtdcInputOrderField req;
-       memset(&req, 0, sizeof(req));	
-       strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());  //应用单元代码	
-       strcpy(req.InvestorID, this->ctptrader->trader->username.c_str()); //投资者代码	
-       strcpy(req.InstrumentID, instId); //合约代码	
-       strcpy(req.OrderRef, orderRef);  //报单引用
-       sprintf(req.OrderRef,"%d",this->nextOrderRef);
-       this->nextOrderRef++;
+    int ret; 
+    int orderref,requestid;
+    char reqid[64];
+    ordreq_t ordreq;
+    CThostFtdcInputOrderField req;
+    memset(&req, 0, sizeof(req));	
+    req.CombHedgeFlag[0]=THOST_FTDC_HF_Speculation;
+    req.ContingentCondition=THOST_FTDC_CC_Immediately;
+    req.ForceCloseReason=THOST_FTDC_FCC_NotForceClose;
+    req.IsAutoSuspend=0;
+    req.OrderPriceType=THOST_FTDC_OPT_LimitPrice;
+    req.VolumeCondition=THOST_FTDC_VC_AV;
+    req.MinVolume=1;
+    strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());  //应用单元代码	
+    strcpy(req.InvestorID, this->ctptrader->trader->username.c_str()); //投资者代码	
+    strcpy(req.InstrumentID, instId); //合约代码	
+    strcpy(req.UserID, this->ctptrader->trader->username.c_str()); //投资者代码	
+    req.LimitPrice=price;
 
-    //int nextOrderRef = atoi(orderRef);
-    //sprintf(orderRef, "%d", ++nextOrderRef);
-
-    req.LimitPrice = price;	//价格
     if(0==req.LimitPrice){
-    req.OrderPriceType = THOST_FTDC_OPT_AnyPrice;//价格类型=市价
-    req.TimeCondition = THOST_FTDC_TC_IOC;//有效期类型:立即完成，否则撤销
+        req.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
+        req.TimeCondition = THOST_FTDC_TC_IOC;
     }else{
-    req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;//价格类型=限价	
-    req.TimeCondition = THOST_FTDC_TC_GFD;  //有效期类型:当日有效
+        req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;	
+        req.TimeCondition = THOST_FTDC_TC_GFD;
     }
+
     req.Direction = MapDirection(dir,true);  //买卖方向	
-    req.CombOffsetFlag[0] = MapOffset(kpp[0],true); //组合开平标志:开仓
-    req.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;	  //组合投机套保标志	
-    req.VolumeTotalOriginal = vol;	///数量		
-    req.VolumeCondition = THOST_FTDC_VC_AV; //成交量类型:任何数量
-    req.MinVolume = 1;	//最小成交量:1	
-    req.ContingentCondition = THOST_FTDC_CC_Immediately;  //触发条件:立即
-
-    //TThostFtdcPriceType	StopPrice;  //止损价
-    req.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;	//强平原因:非强平	
-    req.IsAutoSuspend = 0;  //自动挂起标志:否	
-    req.UserForceClose = 0;   //用户强评标志:否
-
-    int ret = this->api->ReqOrderInsert(&req, ++this->requestId);
-    */
+    req.CombOffsetFlag[0] = MapOffset(kpp,true); //组合开平标志:开仓
+    req.VolumeTotalOriginal=vol;
+    orderref=this->get_order_ref();
+    requestid=this->get_request_id();
+    sprintf(req.OrderRef,"%d",orderref);
+    ret = this->api->ReqOrderInsert(&req, requestid);
+    assert(ret==0);
+    
+    snprintf(reqid,sizeof(reqid),"%d_%d",requestid,orderref);
+    if(this->ctptrader->reqid2req.find(reqid)==this->ctptrader->reqid2req.end()) {
+        this->ctptrader->reqid2req[reqid]=new (ordreq_t);
+        memcpy(&this->ctptrader->reqid2req[reqid]->base, &req, sizeof(CThostFtdcInputOrderField));
+        this->ctptrader->reqid2req[reqid]->stime=time(NULL);
+    } else {
+        assert(0);
+    }
 }
 
+int CtpTradeSpi::get_order_ref()
+{
+    int orderref=this->nextOrderRef++;
+    return orderref;
+}
+
+int CtpTradeSpi::get_request_id()
+{
+    int requestid=this->requestId++;
+    return requestid;
+}
+
+int CtpTradeSpi::get_front_id()
+{
+    int frontid=this->frontId++;
+    return frontid;
+}
+int CtpTradeSpi::get_session_id();
+{
+    int sessionid=this->sessionId++;
+    return sessionid;
+}
 
 void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, 
           CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -406,6 +440,7 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	msg->data=(void*)data;
 	msg->type=TOnRspOrderInsert;
 	this->ctptrader->post_msg(msg);
+    /*put this msg to StrategyScript*/
 }
 
 void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
@@ -427,7 +462,7 @@ void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
     strcpy(req.ExchangeID, orderList[i]->ExchangeID);
     strcpy(req.OrderSysID, orderList[i]->OrderSysID);
     req.ActionFlag = THOST_FTDC_AF_Delete;  //操作标志 
-    int ret = this->api->ReqOrderAction(&req, ++this->requestId);
+    int ret = this->api->ReqOrderAction(&req, this->get_request_id());
     */
 }
 
@@ -445,7 +480,7 @@ void CtpTradeSpi::OnRspOrderAction(
 		data->pRspInfo=new(CThostFtdcRspInfoField);
 		memcpy(data->pRspInfo,pRspInfo,sizeof(CThostFtdcRspInfoField));
 	}else {
-		//LOG_DEBUG<<"spi OnRspOrderAction"<<std::endl;
+		//LOG_DEBUG<<"spi OnRspOrderAction null"<<std::endl;
 	}
 
 	memcpy(&data->pInputOrderAction,pInputOrderAction,sizeof(*pInputOrderAction));

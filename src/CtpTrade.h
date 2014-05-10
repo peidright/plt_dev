@@ -42,6 +42,13 @@ public:
 		this->login_status=0;
 	};
 
+    int get_order_ref();
+    int get_request_id();
+    int get_front_id();
+    int get_session_id();
+
+
+
 	/*
    CtpTradeSpi(CThostFtdcTraderApi* api, Trader *trader):api(api){
 
