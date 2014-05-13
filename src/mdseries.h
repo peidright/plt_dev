@@ -39,6 +39,7 @@ public:
 	mdseries(period_type ptype, int period);
 	int updatems(float v, int b1, int b2);
 	int updateme(float v, int b1, int b2);
+	map<int,bool> ksregmap;//stragtepy map
 
 	int update(float o,float c,float h, float l, int sec, int msec,int is_new);
 	int kline_update();
@@ -62,9 +63,27 @@ public:
 	vector<int>         perids;
 	dseries             ds;  /*base misc service*/
 	inst                *pinst;
+	map<int,bool> tsregmap;//stragtepy map
 	md() {
 		this->pinst=NULL;
 	}
+    int reg_strategy(int sid, int period)
+    {
+        int ret=0;
+        /*0==tick
+         * */
+        if(period==0) {
+            tsregmap[sid]=true;
+        }else {
+            /**/
+            if(mds.find(period)!=mds.end()) {
+                mds[period]->ksregmap[sid]=true;
+            }else {
+                ret=-1;
+            }
+        }
+        return ret;
+    };
 	int update(float v, int t1, int t2);
 
 	//int mdseries::update(float o,float c,float h, float l, int sec, int msec,int is_new) {

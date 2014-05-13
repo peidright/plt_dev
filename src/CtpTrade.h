@@ -47,8 +47,6 @@ public:
     int get_front_id();
     int get_session_id();
 
-
-
 	/*
    CtpTradeSpi(CThostFtdcTraderApi* api, Trader *trader):api(api){
 
@@ -119,7 +117,7 @@ public:
 	void ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId);
 	///报单录入请求
   void ReqOrderInsert(TThostFtdcInstrumentIDType instId,
-        TThostFtdcDirectionType dir, TThostFtdcCombOffsetFlagType kpp,
+        TThostFtdcDirectionType dir, char kpp,
         TThostFtdcPriceType price,   TThostFtdcVolumeType vol);
 	///报单操作请求
 	void ReqOrderAction(TThostFtdcSequenceNoType orderSeq);

@@ -27,11 +27,11 @@ char MapOffset(char src, bool toOrig=true){
   if(toOrig){
     if('o'==src||'O'==src){src=THOST_FTDC_OF_Open;}
     else if('c'==src||'C'==src){src=THOST_FTDC_OF_Close;}
-    else if('j'==src||'J'==src){src='THOST_FTDC_OF_CloseToday;}
+    else if('j'==src||'J'==src){src=THOST_FTDC_OF_CloseToday;}
     else {assert(0);}
   }else{
     if(THOST_FTDC_OF_Open==src){src='O';}
-    else if('THOST_FTDC_OF_Close==src){src='C';}
+    else if(THOST_FTDC_OF_Close==src){src='C';}
     else if(THOST_FTDC_OF_CloseToday==src){src='J';}
     else {assert(0);}
   }
@@ -413,7 +413,7 @@ int CtpTradeSpi::get_front_id()
     int frontid=this->frontId++;
     return frontid;
 }
-int CtpTradeSpi::get_session_id();
+int CtpTradeSpi::get_session_id()
 {
     int sessionid=this->sessionId++;
     return sessionid;

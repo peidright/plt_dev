@@ -7,19 +7,29 @@ extern int sframe_agent_loop(strategy_config_t &config);
 
 
 
-int sframe::put_msg(string msg) {
-	this->msg=msg+":ddd";
-	cout<<"msg: "<<std::endl;
-	return 0;
+int sframe::put_msg(msg_t *msg,int key) {
+again:
+	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
+	if(lk) {
+		pipemap[key]->msgqueue.push_back(msg);
+		pipemap[key]->qsem.post();
+	}else {
+        /*todo*/
+        goto again;
+	}
 };
+
 msg_t* sframe::get_msg(int key) {
 	msg_t *msg=NULL;
+again:
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if(lk) {
 		pipemap[key]->qsem.wait();
 		msg=pipemap[key]->msgqueue[0];
 		pipemap[key]->msgqueue.pop_front();
 	}else {
+        /*todo*/
+        goto again;
 	}
 	return msg;
 };
@@ -200,4 +210,38 @@ int sframe_agent_loop(strategy_config_t &config) {
 	PyRun_AnyFileEx(f,"test.py",0);
 	cout<<"step3...."<<std::endl;
 }
+
+int sframe_put_msg(msg_t *msg, int key)
+{
+    int ret=g_sframe.put_msg(msg, key);
+    return ret;
+}
+
+int sframe_quote_kchange(float o,float c, float h, float l, int sec,int msec,int subtype, int key)
+{
+    int ret;
+    msg_t *msg=new(msg_t);
+    msg->data=new (KChange_t);
+    ((KChange_t*)msg->data)->o=o;
+    ((KChange_t*)msg->data)->c=c;
+    ((KChange_t*)msg->data)->h=h;
+    ((KChange_t*)msg->data)->l=l;
+    subtype=(subtype==0?OLD:NEW);
+    ((KChange_t*)msg->data)->subtype=subtype;
+    ret=sframe_put_msg(msg,key);
+    return ret;
+}
+
+int sframe_quote_tchange(float v, int sec, int msec,int subtype, int key)
+{
+    int ret;
+    msg_t *msg=new(msg_t);
+    msg->data=new (TChange_t);
+    ((TChange_t*)msg->data)->subtype=NEW;
+    ((TChange_t*)msg->data)->v=v;
+    ret=sframe_put_msg(msg, key);
+    return ret;
+}
+
+
 

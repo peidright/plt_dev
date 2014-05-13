@@ -4,6 +4,7 @@
 #include "boost/date_time.hpp"
 #include "log.h"
 #include "tm.h"
+#include "StrategyFrame.h"
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
@@ -281,6 +282,8 @@ int md::update(float v, int t1, int t2) {
         int idx_next;
         float o,c,h,l;
         int sec,msec;
+
+
 		if(status <0) {
 			/**/
 			assert(0);
@@ -289,6 +292,12 @@ int md::update(float v, int t1, int t2) {
 			cerr<<"update ms finished, return first"<<std::endl;
 			return 0;
 #endif
+            for(map<int,bool>::iterator it=this->tsregmap.begin();it!=this->tsregmap.end();it++) {
+                /*todo*/
+                sframe_quote_tchange(v, t1, t2,0,it->first);
+            }
+
+
 			if(this->mds.find(1)!=this->mds.end()) {
 				if( (t1 > this->mds[1]->last_sec) || 
 						(t1== this->mds[1]->last_sec && (t2 >this->mds[1]->last_msec)) ) { 
@@ -331,7 +340,15 @@ int md::update(float v, int t1, int t2) {
                         l=this->mds[1]->low.data[idx_next];
                         sec=t1;
                         msec=t2;
-	                    //this->update(o,c,h,l,sec,msec,idx_next-idx_prev);
+
+                        for(map<int, mdseries*>::iterator it=this->mds.begin();it!=this->mds.end();it++) {
+                            if(it->first!=1) {
+                                this->update(o,c,h,l,sec,msec,idx_next-idx_prev);
+                            }
+                        	for(map<int,bool>::iterator subit=this->mds[it->first]->ksregmap.begin();subit!=this->mds[it->first]->ksregmap.end();subit++) {
+                                sframe_quote_kchange(o,c,h,l,sec,msec,idx_next-idx_prev, subit->first);
+                            }
+                        }
                         if(idx_next !=idx_prev) {
                             o=this->mds[1]->open.data[idx_prev];
                             c=this->mds[1]->close.data[idx_prev];

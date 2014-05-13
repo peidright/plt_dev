@@ -42,13 +42,13 @@ void CtpTrader::trade_stm(msg_t &msg)
 	inst_t *pinst;
 	inst   *ppinst;
 	TThostFtdcInstrumentIDType instId;
-    position_t *position;
 	int ret;
     char reqid[64];
     char orderid[64];
     TOnRtnOrder_t *OnRtnOrder;
     TOnRtnTrade_t *OnRtnTrade;
-    position_t *position;
+    position_t *pposition;
+    struct CThostFtdcInvestorPositionField  *pposition_field;
 
     int orderref;
     int requestid;
@@ -186,15 +186,31 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryInvestorPosition:
-                if(this->positions.find(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID)
-                        ==this->positions.end()) {
-                    position=new (position_t);
-                    memcpy(&position->base, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
+                if(this->position.find(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID)
+                        ==this->position.end()) {
+                    pposition=new (position_t);
+#define THOST_FTDC_PD_Long '2'
+#define THOST_FTDC_PD_Short '3'
+
+                    if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
+                        pposition_field=&pposition->bbase;
+                    }else if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Short){
+                        pposition_field=&pposition->sbase;
+                    }else {
+                        assert(0);
+                    }
+                    memcpy(pposition_field, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
                             sizeof(struct CThostFtdcInvestorPositionField));
-                    postions[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]=position;
+                    position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]=pposition;
                 }else {
-                    memcpy(&postions[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID].base, 
-                            &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
+                    if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
+                        pposition_field=&position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]->bbase;
+                    }else if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Short){
+                        pposition_field=&position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]->sbase;
+                    }else {
+                        assert(0);
+                    }
+                    memcpy(&pposition_field, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
                             sizeof(struct CThostFtdcInvestorPositionField));
                 }
                 LOG_DEBUG<<"Inst position:"<<((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID<<" yp:"<<
@@ -234,8 +250,8 @@ void CtpTrader::trade_stm(msg_t &msg)
                     memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
                     this->orderid2order[orderid]->uptime=time(NULL);
                 } else {
-                    this->reqid2req[reqid]=new (order_t);
-                    memcpy(&this->reqid2req[reqid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
+                    this->orderid2order[reqid]=new (order_t);
+                    memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
                     this->orderid2order[orderid]->uptime=time(NULL);
                     //assert(0);
                 }
@@ -276,7 +292,7 @@ void CtpTrader::trade_stm(msg_t &msg)
                     this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
                 }
                 msg.type=TSTOP;
-                breka;
+                break;
 			default:
 				msg.type=TSTOP;
 				break;

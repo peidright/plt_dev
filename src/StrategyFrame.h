@@ -61,7 +61,7 @@ class sframe {
 	boost::timed_mutex  smutex;
 	int base_key;
 	string msg;
-	int put_msg(string msg);
+	int put_msg(msg_t *msg,int key);
 	msg_t* get_msg(int key);
 	int reg_agent_key();
 	int dispatch();
@@ -83,6 +83,10 @@ class sframe_agent{
 	msg_t *pystr2msg(string str);
 	string msg2pystr(msg_t *msg);
 };
+
+int sframe_put_msg(msg_t *msg, int key);
+int sframe_quote_kchange(float o,float c, float h, float l, int sec,int msec,int subtype, int key);
+int sframe_quote_tchange(float v, int sec, int msec, int subtype, int key);
 
 extern "C" void initsframe_agent();
 #endif
