@@ -192,6 +192,10 @@ int  ctp_work()
         sleep(10);
         cout<<"sleep 10 finished"<<std::endl;
         g_sframe.init(g_ctp_quoter,g_ctp_trader);
+        LOG_DEBUG<<"strategy begin"<<std::endl;
+	    strategy_demo();
+
+        LOG_DEBUG<<"strategy end"<<std::endl;
 
 		ctp_wait_loop();
 		while(g_ctp_quoter->is_sub()==0) {
@@ -216,7 +220,6 @@ int  ctp_work()
 
 int main(int argc, char * argv[]){
 
-	//strategy_demo();
 	//ctp_wait_loop();
 	//python_demo();
 	//exit(0);

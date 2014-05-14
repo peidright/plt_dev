@@ -1,13 +1,27 @@
 from ctypes import *
+import json
+import sframe_agent
+import time
 
-import sframe
-
-class res(Structure):
-	_fields_ = [("subtype", c_int),("o", c_float),("c",c_float),("h",c_float),("l",c_float)];
 if __name__=="__main__":
-	d=sframe.sframe();
-	res= d.put_msg("dddd");
-	print res
-	res= d.get_msg();
-	print res
+    f=open("testt.log","a+")
+    d=sframe_agent.sframe_agent();
+    sid=d.init();
+    #dispatchsynret",&sframe_agent::dispatchsynret)
+    req={"instn":"ag1412","period":0,"sid":sid,"type":131};
+    req=json.dumps(req);
+    print>>f,req
+    print "req is",req 
+    res=d.dispatchsynret(req);
+    print res;
+    print>>f,res;
+    try:
+        while True:
+            res=d.get_msg();
+            print>>f,res;
+            print json.loads(res);
+    except Exception:
+        print>>f,"except finished"
+        f.close()
+
 

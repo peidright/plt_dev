@@ -282,6 +282,7 @@ int md::reg_strategy(int sid, int period)
             ret=-1;
         }
     }
+    LOG_DEBUG<<"reg_strategy : sid="<<sid<<" period:"<<period<<std::endl;
     return ret;
 };
 	
@@ -310,6 +311,7 @@ int md::update(float v, int t1, int t2) {
 #endif
             for(map<int,bool>::iterator it=this->tsregmap.begin();it!=this->tsregmap.end();it++) {
                 /*todo*/
+                LOG_DEBUG<<"quote_tchange v:"<<v<<" sid:"<<it->first<<std::endl;
                 sframe_quote_tchange(v, t1, t2,0,it->first);
             }
 

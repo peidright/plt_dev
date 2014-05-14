@@ -11,6 +11,7 @@ int sframe::put_msg(msg_t *msg,int key) {
 again:
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if(lk) {
+        LOG_DEBUG<<"sframe put_msg"<<std::endl;
 		pipemap[key]->msgqueue.push_back(msg);
 		pipemap[key]->qsem.post();
 	}else {
@@ -27,8 +28,10 @@ again:
 		pipemap[key]->qsem.wait();
 		msg=pipemap[key]->msgqueue[0];
 		pipemap[key]->msgqueue.pop_front();
+        LOG_DEBUG<<"sframe get_msg"<<std::endl;
 	}else {
         /*todo*/
+        LOG_DEBUG<<"sframe get_msg lockerr"<<std::endl;
         goto again;
 	}
 	return msg;
@@ -175,6 +178,7 @@ msg_t *sframe_agent::pystr2msg(string str) {
 	KChange_t *kchange=NULL;
 	TChange_t *tchange=NULL;
     SRegMdStrategy_t *pSRegMdStrategy;
+    cout<<"str is:"<<str<<std::endl;
 	if (reader.parse(str, root))  
 	{
 		int type=root["type"].asInt();    
@@ -204,18 +208,21 @@ msg_t *sframe_agent::pystr2msg(string str) {
 				break; 
 
             case SRegMdStrategy:
+                cout<<"SRegMdStrategy"<<std::endl;
                 pSRegMdStrategy=new (SRegMdStrategy_t);
                 msg->data=pSRegMdStrategy;
                 msg->type=SRegMdStrategy;
                 pSRegMdStrategy->instn=root["instn"].asString();
                 pSRegMdStrategy->period=root["period"].asInt();
                 pSRegMdStrategy->sid=root["sid"].asInt();
+                break;
 			default:
 				break;
 		}
         return msg;
 	} else {
         /*todo msg free*/
+        LOG_DEBUG<<"parse error:"<<str<<std::endl;
 	}
 	return NULL;
 };
@@ -267,6 +274,7 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 			root["type"]=TChange;
 			root["subtype"]=tchange->subtype;
 			root["v"]=tchange->v;
+            LOG_DEBUG<<"root v:"<<root["v"]<<"tchange->v"<<tchange->v<<std::endl;
 			strmsg=root.toStyledString();
 			break;
 		case KChange:
@@ -289,6 +297,7 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 			/*todo*/
 			break;
 	}
+    LOG_DEBUG<<"strmsg is :"<<strmsg<<std::endl;
 	return strmsg;
 };
 
@@ -342,6 +351,7 @@ int sframe_quote_kchange(float o,float c, float h, float l, int sec,int msec,int
     int ret;
     msg_t *msg=new(msg_t);
     msg->data=new (KChange_t);
+    msg->type=KChange;
     ((KChange_t*)msg->data)->o=o;
     ((KChange_t*)msg->data)->c=c;
     ((KChange_t*)msg->data)->h=h;
@@ -354,8 +364,10 @@ int sframe_quote_kchange(float o,float c, float h, float l, int sec,int msec,int
 
 int sframe_quote_tchange(float v, int sec, int msec,int subtype, int key)
 {
+    LOG_DEBUG<<"sframe quote tchange"<<std::endl;
     int ret;
     msg_t *msg=new(msg_t);
+    msg->type=TChange;
     msg->data=new (TChange_t);
     ((TChange_t*)msg->data)->subtype=NEW;
     ((TChange_t*)msg->data)->v=v;
