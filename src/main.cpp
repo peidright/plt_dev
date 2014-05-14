@@ -189,6 +189,10 @@ int  ctp_work()
 		LOG_DEBUG<<"TRADE_FINISHED"<<std::endl;
 		i=0;
 		ctp_quote_init(QUOTE_DIR);
+        sleep(10);
+        cout<<"sleep 10 finished"<<std::endl;
+        g_sframe.init(g_ctp_quoter,g_ctp_trader);
+
 		ctp_wait_loop();
 		while(g_ctp_quoter->is_sub()==0) {
 			LOG_DEBUG<<"wait for sub market is_last"<<std::endl;

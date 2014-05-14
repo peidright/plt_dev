@@ -161,6 +161,7 @@ string sframe_agent::get_msg() {
 int sframe_agent::init(){
 	this->psframe=&g_sframe;
 	this->agent_key=this->psframe->reg_agent_key();
+    return this->agent_key;
 };
 
 msg_t *sframe_agent::pystr2msg(string str) {
@@ -173,6 +174,7 @@ msg_t *sframe_agent::pystr2msg(string str) {
 	msg->data=NULL;
 	KChange_t *kchange=NULL;
 	TChange_t *tchange=NULL;
+    SRegMdStrategy_t *pSRegMdStrategy;
 	if (reader.parse(str, root))  
 	{
 		int type=root["type"].asInt();    
@@ -200,10 +202,20 @@ msg_t *sframe_agent::pystr2msg(string str) {
 				kchange->h=root["h"].asFloat();
 				kchange->l=root["l"].asFloat();
 				break; 
+
+            case SRegMdStrategy:
+                pSRegMdStrategy=new (SRegMdStrategy_t);
+                msg->data=pSRegMdStrategy;
+                msg->type=SRegMdStrategy;
+                pSRegMdStrategy->instn=root["instn"].asString();
+                pSRegMdStrategy->period=root["period"].asInt();
+                pSRegMdStrategy->sid=root["sid"].asInt();
 			default:
 				break;
 		}
+        return msg;
 	} else {
+        /*todo msg free*/
 	}
 	return NULL;
 };
