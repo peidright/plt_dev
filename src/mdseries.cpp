@@ -267,7 +267,23 @@ int md::drivemd() {
 	return 0;
 };
 
-
+int md::reg_strategy(int sid, int period)
+{
+    int ret=0;
+    /*0==tick
+     * */
+    if(period==0) {
+        tsregmap[sid]=true;
+    }else {
+        /**/
+        if(mds.find(period)!=mds.end()) {
+            mds[period]->ksregmap[sid]=true;
+        }else {
+            ret=-1;
+        }
+    }
+    return ret;
+};
 	
 int md::update(float v, int t1, int t2) {
 		/*1.¸üĞÂ ds
@@ -343,7 +359,7 @@ int md::update(float v, int t1, int t2) {
 
                         for(map<int, mdseries*>::iterator it=this->mds.begin();it!=this->mds.end();it++) {
                             if(it->first!=1) {
-                                this->update(o,c,h,l,sec,msec,idx_next-idx_prev);
+                                //this->update(o,c,h,l,sec,msec,idx_next-idx_prev);
                             }
                         	for(map<int,bool>::iterator subit=this->mds[it->first]->ksregmap.begin();subit!=this->mds[it->first]->ksregmap.end();subit++) {
                                 sframe_quote_kchange(o,c,h,l,sec,msec,idx_next-idx_prev, subit->first);
@@ -413,6 +429,12 @@ int md::update_timer()
 	return 0;
 };
 
+int mdservice::regmd_strategy(string instn, int sid, int period){
+    if(mds.find(instn)==mds.end()) {
+        return -1;
+    }
+    return mds[instn]->reg_strategy(sid, period);
+};
 
 int mdservice::mmd(string contract,int period, int bar){
 

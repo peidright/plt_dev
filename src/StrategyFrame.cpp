@@ -48,6 +48,78 @@ again:
 };
 int sframe::dispatch(){
 };
+
+int sframe::init(CtpQuoter *ctpquoter, CtpTrader *ctptrader)
+{
+    this->ctpquoter=ctpquoter;
+    this->ctptrader=ctptrader;
+    return 0;
+};
+msg_t *sframe::dispatchsynret(msg_t *msg)
+{
+    int ret;
+    SRegMdInst_t *pSRegMdInst;
+    SRegMdPeriod_t *pSRegMdPeriod;
+    SRegMdStrategy_t *pSRegMdStrategy;
+    SRegRspCommon_t  *pSRegRspCommon;
+    msg_t *pmsg=NULL;
+
+    switch(msg->type) {
+        case SRegMdInst:
+            pSRegMdInst=(SRegMdInst_t*)msg->data;
+            assert(0);
+            break;
+        case SRegMdPeriod:
+            pSRegMdPeriod=(SRegMdPeriod_t*)msg->data;
+            pmsg=new(msg_t);
+            ret=this->ctpquoter->mds->regmd_period(pSRegMdPeriod->instn,(pSRegMdPeriod->period==0?MIRCO:MINUTE),pSRegMdPeriod->period);
+            pSRegRspCommon=new(SRegRspCommon_t);
+            pmsg->data=pSRegRspCommon;
+            pmsg->type=SRegRspCommon;
+            pSRegRspCommon->ret=ret;
+            break;
+        case SRegMdStrategy:
+            pSRegMdStrategy=(SRegMdStrategy_t*)msg->data;
+            ret=this->ctpquoter->mds->regmd_strategy(pSRegMdStrategy->instn,pSRegMdStrategy->sid,pSRegMdStrategy->period);
+            pmsg=new(msg_t);
+            pSRegRspCommon=new(SRegRspCommon_t);
+            pmsg->data=pSRegRspCommon;
+            pmsg->type=SRegRspCommon;
+            pSRegRspCommon->ret=ret;
+            break;
+        default:
+            assert(0);
+            break;
+    }
+    return pmsg;
+}
+int sframe::dispatchsyn(msg_t *msg){
+    int ret=-1;
+    SRegMdInst_t *pSRegMdInst;
+    SRegMdPeriod_t *pSRegMdPeriod;
+    SRegMdStrategy_t *pSRegMdStrategy;
+    SRegRspCommon_t  *pSRegRspCommon;
+
+    switch(msg->type) {
+        case SRegMdInst:
+            pSRegMdInst=(SRegMdInst_t*)msg->data;
+            assert(0);
+            break;
+        case SRegMdPeriod:
+            pSRegMdPeriod=(SRegMdPeriod_t*)msg->data;
+            ret=this->ctpquoter->mds->regmd_period(pSRegMdPeriod->instn,(pSRegMdPeriod->period==0?MIRCO:MINUTE),pSRegMdPeriod->period);
+            break;
+        case SRegMdStrategy:
+            pSRegMdStrategy=(SRegMdStrategy_t*)msg->data;
+            ret=this->ctpquoter->mds->regmd_strategy(pSRegMdStrategy->instn,pSRegMdStrategy->sid,pSRegMdStrategy->period);
+            break;
+        default:
+            assert(0);
+            break;
+    }
+    return ret;
+}
+
 int sframe::test(int key){
 	msg_t *msg=new(msg_t);
 	msg->data=NULL;
@@ -78,11 +150,11 @@ int sframe_agent::put_msg(string msg) {
 	return 0;
 };
 string sframe_agent::get_msg() {
-	cout<<"get_msg1"<<std::endl;
+	//cout<<"get_msg1"<<std::endl;
 	this->psframe->test(agent_key);
-	cout<<"get_msg2"<<std::endl;
+	//cout<<"get_msg2"<<std::endl;
 	msg_t *msg=this->psframe->get_msg(agent_key);
-	cout<<"get_msg3"<<std::endl;
+	//cout<<"get_msg3"<<std::endl;
 	return this->msg2pystr(msg);
 };
 
@@ -136,12 +208,37 @@ msg_t *sframe_agent::pystr2msg(string str) {
 	return NULL;
 };
 
+int sframe_agent::dispatchsyn(string msg){
+    /*if complicate result, we must return json*/
+    int ret;
+    msg_t *msg1=this->pystr2msg(msg);
+    ret=this->psframe->dispatchsyn(msg1);
+    free(msg1->data);
+    free(msg1);
+    return ret;
+}
+
+
+string sframe_agent::dispatchsynret(string msg){
+    string ret;
+    msg_t *msg1=this->pystr2msg(msg);
+    msg_t *msg2=this->psframe->dispatchsynret(msg1);
+    free(msg1->data);
+    free(msg1);
+    ret=this->msg2pystr(msg2);
+    free(msg2->data);
+    free(msg2);
+    return ret;
+}
+
+
 string sframe_agent::msg2pystr(msg_t *msg) {
 
 	Json::Reader reader;
 	Json::Value root;
 	KChange_t *kchange=NULL;
 	TChange_t *tchange=NULL;
+    SRegRspCommon_t *pSRegRspCommon;
 	string strmsg="";
 	
 	/*
@@ -149,6 +246,9 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 	Json::FastWriter writer;
 	std::string out2 = writer.write(root);
 	*/
+    if(msg==NULL)
+        return root.toStyledString();
+
 	switch(msg->type) {
 		case TChange:
 			tchange=(TChange_t*)msg->data;
@@ -167,6 +267,12 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 			root["l"]=kchange->l;
 			strmsg=root.toStyledString();
 			break; 
+        case SRegRspCommon:
+            pSRegRspCommon=(SRegRspCommon_t*)msg->data;
+            root["ret"]=pSRegRspCommon->ret;
+            root["type"]=msg->type;
+        	strmsg=root.toStyledString();
+            break;
 		default:
 			/*todo*/
 			break;
@@ -182,6 +288,8 @@ BOOST_PYTHON_MODULE(sframe_agent)
 		.def("get_msg", &sframe_agent::get_msg)
 		.def("put_msg", &sframe_agent::put_msg)
 		.def("init",    &sframe_agent::init)
+        .def("dispatchsyn",&sframe_agent::dispatchsyn)
+        .def("dispatchsynret",&sframe_agent::dispatchsynret)
 	;
 };
 

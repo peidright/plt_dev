@@ -67,23 +67,7 @@ public:
 	md() {
 		this->pinst=NULL;
 	}
-    int reg_strategy(int sid, int period)
-    {
-        int ret=0;
-        /*0==tick
-         * */
-        if(period==0) {
-            tsregmap[sid]=true;
-        }else {
-            /**/
-            if(mds.find(period)!=mds.end()) {
-                mds[period]->ksregmap[sid]=true;
-            }else {
-                ret=-1;
-            }
-        }
-        return ret;
-    };
+    int reg_strategy(int sid, int period);
 	int update(float v, int t1, int t2);
 
 	//int mdseries::update(float o,float c,float h, float l, int sec, int msec,int is_new) {
@@ -107,6 +91,7 @@ public:
 	map<string, md*> mds;
 	/*todo ¶ÁĞ´Ëø*/
 	int mmd(string contract,int period, int bar);
+    int regmd_strategy(string instn, int sid, int period);
 	int regmd_period(string contract,period_type ptype, int period);
 	int loadmd_period(string instn, int period, dmgr *pdmgr) {
 		/*todo err*/

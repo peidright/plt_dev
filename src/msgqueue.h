@@ -15,55 +15,63 @@
 
 
 enum msgtype {
-	TChange,
-	KChange,
-	TMessage,
-	TSTOP,
-	TSTART,
-	TOnFrontConnected,
-	TReqUserLogin,
-	TOnRspUserLogin,
+	TChange=0,
+	KChange=1,
+	TMessage=2,
+	TSTOP=3,
+	TSTART=4,
+	TOnFrontConnected=5,
+	TReqUserLogin=6,
+	TOnRspUserLogin=7,
 
-	TReqSettlementInfoConfirm,
-	TOnRspSettlementInfoConfirm,
+	TReqSettlementInfoConfirm=8,
+	TOnRspSettlementInfoConfirm=9,
 	
-	TReqQryInstrument,
-	TOnRspQryInstrument,
+	TReqQryInstrument=10,
+	TOnRspQryInstrument=11,
 	
-	TReqQryTradingAccount,
-	TOnRspQryTradingAccount,
+	TReqQryTradingAccount=12,
+	TOnRspQryTradingAccount=13,
 
-	TReqQryInvestorPosition,
-	TOnRspQryInvestorPosition,
+	TReqQryInvestorPosition=14,
+	TOnRspQryInvestorPosition=15,
 
-	TReqOrderInsert,
-	TOnRspOrderInsert,
+	TReqOrderInsert=16,
+	TOnRspOrderInsert=17,
 
-	TReqOrderAction,
-	TOnRspOrderAction,
-	TOnRtnInstrumentStatus,
+	TReqOrderAction=18,
+	TOnRspOrderAction=19,
+	TOnRtnInstrumentStatus=20,
 
 
-	TOnRtnOrder,
-	TOnRtnTrade,
-	TOnFrontDisconnected,
-	TOnHeartBeatWarning,
-	TOnRspError,
+	TOnRtnOrder=21,
+	TOnRtnTrade=22,
+	TOnFrontDisconnected=23,
+	TOnHeartBeatWarning=24,
+	TOnRspError=25,
 
 	TRADE_QUOTE=64,
-	QSTOP,
-	QSTART,
-	QOnFrontConnected,
-	QOnFrontDisconnected,
-	QOnHeartBeatWarning,
-	QOnRspError,
-	QReqSubscribeMarketData,
-    	QOnRspSubMarketData,
-	QOnRspUnSubMarketData,
-	QReqUserLogin,
-	QOnRspUserLogin,
-	QOnRspUserLogout,
-	QOnRtnDepthMarketData,
+	QSTOP=65,
+	QSTART=66,
+	QOnFrontConnected=67,
+	QOnFrontDisconnected=68,
+	QOnHeartBeatWarning=69,
+	QOnRspError=70,
+	QReqSubscribeMarketData=71,
+    	QOnRspSubMarketData=72,
+	QOnRspUnSubMarketData=73,
+	QReqUserLogin=74,
+	QOnRspUserLogin=75,
+	QOnRspUserLogout=76,
+	QOnRtnDepthMarketData=77,
+
+    TRADE_STRATEGY=128,
+
+    SRegMdInst=129,
+    SRegMdPeriod=130,
+    SRegMdStrategy=131,
+
+    SRegRspCommon =196,
 };
 
 
@@ -220,5 +228,25 @@ typedef struct  {
 	float h;
 	float l;
 }KChange_t;
+
+typedef struct {
+    //int regmd_strategy(string instn, int sid, int period);
+}SRegMdInst_t;
+typedef struct {
+	//int regmd_period(string contract,period_type ptype, int period);
+    //if period==0,is MIRCO,else is ...
+    string instn;
+    int period;
+}SRegMdPeriod_t;
+
+typedef struct {
+    string instn;
+    int sid;
+    int period;
+}SRegMdStrategy_t;
+
+typedef struct {
+    int ret;
+}SRegRspCommon_t;
 
 #endif

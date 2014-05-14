@@ -5,6 +5,9 @@
 #include "msgqueue.h"
 #include "strategy_config.h"
 #include <boost/python.hpp>
+#include "CtpTrader.h"
+#include "CtpQuoter.h"
+
 using namespace boost::python;
 using namespace std;
 
@@ -65,8 +68,15 @@ class sframe {
 	msg_t* get_msg(int key);
 	int reg_agent_key();
 	int dispatch();
+    int dispatchsyn(msg_t *msg);
+    msg_t* dispatchsynret(msg_t *msg);
+
 	int test(int key);
+    int init(CtpQuoter *ctpquoter, CtpTrader *ctptrader);
 	boost::thread_group stg;
+
+    class CtpQuoter *ctpquoter;
+    class CtpTrader *ctptrader;
 	int run(strategy_config_t &config);
 };
 
@@ -77,6 +87,8 @@ class sframe_agent{
 	int agent_key;
 	int put_msg(string msg);
 	string get_msg();
+    int dispatchsyn(string msg);
+    string dispatchsynret(string msg);
 	int    init();
 	private:
 	class sframe  *psframe;
