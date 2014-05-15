@@ -22,11 +22,16 @@ public:
 	instmgr *pinstmgr;
 	string localdir;
     map<string, position_t*> position;
-    map<string, int> reqid2strategyid;
     map<string, string> reqid2orderid;
     map<string, string> orderid2reqid;
     map<string, ordreq_t*> reqid2req;
     map<string, order_t*> orderid2order;
+
+    map<string, int> orderid2sid;
+    /*for 
+     * */
+    map<string, int> reqid2sid;
+    //map<string, int> reqid2strategyid;
     
 	CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir);
 	void trade_stm(msg_t &msg);

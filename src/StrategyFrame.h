@@ -55,7 +55,7 @@ class msgpipe_t {
 	};
 	boost::interprocess::interprocess_semaphore qsem;
 	boost::timed_mutex  qmutex;
-	deque<msg_t*> msgqueue;
+	deque<msg_t> msgqueue;
 };	
 
 class sframe {
@@ -65,11 +65,11 @@ class sframe {
 	int base_key;
 	string msg;
 	int put_msg(msg_t *msg,int key);
-	msg_t* get_msg(int key);
+	msg_t  get_msg(int key);
 	int reg_agent_key();
 	int dispatch();
-    int dispatchsyn(msg_t *msg);
-    msg_t* dispatchsynret(msg_t *msg);
+    int dispatchsyn(msg_t msg);
+    msg_t dispatchsynret(msg_t msg);
 
 	int test(int key);
     int init(CtpQuoter *ctpquoter, CtpTrader *ctptrader);
@@ -92,8 +92,8 @@ class sframe_agent{
 	int    init();
 	private:
 	class sframe  *psframe;
-	msg_t *pystr2msg(string str);
-	string msg2pystr(msg_t *msg);
+	msg_t pystr2msg(string str);
+	string msg2pystr(msg_t msg);
 };
 
 int sframe_put_msg(msg_t *msg, int key);

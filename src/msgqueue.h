@@ -15,40 +15,41 @@
 
 
 enum msgtype {
-	TChange=0,
-	KChange=1,
-	TMessage=2,
-	TSTOP=3,
-	TSTART=4,
-	TOnFrontConnected=5,
-	TReqUserLogin=6,
-	TOnRspUserLogin=7,
+    MSG_NULL=0
+	TChange=6,
+	KChange=7,
+	TMessage=8,
+	TSTOP=9,
+	TSTART=10,
+	TOnFrontConnected=11,
+	TReqUserLogin=12,
+	TOnRspUserLogin=13,
 
-	TReqSettlementInfoConfirm=8,
-	TOnRspSettlementInfoConfirm=9,
+	TReqSettlementInfoConfirm=14,
+	TOnRspSettlementInfoConfirm=15,
 	
-	TReqQryInstrument=10,
-	TOnRspQryInstrument=11,
+	TReqQryInstrument=16,
+	TOnRspQryInstrument=17,
 	
-	TReqQryTradingAccount=12,
-	TOnRspQryTradingAccount=13,
+	TReqQryTradingAccount=18,
+	TOnRspQryTradingAccount=19,
 
-	TReqQryInvestorPosition=14,
-	TOnRspQryInvestorPosition=15,
+	TReqQryInvestorPosition=20,
+	TOnRspQryInvestorPosition=21,
 
-	TReqOrderInsert=16,
-	TOnRspOrderInsert=17,
+	TReqOrderInsert=22,
+	TOnRspOrderInsert=23,
 
-	TReqOrderAction=18,
-	TOnRspOrderAction=19,
-	TOnRtnInstrumentStatus=20,
+	TReqOrderAction=24,
+	TOnRspOrderAction=25,
+	TOnRtnInstrumentStatus=26,
 
 
-	TOnRtnOrder=21,
-	TOnRtnTrade=22,
-	TOnFrontDisconnected=23,
-	TOnHeartBeatWarning=24,
-	TOnRspError=25,
+	TOnRtnOrder=27,
+	TOnRtnTrade=28,
+	TOnFrontDisconnected=29,
+	TOnHeartBeatWarning=30,
+	TOnRspError=31,
 
 	TRADE_QUOTE=64,
 	QSTOP=65,

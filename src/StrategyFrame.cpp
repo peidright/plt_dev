@@ -12,7 +12,7 @@ again:
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if(lk) {
         LOG_DEBUG<<"real sframe put_msg"<<((TChange_t*)msg->data)->v<<std::endl;
-		pipemap[key]->msgqueue.push_back(msg);
+		pipemap[key]->msgqueue.push_back(*msg);
 		pipemap[key]->qsem.post();
 	}else {
         /*todo*/
@@ -21,8 +21,9 @@ again:
 	}
 };
 
-msg_t* sframe::get_msg(int key) {
-	msg_t *msg=NULL;
+msg_t sframe::get_msg(int key) {
+	msg_t msg;
+    memset(&msg,0x0,sizeof(msg_t));
 again:
     //while(this->pipemap[key]->msgqueue.size() == 0){usleep(100);};
     pipemap[key]->qsem.wait();
@@ -67,62 +68,61 @@ int sframe::init(CtpQuoter *ctpquoter, CtpTrader *ctptrader)
     this->ctptrader=ctptrader;
     return 0;
 };
-msg_t *sframe::dispatchsynret(msg_t *msg)
+msg_t sframe::dispatchsynret(msg_t msg)
 {
     int ret;
     SRegMdInst_t *pSRegMdInst;
     SRegMdPeriod_t *pSRegMdPeriod;
     SRegMdStrategy_t *pSRegMdStrategy;
     SRegRspCommon_t  *pSRegRspCommon;
-    msg_t *pmsg=NULL;
+    msg_t msg1;
+    memset(&msg1,0x0,sizeof(msg_t));
 
-    switch(msg->type) {
+    switch(msg.type) {
         case SRegMdInst:
-            pSRegMdInst=(SRegMdInst_t*)msg->data;
+            pSRegMdInst=(SRegMdInst_t*)msg.data;
             assert(0);
             break;
         case SRegMdPeriod:
-            pSRegMdPeriod=(SRegMdPeriod_t*)msg->data;
-            pmsg=new(msg_t);
+            pSRegMdPeriod=(SRegMdPeriod_t*)msg.data;
             ret=this->ctpquoter->mds->regmd_period(pSRegMdPeriod->instn,(pSRegMdPeriod->period==0?MIRCO:MINUTE),pSRegMdPeriod->period);
             pSRegRspCommon=new(SRegRspCommon_t);
-            pmsg->data=pSRegRspCommon;
-            pmsg->type=SRegRspCommon;
+            msg1.data=pSRegRspCommon;
+            msg1.type=SRegRspCommon;
             pSRegRspCommon->ret=ret;
             break;
         case SRegMdStrategy:
-            pSRegMdStrategy=(SRegMdStrategy_t*)msg->data;
+            pSRegMdStrategy=(SRegMdStrategy_t*)msg.data;
             ret=this->ctpquoter->mds->regmd_strategy(pSRegMdStrategy->instn,pSRegMdStrategy->sid,pSRegMdStrategy->period);
-            pmsg=new(msg_t);
             pSRegRspCommon=new(SRegRspCommon_t);
-            pmsg->data=pSRegRspCommon;
-            pmsg->type=SRegRspCommon;
+            msg1.data=pSRegRspCommon;
+            msg1.type=SRegRspCommon;
             pSRegRspCommon->ret=ret;
             break;
         default:
             assert(0);
             break;
     }
-    return pmsg;
+    return msg1;
 }
-int sframe::dispatchsyn(msg_t *msg){
+int sframe::dispatchsyn(msg_t msg){
     int ret=-1;
     SRegMdInst_t *pSRegMdInst;
     SRegMdPeriod_t *pSRegMdPeriod;
     SRegMdStrategy_t *pSRegMdStrategy;
     SRegRspCommon_t  *pSRegRspCommon;
 
-    switch(msg->type) {
+    switch(msg.type) {
         case SRegMdInst:
-            pSRegMdInst=(SRegMdInst_t*)msg->data;
+            pSRegMdInst=(SRegMdInst_t*)msg.data;
             assert(0);
             break;
         case SRegMdPeriod:
-            pSRegMdPeriod=(SRegMdPeriod_t*)msg->data;
+            pSRegMdPeriod=(SRegMdPeriod_t*)msg.data;
             ret=this->ctpquoter->mds->regmd_period(pSRegMdPeriod->instn,(pSRegMdPeriod->period==0?MIRCO:MINUTE),pSRegMdPeriod->period);
             break;
         case SRegMdStrategy:
-            pSRegMdStrategy=(SRegMdStrategy_t*)msg->data;
+            pSRegMdStrategy=(SRegMdStrategy_t*)msg.data;
             ret=this->ctpquoter->mds->regmd_strategy(pSRegMdStrategy->instn,pSRegMdStrategy->sid,pSRegMdStrategy->period);
             break;
         default:
@@ -144,7 +144,7 @@ int sframe::test(int key){
 
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if (lk) {
-		pipemap[key]->msgqueue.push_back(msg);
+		pipemap[key]->msgqueue.push_back(*msg);
 		pipemap[key]->qsem.post();
 	} else {
 		assert(0);
@@ -176,14 +176,14 @@ int sframe_agent::init(){
     return this->agent_key;
 };
 
-msg_t *sframe_agent::pystr2msg(string str) {
+msg_t sframe_agent::pystr2msg(string str) {
 	/*
 	 * */
 	Json::Reader reader;
 	Json::Value root;
 
-	msg_t *msg=new(msg_t);
-	msg->data=NULL;
+	msg_t msg;
+    memset(&msg,0x0,sizeof(msg_t));
 	KChange_t *kchange=NULL;
 	TChange_t *tchange=NULL;
     SRegMdStrategy_t *pSRegMdStrategy;
@@ -198,17 +198,17 @@ msg_t *sframe_agent::pystr2msg(string str) {
 		switch(type) {
 			case TChange:
 				tchange=new (TChange_t);
-				msg->data=tchange;
-				msg->len=sizeof(TChange_t);
-				msg->type=TChange;
+				msg.data=tchange;
+				msg.len=sizeof(TChange_t);
+				msg.type=TChange;
 				tchange->subtype=root["subtype"].asInt();
 				tchange->v=root["v"].asFloat();
 				break;
 			case KChange:
 				kchange=new (KChange_t);
-				msg->data=kchange;
-				msg->len=sizeof(KChange_t);
-				msg->type=KChange;
+				msg.data=kchange;
+				msg.len=sizeof(KChange_t);
+				msg.type=KChange;
 				kchange->subtype=root["subtype"].asInt();
 				kchange->o=root["o"].asFloat();
 				kchange->c=root["c"].asFloat();
@@ -219,8 +219,8 @@ msg_t *sframe_agent::pystr2msg(string str) {
             case SRegMdStrategy:
                 cout<<"SRegMdStrategy"<<std::endl;
                 pSRegMdStrategy=new (SRegMdStrategy_t);
-                msg->data=pSRegMdStrategy;
-                msg->type=SRegMdStrategy;
+                msg.data=pSRegMdStrategy;
+                msg.type=SRegMdStrategy;
                 pSRegMdStrategy->instn=root["instn"].asString();
                 pSRegMdStrategy->period=root["period"].asInt();
                 pSRegMdStrategy->sid=root["sid"].asInt();
@@ -233,34 +233,31 @@ msg_t *sframe_agent::pystr2msg(string str) {
         /*todo msg free*/
         LOG_DEBUG<<"parse error:"<<str<<std::endl;
 	}
-	return NULL;
+	return msg;
 };
 
 int sframe_agent::dispatchsyn(string msg){
     /*if complicate result, we must return json*/
     int ret;
-    msg_t *msg1=this->pystr2msg(msg);
+    msg_t msg1=this->pystr2msg(msg);
     ret=this->psframe->dispatchsyn(msg1);
     free(msg1->data);
-    free(msg1);
     return ret;
 }
 
 
 string sframe_agent::dispatchsynret(string msg){
     string ret;
-    msg_t *msg1=this->pystr2msg(msg);
-    msg_t *msg2=this->psframe->dispatchsynret(msg1);
+    msg_t msg1=this->pystr2msg(msg);
+    msg_t msg2=this->psframe->dispatchsynret(msg1);
     free(msg1->data);
-    free(msg1);
     ret=this->msg2pystr(msg2);
     free(msg2->data);
-    free(msg2);
     return ret;
 }
 
 
-string sframe_agent::msg2pystr(msg_t *msg) {
+string sframe_agent::msg2pystr(msg_t msg) {
 
 	Json::Reader reader;
 	Json::Value root;
@@ -274,12 +271,12 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 	Json::FastWriter writer;
 	std::string out2 = writer.write(root);
 	*/
-    if(msg==NULL)
+    if(msg.type==MSG_NULL)
         return root.toStyledString();
 
-	switch(msg->type) {
+	switch(msg.type) {
 		case TChange:
-			tchange=(TChange_t*)msg->data;
+			tchange=(TChange_t*)msg.data;
 			root["type"]=TChange;
 			root["subtype"]=tchange->subtype;
 			root["v"]=tchange->v;
@@ -287,7 +284,7 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 			strmsg=root.toStyledString();
 			break;
 		case KChange:
-			kchange=(KChange_t*)msg->data;
+			kchange=(KChange_t*)msg.data;
 			root["type"]=KChange;
 			root["subtype"]=kchange->subtype;
 			root["o"]=kchange->o;
@@ -297,9 +294,9 @@ string sframe_agent::msg2pystr(msg_t *msg) {
 			strmsg=root.toStyledString();
 			break; 
         case SRegRspCommon:
-            pSRegRspCommon=(SRegRspCommon_t*)msg->data;
+            pSRegRspCommon=(SRegRspCommon_t*)msg.data;
             root["ret"]=pSRegRspCommon->ret;
-            root["type"]=msg->type;
+            root["type"]=msg.type;
         	strmsg=root.toStyledString();
             break;
 		default:

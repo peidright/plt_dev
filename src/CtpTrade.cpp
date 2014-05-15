@@ -86,8 +86,8 @@ void CtpTradeSpi::OnFrontConnected()
     //LOG_INFO<<"Trade OnFrontConnected"<<std::endl;
 }
 
-void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
-	        TThostFtdcUserIDType	vUserId,	TThostFtdcPasswordType	vPasswd)
+void CtpTradeSpi::ReqUserLogin(TThostFtdcBrokerIDType vAppId,TThostFtdcUserIDType vUserId,
+                               TThostFtdcPasswordType vPasswd, int sid)
 {
 	int ret;
  	/* 
@@ -163,7 +163,7 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 }
 
 
-void CtpTradeSpi::ReqSettlementInfoConfirm(const char * brokerid, const char *userid)
+void CtpTradeSpi::ReqSettlementInfoConfirm(const char * brokerid, const char *userid,int sid)
 
 {
 	CThostFtdcSettlementInfoConfirmField req;
@@ -207,13 +207,23 @@ void CtpTradeSpi::OnRspSettlementInfoConfirm(
 }
 
 
-void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
+void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid)
 {
+    int request_id=this->get_request_id();
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-    	strcpy(req.InstrumentID, instId);//为空表示查询所有合约
-	int ret = this->api->ReqQryInstrument(&req, this->get_request_id());
+    strcpy(req.InstrumentID, instId);//为空表示查询所有合约
+	int ret = this->api->ReqQryInstrument(&req, request_id);
 	assert(ret==0);
+    char id_buf[64];
+    snprintf(id_buf,64,"%d",request_id);
+
+    if(sid>0) {
+        /*update map reqid->sid, not use session id for network change
+         *??
+         * */
+         this->ctptrader->reqid2sid[id_buf]=sid;
+    }
 }
 
 void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, 
@@ -247,14 +257,21 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	//LOG_INFO<<"Trade OnRspQryInstrument instid: "<<pInstrument->InstrumentID << " InstrumentName: "<<pInstrument->InstrumentName<<" productid: "<<pInstrument->ProductID<<" productclass: "<<pInstrument->ProductClass<< " is_trading: "<<pInstrument->IsTrading <<std::endl;
 }
 
-void CtpTradeSpi::ReqQryTradingAccount()
+void CtpTradeSpi::ReqQryTradingAccount(int sid)
 {
+    int request_id=this->get_request_id();
+    char id_buf[64];
+    snprintf(id_buf,64,"%d",request_id);
+
 	CThostFtdcQryTradingAccountField req;
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
-	int ret = this->api->ReqQryTradingAccount(&req, this->get_request_id());
+	int ret = this->api->ReqQryTradingAccount(&req, request_id);
     assert(ret==0);
+    if(sid>0) {
+        this->ctptrader->reqid2sid[id_buf]=sid;
+    }
 }
 
 
@@ -297,15 +314,22 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	//LOG_INFO<<"Trade OnRspQryTradingAccount"<<std::endl;
 }
 
-void CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
+void CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId,int sid)
 {
+    int request_id=this->get_request_id();
+    char id_buf[64];
+    snprintf(id_buf,64,"%d",request_id);
+
 	CThostFtdcQryInvestorPositionField req;
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
 	strcpy(req.InstrumentID, this->ctptrader->trader->username.c_str());	
-	int ret = this->api->ReqQryInvestorPosition(&req, this->get_request_id());
+	int ret = this->api->ReqQryInvestorPosition(&req, request_id);
     assert(ret==0);
+    if(sid>0) {
+        this->ctptrader->reqid2sid[id_buf]=sid;
+    }
 }
 
 
@@ -348,7 +372,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 
 void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
     TThostFtdcDirectionType dir, char kpp,
-    TThostFtdcPriceType price,   TThostFtdcVolumeType vol)
+    TThostFtdcPriceType price,   TThostFtdcVolumeType vol,int sid)
 {
     int ret; 
     int orderref,requestid;
@@ -393,6 +417,9 @@ void CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
         this->ctptrader->reqid2req[reqid]->stime=time(NULL);
     } else {
         assert(0);
+    }
+    if(sid>0) {
+        this->ctptrader->reqid2sid[reqid]=sid;
     }
 }
 
@@ -443,7 +470,8 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
     /*put this msg to StrategyScript*/
 }
 
-void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
+//void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq,int sid)
+void CtpTradeSpi::ReqOrderAction(string exchangeid,string ordersysid,int sid)
 {
     /*
        bool found=false; unsigned int i=0;
@@ -451,19 +479,24 @@ void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
        if(orderList[i]->BrokerOrderSeq == orderSeq){ found = true; break;}
        }
        if(!found){cerr<<" 请求 | 报单不存在."<<endl; return;} 
+       */
+    int request_id=this->get_request_id();
+    char id_buf[128];
+    snprintf(id_buf,128,"%s_%s",exchangeid.c_str(),ordersysid.c_str());
 
-       CThostFtdcInputOrderActionField req;
-       memset(&req, 0, sizeof(req));
-       strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());   //经纪公司代码	
-       strcpy(req.InvestorID, this->ctptrader->trader->username.c_str()); //投资者代码
+    CThostFtdcInputOrderActionField req;
+    memset(&req, 0, sizeof(req));
+    strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());   //经纪公司代码	
+    strcpy(req.InvestorID, this->ctptrader->trader->username.c_str()); //投资者代码
     //strcpy(req.OrderRef, pOrderRef); //报单引用	
     //req.FrontID = frontId;           //前置编号	
     //req.SessionID = sessionId;       //会话编号
-    strcpy(req.ExchangeID, orderList[i]->ExchangeID);
-    strcpy(req.OrderSysID, orderList[i]->OrderSysID);
+    strcpy(req.ExchangeID, exchangeid.c_str());
+    strcpy(req.OrderSysID, ordersysid.c_str());
     req.ActionFlag = THOST_FTDC_AF_Delete;  //操作标志 
-    int ret = this->api->ReqOrderAction(&req, this->get_request_id());
-    */
+    int ret = this->api->ReqOrderAction(&req, request_id);
+    /*todo must has in*/
+    this->ctptrader->orderid2sid[id_buf]=sid;
 }
 
 void CtpTradeSpi::OnRspOrderAction(

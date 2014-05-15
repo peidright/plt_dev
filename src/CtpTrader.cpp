@@ -82,7 +82,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				/**/
 				LOG_DEBUG<<"trade req settle stm"<<std::endl;
 				this->trade_spi->ReqSettlementInfoConfirm(this->trader->brokerid.c_str(), 
-						this->trader->username.c_str()
+						this->trader->username.c_str(),0
 						);
 				msg.type=TSTOP;
 				break;
@@ -100,7 +100,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				LOG_DEBUG<<"trade login stm"<<std::endl;
 				 this->trade_spi->ReqUserLogin((char*)this->trader->brokerid.c_str(),
 					(char*)this->trader->username.c_str(),
-				(char*)this->trader->password.c_str());
+				(char*)this->trader->password.c_str(),0);
 				if(ret==0) {
 					//LOG_DEBUG<<"trade_stm login msg sended\n" <<std::endl;
 					msg.type=TSTOP;
@@ -123,7 +123,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 				 * */
 				LOG_DEBUG<<"trade qryInstrument stm"<<std::endl;
 				memset(&instId,0x0,sizeof(TThostFtdcInstrumentIDType));
-				this->trade_spi->ReqQryInstrument(instId);
+				this->trade_spi->ReqQryInstrument(instId,-1);
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryInstrument:
@@ -258,6 +258,9 @@ void CtpTrader::trade_stm(msg_t &msg)
                 /*todo err check*/
                 this->orderid2reqid[orderid]=reqid;
                 this->reqid2orderid[reqid]=orderid;
+                /*if reqid not existed*/
+                sframe_put_msg(msg, this->reqid2sid[reqid]);
+                msg->data=NULL;
 				msg.type=TSTOP;
 				break;
             case TOnRtnTrade:
@@ -291,6 +294,8 @@ void CtpTrader::trade_stm(msg_t &msg)
                 }else {
                     this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
                 }
+                sframe_put_msg(msg, this->orderid2sid[orderid]);
+                msg.data=NULL;
                 msg.type=TSTOP;
                 break;
 			default:
@@ -353,7 +358,6 @@ again:
 		*/
         lk.unlock();
 		LOG_DEBUG<<"ctptrader post_msg again"<<std::endl;
-
 		goto again;
 	}
 }
