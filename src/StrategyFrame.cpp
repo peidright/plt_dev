@@ -16,6 +16,7 @@ again:
 		pipemap[key]->qsem.post();
 	}else {
         /*todo*/
+        LOG_DEBUG<<"lockerr put_msg again"<<std::endl;
         goto again;
 	}
 };
@@ -23,12 +24,20 @@ again:
 msg_t* sframe::get_msg(int key) {
 	msg_t *msg=NULL;
 again:
+    //while(this->pipemap[key]->msgqueue.size() == 0){usleep(100);};
+    pipemap[key]->qsem.wait();
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if(lk) {
-		pipemap[key]->qsem.wait();
-		msg=pipemap[key]->msgqueue[0];
-		pipemap[key]->msgqueue.pop_front();
-        LOG_DEBUG<<"sframe get_msg"<<std::endl;
+        if(pipemap[key]->msgqueue.size()>0){
+
+            //pipemap[key]->qsem.wait();
+            msg=pipemap[key]->msgqueue[0];
+            pipemap[key]->msgqueue.pop_front();
+            LOG_DEBUG<<"sframe get_msg"<<std::endl;
+        }else {
+            LOG_DEBUG<<"sframe get_msg null, repost? todo"<<std::endl;
+            //pipemap[key]->qsem.post();
+        }
 	}else {
         /*todo*/
         LOG_DEBUG<<"sframe get_msg lockerr"<<std::endl;

@@ -292,8 +292,6 @@ int md::update(float v, int t1, int t2) {
 		  3.更新 x周期线。
 		  每次更新，都反馈是否要更新下次线的四个值。
 		*/
-		cerr<<"ds update ms"<<std::endl;
-
 		int status=this->ds.update_ms(v,t1,t2);
         int idx_prev;
         int idx_next;
@@ -319,10 +317,12 @@ int md::update(float v, int t1, int t2) {
 			if(this->mds.find(1)!=this->mds.end()) {
 				if( (t1 > this->mds[1]->last_sec) || 
 						(t1== this->mds[1]->last_sec && (t2 >this->mds[1]->last_msec)) ) { 
+                        /*
                         cout<<"idx_o:"<<this->mds[1]->open.cidx<<std::endl;
                         cout<<"idx_h:"<<this->mds[1]->high.cidx<<std::endl;
                         cout<<"idx_l:"<<this->mds[1]->low.cidx<<std::endl;
                         cout<<"idx_c:"<<this->mds[1]->close.cidx<<std::endl;
+                        */
 
                         assert(this->mds[1]->open.cidx==this->mds[1]->close.cidx);
                         assert(this->mds[1]->high.cidx==this->mds[1]->close.cidx);
@@ -335,12 +335,12 @@ int md::update(float v, int t1, int t2) {
 						this->mds[1]->last_msec=t2;
 						this->mds[1]->last_sec=t1;
 
+                        /*
                         cout<<"idx_o:"<<this->mds[1]->open.cidx<<std::endl;
                         cout<<"idx_h:"<<this->mds[1]->high.cidx<<std::endl;
                         cout<<"idx_l:"<<this->mds[1]->low.cidx<<std::endl;
                         cout<<"idx_c:"<<this->mds[1]->close.cidx<<std::endl;
-
-
+                        */
                         assert(this->mds[1]->open.cidx==this->mds[1]->close.cidx);
                         assert(this->mds[1]->high.cidx==this->mds[1]->close.cidx);
                         assert(this->mds[1]->low.cidx==this->mds[1]->close.cidx);

@@ -83,7 +83,6 @@ again:
 	if(lk) {
 		this->mqueue_map[my_hash(contract)].push_back(*msg);
 		this->qsem_map[my_hash(contract)]->post();
-		printf("post msg\n");	
 	}else {
 		/*
 		   do some warnning
@@ -105,7 +104,6 @@ again:
 	if(lk) {
 		this->mqueue.push_back(*msg);
 		this->qsem.post();
-		printf("post msg\n");	
 		lk.unlock();
 	}else {
 		/*
@@ -332,17 +330,19 @@ loop:
 		ctpquoter->qsem.wait();
 		boost::unique_lock<boost::timed_mutex> lk(ctpquoter->qmutex,boost::chrono::milliseconds(1));
 		if (lk) {
-			if(ctpquoter->mqueue.size()<=0) {
-				/*bug happen*/
-				cout<<"should not be zero qqueue"<<std::endl;
-				lk.unlock();
-			}
-			msg_t msg=ctpquoter->mqueue[0];
-			printf("quote_loop get this msg\n");
-			ctpquoter->mqueue.pop_front();
-			lk.unlock();
-			//continue;
-			ctpquoter->quote_stm(msg);
+            if(ctpquoter->mqueue.size()<=0) {
+                /*bug happen*/
+                cout<<"should not be zero qqueue"<<std::endl;
+                lk.unlock();
+                continue;
+            }else {
+                msg_t msg=ctpquoter->mqueue[0];
+                printf("quote_loop get this msg\n");
+                ctpquoter->mqueue.pop_front();
+                lk.unlock();
+                //continue;
+                ctpquoter->quote_stm(msg);
+            }
 		} else {
 			cout<<"quote main loop err"<<std::endl;
 		}
@@ -387,16 +387,17 @@ loop:
 		ctpquoter->qsem_map[key]->wait();
 		boost::unique_lock<boost::timed_mutex> lk(*ctpquoter->qmutex_map[key],boost::chrono::milliseconds(1));
 		if (lk) {
-			if(ctpquoter->mqueue_map[key].size()<=0) {
-				/*bug happen*/
-				LOG_INFO<<"DepthMarketProcess: should not be zero qqueue"<<std::endl;
-				lk.unlock();
-				continue;
-			}
-			msg_t msg=ctpquoter->mqueue_map[key][0];
-			ctpquoter->mqueue_map[key].pop_front();
-			lk.unlock();
-			ctpquoter->quote_stm(msg);
+            if(ctpquoter->mqueue_map[key].size()<=0) {
+                /*bug happen*/
+                LOG_INFO<<"DepthMarketProcess: should not be zero qqueue"<<std::endl;
+                lk.unlock();
+                continue;
+            }else {
+                msg_t msg=ctpquoter->mqueue_map[key][0];
+                ctpquoter->mqueue_map[key].pop_front();
+                lk.unlock();
+                ctpquoter->quote_stm(msg);
+            }
 		} else {
 			LOG_INFO<<"depth market process lk err,thread id: "<<key<<std::endl;
 		}

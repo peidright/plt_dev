@@ -23,8 +23,8 @@ string g_trade_addr="tcp://ctpmn1-front1.citicsf.com:51205";
 string g_quote_addr="tcp://ctpmn1-front1.citicsf.com:51213";
 
 #else
-string g_username="001223";
-string g_password="888888";
+string g_username="00108516";
+string g_password="2231";
 string g_brokerid="6000";
 string g_trade_addr="tcp://180.166.132.66:41205";
 string g_quote_addr="tcp://180.166.132.66:41213";

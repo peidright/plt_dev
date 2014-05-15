@@ -54,6 +54,6 @@ void test1()
 
 int my_hash(string str) {
 	 boost::hash<std::string> string_hash;
-	 cerr<<"string hash"<<string_hash(str)<<" str is:"<< str<<std::endl;
+	 //cerr<<"string hash"<<string_hash(str)<<" str is:"<< str<<std::endl;
 	 return string_hash(str)%8;	
 }
