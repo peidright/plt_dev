@@ -11,7 +11,7 @@ int sframe::put_msg(msg_t *msg,int key) {
 again:
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if(lk) {
-        LOG_DEBUG<<"sframe put_msg"<<std::endl;
+        LOG_DEBUG<<"real sframe put_msg"<<((TChange_t*)msg->data)->v<<std::endl;
 		pipemap[key]->msgqueue.push_back(msg);
 		pipemap[key]->qsem.post();
 	}else {
@@ -154,7 +154,7 @@ int sframe_agent::put_msg(string msg) {
 };
 string sframe_agent::get_msg() {
 	//cout<<"get_msg1"<<std::endl;
-	this->psframe->test(agent_key);
+	//this->psframe->test(agent_key);
 	//cout<<"get_msg2"<<std::endl;
 	msg_t *msg=this->psframe->get_msg(agent_key);
 	//cout<<"get_msg3"<<std::endl;
@@ -371,6 +371,7 @@ int sframe_quote_tchange(float v, int sec, int msec,int subtype, int key)
     msg->data=new (TChange_t);
     ((TChange_t*)msg->data)->subtype=NEW;
     ((TChange_t*)msg->data)->v=v;
+    LOG_DEBUG<<"sframe_quote_tchange: v="<<((TChange_t*)msg->data)->v<<std::endl;
     ret=sframe_put_msg(msg, key);
     return ret;
 }

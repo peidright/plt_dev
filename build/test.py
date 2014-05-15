@@ -19,7 +19,7 @@ if __name__=="__main__":
         while True:
             res=d.get_msg();
             print>>f,res;
-            print json.loads(res);
+            #print json.loads(res);
     except Exception:
         print>>f,"except finished"
         f.close()
