@@ -165,7 +165,7 @@ string sframe_agent::get_msg() {
 	//cout<<"get_msg1"<<std::endl;
 	//this->psframe->test(agent_key);
 	//cout<<"get_msg2"<<std::endl;
-	msg_t *msg=this->psframe->get_msg(agent_key);
+	msg_t msg=this->psframe->get_msg(agent_key);
 	//cout<<"get_msg3"<<std::endl;
 	return this->msg2pystr(msg);
 };
@@ -241,7 +241,7 @@ int sframe_agent::dispatchsyn(string msg){
     int ret;
     msg_t msg1=this->pystr2msg(msg);
     ret=this->psframe->dispatchsyn(msg1);
-    free(msg1->data);
+    free(msg1.data);
     return ret;
 }
 
@@ -250,9 +250,9 @@ string sframe_agent::dispatchsynret(string msg){
     string ret;
     msg_t msg1=this->pystr2msg(msg);
     msg_t msg2=this->psframe->dispatchsynret(msg1);
-    free(msg1->data);
+    free(msg1.data);
     ret=this->msg2pystr(msg2);
-    free(msg2->data);
+    free(msg2.data);
     return ret;
 }
 

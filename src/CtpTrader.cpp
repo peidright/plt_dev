@@ -259,8 +259,8 @@ void CtpTrader::trade_stm(msg_t &msg)
                 this->orderid2reqid[orderid]=reqid;
                 this->reqid2orderid[reqid]=orderid;
                 /*if reqid not existed*/
-                sframe_put_msg(msg, this->reqid2sid[reqid]);
-                msg->data=NULL;
+                sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                msg.data=NULL;
 				msg.type=TSTOP;
 				break;
             case TOnRtnTrade:
@@ -294,7 +294,7 @@ void CtpTrader::trade_stm(msg_t &msg)
                 }else {
                     this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
                 }
-                sframe_put_msg(msg, this->orderid2sid[orderid]);
+                sframe_put_msg(&msg, this->orderid2sid[orderid]);
                 msg.data=NULL;
                 msg.type=TSTOP;
                 break;

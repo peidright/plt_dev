@@ -15,7 +15,7 @@
 
 
 enum msgtype {
-    MSG_NULL=0
+    MSG_NULL=0,
 	TChange=6,
 	KChange=7,
 	TMessage=8,
@@ -71,7 +71,6 @@ enum msgtype {
     SRegMdInst=129,
     SRegMdPeriod=130,
     SRegMdStrategy=131,
-
     SRegRspCommon =196,
 };
 

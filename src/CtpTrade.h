@@ -118,7 +118,7 @@ public:
         TThostFtdcDirectionType dir, char kpp,
         TThostFtdcPriceType price,TThostFtdcVolumeType vol, int sid);
 	///报单操作请求
-    void CtpTradeSpi::ReqOrderAction(string exchangeid,string ordersysid,int sid);
+    void ReqOrderAction(string exchangeid,string ordersysid,int sid);
 	//void ReqOrderAction(TThostFtdcSequenceNoType orderSeq, int sid);
 	// 是否收到成功的响应
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);

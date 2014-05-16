@@ -10,6 +10,7 @@
 #include "mdseries.h"
 #include "instmgr.h"
 #include "position.h"
+#include "StrategyFrame.h"
 class dmgr;
 class instmgr;
 class CtpTradeSpi;

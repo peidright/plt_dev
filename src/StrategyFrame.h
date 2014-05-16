@@ -16,6 +16,9 @@ using namespace std;
 #include <deque>
 #include <string>
 
+class CtpTrader;
+class CtpQuoter;
+
 
 enum symsg_type {
 	TCHANGE,
