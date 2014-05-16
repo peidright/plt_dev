@@ -103,22 +103,22 @@ public:
 
 public:
 	///用户登录请求
-	void ReqUserLogin(TThostFtdcBrokerIDType	appId,
+	int ReqUserLogin(TThostFtdcBrokerIDType	appId,
 	        TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd, int sid);
 	///投资者结算结果确认
-	void   ReqSettlementInfoConfirm(const char * brokerid, const char *userid, int sid);
+	int   ReqSettlementInfoConfirm(const char * brokerid, const char *userid, int sid);
 	///请求查询合约
-	void ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid);
+	int ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid);
 	///请求查询资金账户
-	void ReqQryTradingAccount(int sid);
+	int ReqQryTradingAccount(int sid);
 	///请求查询投资者持仓
-	void ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId, int sid);
+	int ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId, int sid);
 	///报单录入请求
-    void ReqOrderInsert(TThostFtdcInstrumentIDType instId,
+    int ReqOrderInsert(TThostFtdcInstrumentIDType instId,
         TThostFtdcDirectionType dir, char kpp,
         TThostFtdcPriceType price,TThostFtdcVolumeType vol, int sid);
 	///报单操作请求
-    void ReqOrderAction(string exchangeid,string ordersysid,int sid);
+    int ReqOrderAction(string exchangeid,string ordersysid,int sid);
 	//void ReqOrderAction(TThostFtdcSequenceNoType orderSeq, int sid);
 	// 是否收到成功的响应
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);

@@ -107,11 +107,21 @@ typedef struct {
 }TOnRspSettlementInfoConfirm_t;
 
 typedef struct {
+    TThostFtdcInstrumentIDType instn;
+    int sid;
+}TReqQryInstrument_t;
+
+typedef struct {
 	CThostFtdcInstrumentField pInstrument;
     	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspQryInstrument_t;
+
+typedef struct {
+    int sid;
+}TReqQryTradingAccount_t;
+
 
 typedef struct {
 	CThostFtdcTradingAccountField pTradingAccount;
@@ -120,6 +130,10 @@ typedef struct {
 	bool bIsLast;
 }TOnRspQryTradingAccount_t;
 
+typedef struct {
+	int TThostFtdcInstrumentIDType instn;
+    int sid;
+}TReqQryInvestorPosition_t;
 typedef struct {
 	CThostFtdcInvestorPositionField pInvestorPosition;
 	CThostFtdcRspInfoField *pRspInfo;

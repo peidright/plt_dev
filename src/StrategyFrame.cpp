@@ -176,16 +176,30 @@ int sframe_agent::init(){
     return this->agent_key;
 };
 
+	void ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid);
+	void ReqQryTradingAccount(int sid);
+	void ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId, int sid);
+    void ReqOrderInsert(TThostFtdcInstrumentIDType instId,
+        TThostFtdcDirectionType dir, char kpp,
+        TThostFtdcPriceType price,TThostFtdcVolumeType vol, int sid);
+    void ReqOrderAction(string exchangeid,string ordersysid,int sid);
+
 msg_t sframe_agent::pystr2msg(string str) {
 	/*
 	 * */
 	Json::Reader reader;
 	Json::Value root;
 
+    string instn;
+    int sid;
 	msg_t msg;
     memset(&msg,0x0,sizeof(msg_t));
 	KChange_t *kchange=NULL;
 	TChange_t *tchange=NULL;
+    TReqQryInstrument_t *req_inst=NULL;
+    TReqQryTradingAccount_t *req_account:
+    TReqQryInvestorPosition_t *req_position;
+
     SRegMdStrategy_t *pSRegMdStrategy;
     cout<<"str is:"<<str<<std::endl;
 	if (reader.parse(str, root))  
@@ -215,7 +229,30 @@ msg_t sframe_agent::pystr2msg(string str) {
 				kchange->h=root["h"].asFloat();
 				kchange->l=root["l"].asFloat();
 				break; 
+            case TReqQryInstrument:
+                req_inst=new(TReqQryInstrument_t);
+                msg.data=req_inst;
+                msg.len=sizeof(TReqQryInstrument_t);
+                msg.type=TReqQryInstrument;
+                strcpy(req_inst->instn,root["instn"].asString().c_str());
+                req_inst->sid=root["sid"].asInt();
+                break;
+            case TReqQryTradingAccount:
+                req_account=new(TReqQryTradingAccount_t);
+                msg.data=req_account;
+                msg.len=sizeof(TReqQryTradingAccount_t);
+                msg.type=TReqQryTradingAccount;
+                req_account->sid=root["sid"].asInt();
+                break;
 
+            case TReqQryInvestorPosition;
+                req_position=new(TReqQryInvestorPosition_t);
+                msg.data=new(TReqQryInvestorPosition_t);
+                msg.len=sizeof(TReqQryInvestorPosition_t);
+                msg.type=TReqQryInvestorPosition;
+                req_position->sid=root["sid"];
+                strcpy(req_inst->instn,root["instn"].asString().c_str());
+                break;
             case SRegMdStrategy:
                 cout<<"SRegMdStrategy"<<std::endl;
                 pSRegMdStrategy=new (SRegMdStrategy_t);
