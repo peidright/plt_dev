@@ -352,6 +352,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
     TOnRspQryTradingAccount_t *rsp_account;
     TOnRspQryInvestorPosition_t *rsp_position;
     TOnRspOrderInsert_t *rsp_insert;
+    TOnRspOrderAction_t *rsp_action;
 
 	string strmsg="";
 	/*
@@ -515,18 +516,38 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["subtype"]=0;
             root["reqid"]=rsp_insert->nRequestID;
             root["bIsLast"]=rsp_insert->bIsLast;
-
-            req_order=new(TReqOrderInsert_t);
-            msg.data=req_order;
-            msg.len=sizeof(TReqOrderInsert_t);
-            msg.type=TReqOrderInsert;
-            strcpy(req_order->instn,root["instn"].asString().c_str());
-            req_order->dir=root["instn"].asInt();
-            req_order->price=root["price"].asFloat();
-            req_order->vol=root["vol"].asInt();
-            req_order->sid=root["sid"].asInt();
+            root["BrokerID"]=rsp_insert->pInputOrder->BrokerID;
+            root["BusinessUnit"]=rsp_insert->pInputOrder->BusinessUnit;
+            root["CombHedgeFlag"]=rsp_insert->pInputOrder->CombHedgeFlag;
+            root["CombOffsetFlag"]=rsp_insert->pInputOrder->CombOffsetFlag;
+            root["ContingentCondition"]=rsp_insert->pInputOrder->ContingentCondition;
+            root["Direction"]=rsp_insert->pInputOrder->Direction;
+            root["ForceCloseReason"]=rsp_insert->pInputOrder->ForceCloseReason;
+            root["GTDDate"]=rsp_insert->pInputOrder->GTDDate;
+            root["InstrumentID"]=rsp_insert->pInputOrder->InstrumentID;
+            root["InvestorID"]=rsp_insert->pInputOrder->InvestorID;
+            root["IsAutoSuspend"]=rsp_insert->pInputOrder->IsAutoSuspend;
+            root["IsSwapOrder"]=rsp_insert->pInputOrder->IsSwapOrder;
+            root["LimitPrice"]=rsp_insert->pInputOrder->LimitPrice;
+            root["MinVolume"]=rsp_insert->pInputOrder->MinVolume;
+            root["OrderPriceType"]=rsp_insert->pInputOrder->OrderPriceType;
+            root["OrderRef"]=rsp_insert->pInputOrder->OrderRef;
+            root["RequestID"]=rsp_insert->pInputOrder->RequestID;
+            root["StopPrice"]=rsp_insert->pInputOrder->StopPrice;
+            root["TimeCondition"]=rsp_insert->pInputOrder->TimeCondition;
+            root["UserForceClose"]=rsp_insert->pInputOrder->UserForceClose;
+            root["UserID"]=rsp_insert->pInputOrder->UserID;
+            root["VolumeCondition"]=rsp_insert->pInputOrder->VolumeCondition;
+            root["VolumeTotalOriginal"]=rsp_insert->pInputOrder->VolumeTotalOriginal;
+            strmsg=root.toStyledString();
             break;
         case TOnRspOrderAction:
+            rsp_action=msg.data;
+            root["type"]=msg.type;
+            root["subtype"]=0;
+            root["reqid"]=rsp_insert->nRequestID;
+            root["bIsLast"]=rsp_insert->bIsLast;
+            
             req_action=new(ReqOrderAction_t);
             req_action->exchangeid=root["exchangeid"].asString();
             req_action->ordersysid=root["ordersysid"].asString();
