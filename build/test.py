@@ -7,11 +7,10 @@ if __name__=="__main__":
     f=open("testt.log","a+")
     d=sframe_agent.sframe_agent();
     sid=d.init();
-    #dispatchsynret",&sframe_agent::dispatchsynret)
     req={"instn":"ag1412","period":0,"sid":sid,"type":131};
     req=json.dumps(req);
-    print>>f,req
-    print "req is",req 
+    #print>>f,req
+    #print "req is",req 
     res=d.dispatchsynret(req);
     print res;
     print>>f,res;

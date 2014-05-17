@@ -68,6 +68,7 @@ int sframe::init(CtpQuoter *ctpquoter, CtpTrader *ctptrader)
     this->ctptrader=ctptrader;
     return 0;
 };
+
 msg_t sframe::dispatchsynret(msg_t msg)
 {
     int ret;
@@ -75,6 +76,13 @@ msg_t sframe::dispatchsynret(msg_t msg)
     SRegMdPeriod_t *pSRegMdPeriod;
     SRegMdStrategy_t *pSRegMdStrategy;
     SRegRspCommon_t  *pSRegRspCommon;
+
+    TReqQryInstrument_t *req_inst=NULL;
+    TReqQryTradingAccount_t *req_account=NULL:
+    TReqQryInvestorPosition_t *req_position=NULL;
+    TReqOrderInsert_t *req_order=NULL;
+    TReqOrderAction_t  *req_action=NULL;
+
     msg_t msg1;
     memset(&msg1,0x0,sizeof(msg_t));
 
@@ -86,23 +94,47 @@ msg_t sframe::dispatchsynret(msg_t msg)
         case SRegMdPeriod:
             pSRegMdPeriod=(SRegMdPeriod_t*)msg.data;
             ret=this->ctpquoter->mds->regmd_period(pSRegMdPeriod->instn,(pSRegMdPeriod->period==0?MIRCO:MINUTE),pSRegMdPeriod->period);
-            pSRegRspCommon=new(SRegRspCommon_t);
-            msg1.data=pSRegRspCommon;
-            msg1.type=SRegRspCommon;
-            pSRegRspCommon->ret=ret;
+            goto retcommon;
             break;
         case SRegMdStrategy:
             pSRegMdStrategy=(SRegMdStrategy_t*)msg.data;
             ret=this->ctpquoter->mds->regmd_strategy(pSRegMdStrategy->instn,pSRegMdStrategy->sid,pSRegMdStrategy->period);
-            pSRegRspCommon=new(SRegRspCommon_t);
-            msg1.data=pSRegRspCommon;
-            msg1.type=SRegRspCommon;
-            pSRegRspCommon->ret=ret;
+            goto retcommon;
+            break;
+        case TReqQryInstrument:
+            req_inst=msg.data;
+            ret=this->ctptrader->trade_spi->ReqQryInstrument(req_inst->instn,req_inst->sid);
+            goto retcommon;
+            break;
+        case TReqQryTradingAccount:
+            req_account=msg.data;
+            ret=this->ctptrader->trade_spi->ReqQryTradingAccount(req_account->sid);
+            goto retcommon;
+            break;
+        case TReqQryInvestorPosition:
+            req_position=msg.data;
+            ret=this->ctptrader->trade_spi->ReqQryInvestorPosition(req_position->instn, req_position->sid);
+            goto retcommon;
+            break;
+        case TReqOrderInsert:
+            req_order=msg.data;
+            ret=this->ctptrader->trade_spi->ReqOrderInsert(req_order->instn,req_order->dir,req_order->price,
+                                                           req_order->vol,req_order->sid);
+            goto retcommon;
+            break;
+        case TReqOrderAction:
+            req_action=msg.data;
+            ret=this->ctptrader->trade_spi->ReqOrderAction(req_action->exchangeid,req_action->ordersysid,
+                                                           req_action->sid);
+            goto retcommon;
             break;
         default:
             assert(0);
             break;
     }
+    return msg1;
+retcommon:
+    /*todo free msg?*/
     return msg1;
 }
 int sframe::dispatchsyn(msg_t msg){
@@ -176,14 +208,6 @@ int sframe_agent::init(){
     return this->agent_key;
 };
 
-	void ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid);
-	void ReqQryTradingAccount(int sid);
-	void ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId, int sid);
-    void ReqOrderInsert(TThostFtdcInstrumentIDType instId,
-        TThostFtdcDirectionType dir, char kpp,
-        TThostFtdcPriceType price,TThostFtdcVolumeType vol, int sid);
-    void ReqOrderAction(string exchangeid,string ordersysid,int sid);
-
 msg_t sframe_agent::pystr2msg(string str) {
 	/*
 	 * */
@@ -199,6 +223,9 @@ msg_t sframe_agent::pystr2msg(string str) {
     TReqQryInstrument_t *req_inst=NULL;
     TReqQryTradingAccount_t *req_account:
     TReqQryInvestorPosition_t *req_position;
+    TReqOrderInsert_t *req_order;
+    TReqOrderAction_t  *req_action;
+
 
     SRegMdStrategy_t *pSRegMdStrategy;
     cout<<"str is:"<<str<<std::endl;
@@ -245,13 +272,33 @@ msg_t sframe_agent::pystr2msg(string str) {
                 req_account->sid=root["sid"].asInt();
                 break;
 
-            case TReqQryInvestorPosition;
+            case TReqQryInvestorPosition:
                 req_position=new(TReqQryInvestorPosition_t);
                 msg.data=new(TReqQryInvestorPosition_t);
                 msg.len=sizeof(TReqQryInvestorPosition_t);
                 msg.type=TReqQryInvestorPosition;
                 req_position->sid=root["sid"];
                 strcpy(req_inst->instn,root["instn"].asString().c_str());
+                break;
+            case TReqOrderInsert:
+                req_order=new(TReqOrderInsert_t);
+                msg.data=req_order;
+                msg.len=sizeof(TReqOrderInsert_t);
+                msg.type=TReqOrderInsert;
+                strcpy(req_order->instn,root["instn"].asString().c_str());
+                req_order->dir=root["instn"].asInt();
+                req_order->price=root["price"].asFloat();
+                req_order->vol=root["vol"].asInt();
+                req_order->sid=root["sid"].asInt();
+                break;
+            case TReqOrderAction:
+                req_action=new(ReqOrderAction_t);
+                req_action->exchangeid=root["exchangeid"].asString();
+                req_action->ordersysid=root["ordersysid"].asString();
+                req_action->sid=root["sid"].asInt();
+                msg.data=req_order;
+                msg.len=sizeof(ReqOrderAction_t);
+                msg.type=TReqOrderAction;
                 break;
             case SRegMdStrategy:
                 cout<<"SRegMdStrategy"<<std::endl;
@@ -301,8 +348,12 @@ string sframe_agent::msg2pystr(msg_t msg) {
 	KChange_t *kchange=NULL;
 	TChange_t *tchange=NULL;
     SRegRspCommon_t *pSRegRspCommon;
+    TOnRspQryInstrument_t *rsp_inst;
+    TOnRspQryTradingAccount_t *rsp_account;
+    TOnRspQryInvestorPosition_t *rsp_position;
+    TOnRspOrderInsert_t *rsp_insert;
+
 	string strmsg="";
-	
 	/*
 	std::string out = root.toStyledString();
 	Json::FastWriter writer;
@@ -335,6 +386,160 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["ret"]=pSRegRspCommon->ret;
             root["type"]=msg.type;
         	strmsg=root.toStyledString();
+            break;
+        case TOnRspQryInstrument:
+            /*todo rspinfo, and string*/
+            rsp_inst=msg.data;
+            root["type"]=msg.type;
+            root["subtype"]=0;
+            root["reqid"]=rsp_inst->nRequestID;
+            root["bIsLast"]=rsp_inst->bIsLast;
+            root["CreateDate"] = rsp_inst->pInstrument->CreateDate;
+            root["DeliveryMonth"]=rsp_inst->pInstrument->DeliveryMonth;
+            root["DeliveryYear"]=rsp_inst->pInstrument->DeliveryYear;
+            root["EndDelivDate"]=rsp_inst->pInstrument->EndDelivDate;
+            root["ExchangeID"]=rsp_inst->pInstrument->ExchangeID;
+            root["ExchangeInstID"]=rsp_inst->pInstrument->ExchangeInstID;
+            root["ExpireDate"]=rsp_inst->pInstrument->ExpireDate;
+            root["InstLifePhase"]=rsp_inst->pInstrument->InstLifePhase;
+            root["InstrumentID"]=rsp_inst->pInstrument->InstrumentID;
+            root["InstrumentName"]=rsp_inst->pInstrument->InstrumentName;
+            root["IsTrading"]=rsp_inst->pInstrument->IsTrading;
+            root["LongMarginRatio"]=rsp_inst->pInstrument->LongMarginRatio;
+            root["MaxLimitOrderVolume"]=rsp_inst->pInstrument->MaxLimitOrderVolume;
+            root["MaxMarginSideAlgorithm"]=rsp_inst->pInstrument->MaxMarginSideAlgorithm;
+            root["MaxMarketOrderVolume"]=rsp_inst->pInstrument->MaxMarketOrderVolume;
+            root["MinLimitOrderVolume"]=rsp_inst->pInstrument->MinLimitOrderVolume;
+            root["MinMarketOrderVolume"]=rsp_inst->pInstrument->MinMarketOrderVolume;
+            root["OpenDate"]=rsp_inst->pInstrument->OpenDate;
+            root["PositionDateType"]=rsp_inst->pInstrument->PositionDateType;
+            root["PositionType"]=rsp_inst->pInstrument->PositionType;
+            root["PriceTick"]=rsp_inst->pInstrument->PriceTick;
+            root["ProductClass"]=rsp_inst->pInstrument->ProductClass;
+            root["ProductID"]=rsp_inst->pInstrument->ProductID;
+            root["ShortMarginRatio"]=rsp_inst->pInstrument->ShortMarginRatio;
+            root["StartDelivDate"]=rsp_inst->pInstrument->StartDelivDate;
+            root["VolumeMultiple"]=rsp_inst->pInstrument->VolumeMultiple;
+            strmsg=root.toStyledString();
+            break;
+        case TOnRspQryTradingAccount:
+            rsp_account=msg.data;
+            root["bIsLast"]=rsp_account->bIsLast
+            root["type"]=msg.type;
+            root["subtype"]=0;
+            root["reqid"]=rsp_account->nRequestID;
+            root["AccountID"]=rsp_account->pTradingAccount->AccountID;
+            root["Available"]=rsp_account->pTradingAccount->Available;
+            root["Balance"]=rsp_account->pTradingAccount->Balance;
+            root["BrokerID"]=rsp_account->pTradingAccount->BrokerID;
+            root["CashIn"]=rsp_account->pTradingAccount->CashIn;
+            root["CloseProfit"]=rsp_account->pTradingAccount->CloseProfit;
+            root["Commission"]=rsp_account->pTradingAccount->Commission;
+            root["Credit"]=rsp_account->pTradingAccount->Credit;
+            root["CurrMargin"]=rsp_account->pTradingAccount->CurrMargin;
+            root["DeliveryMargin"]=rsp_account->pTradingAccount->DeliveryMargin;
+            root["Deposit"]=rsp_account->pTradingAccount->Deposit;
+            root["ExchangeDeliveryMargin"]=rsp_account->pTradingAccount->ExchangeDeliveryMargin;
+            root["ExChangeMargin"]=rsp_account->pTradingAccount->ExchangeMargin;
+            root["FrozenCash"]=rsp_account->pTradingAccount->FrozenCash;
+            root["FrozenCommission"]=rsp_account->pTradingAccount->FrozenCommission;
+            root["FrozenMargin"]=rsp_account->pTradingAccount->FrozenMargin;
+            root["Interest"]=rsp_account->pTradingAccount->Interest;
+            root["InterestBase"]=rsp_account->pTradingAccount->InterestBase;
+            root["Mortgage"]=rsp_account->pTradingAccount->Mortgage;
+            root["PositionProfit"]=rsp_account->pTradingAccount->PositionProfit;
+            root["PreBalance"]=rsp_account->pTradingAccount->PreBalance;
+            root["PreCredit"]=rsp_account->pTradingAccount->PreCredit;
+            root["PreDeposit"]=rsp_account->pTradingAccount->PreDeposit;
+            root["PreMargin"]=rsp_account->pTradingAccount->PreMargin;
+            root["PreMortgage"]=rsp_account->pTradingAccount->PreMortgage;
+            root["Reserve"]=rsp_account->pTradingAccount->Reserve;
+            root["ReserveBalance"]=rsp_account->pTradingAccount->ReserveBalance;
+            root["SettlementID"]=rsp_account->pTradingAccount->SettlementID;
+            root["TradingDay"]=rsp_account->pTradingAccount->TradingDay;
+            root["Withdraw"]=rsp_account->pTradingAccount->Withdraw;
+            root["WithDrawQuota"]=rsp_account->pTradingAccount->WithdrawQuota;
+            strmsg=root.toStyledString();
+            break;
+        case TOnRspQryInvestorPosition:
+            rsp_position=msg.data;
+            root["type"]=msg.type;
+            root["subtype"]=0;
+            root["reqid"]=rsp_position->nRequestID;
+            root["bIsLast"]=rsp_position->bIsLast;
+            root["BrokerID"]=rsp_position->pInvestorPosition->BrokerID;
+            root["CashIn"]=rsp_position->pInvestorPosition->CashIn;
+            root["CloseAmount"]=rsp_position->pInvestorPosition->CloseAmount;
+            root["CloseProfit"]=rsp_position->pInvestorPosition->CloseProfit;
+            root["CloseProfitByDate"]=rsp_position->pInvestorPosition->CloseProfitByDate;
+            root["CloseProfitByTrade"]=rsp_position->pInvestorPosition->CloseProfitByTrade;
+            root["CloseVolume"]=rsp_position->pInvestorPosition->CloseVolume;
+            root["CombLongFrozen"]=rsp_position->pInvestorPosition->CombLongFrozen;
+            root["CombPosition"]=rsp_position->pInvestorPosition->CombPosition;
+            root["CombShortFrozen"]=rsp_position->pInvestorPosition->CombShortFrozen;
+            root["Commission"]=rsp_position->pInvestorPosition->Commission;
+            root["ExchangeMargin"]=rsp_position->pInvestorPosition->ExchangeMargin;
+            root["FrozenCash"]=rsp_position->pInvestorPosition->FrozenCash;
+            root["FrozenCommission"]=rsp_position->pInvestorPosition->FrozenCommission;
+            root["FrozenMargin"]=rsp_position->pInvestorPosition->FrozenMargin;
+            root["HedgeFlag"]=rsp_position->pInvestorPosition->HedgeFlag;
+            root["InstrumentID"]=rsp_position->pInvestorPosition->InstrumentID;
+            root["InvestorID"]=rsp_position->pInvestorPosition->InvestorID;
+            root["LongFrozen"]=rsp_position->pInvestorPosition->LongFrozen;
+            root["LongFrozenAmount"]=rsp_position->pInvestorPosition->LongFrozenAmount;
+            root["MarginRateByMoney"]=rsp_position->pInvestorPosition->MarginRateByMoney;
+            root["MarginRateByVolume"]=rsp_position->pInvestorPosition->MarginRateByVolume;
+            root["OpenAmount"]=rsp_position->pInvestorPosition->OpenAmount;
+            root["OpenCost"]=rsp_position->pInvestorPosition->OpenCost;
+            root["OpenVolume"]=rsp_position->pInvestorPosition->OpenVolume;
+            root["PosiDirection"]=rsp_position->pInvestorPosition->PosiDirection;
+            root["Position"]=rsp_position->pInvestorPosition->Position;
+            root["PositionCost"]=rsp_position->pInvestorPosition->PositionCost;
+            root["PositionDate"]=rsp_position->pInvestorPosition->PositionDate;
+            root["PositionProfit"]=rsp_position->pInvestorPosition->PositionProfit;
+            root["PreMargin"]=rsp_position->pInvestorPosition->PreMargin;
+            root["PreSettlementPrice"]=rsp_position->pInvestorPosition->PreSettlementPrice;
+            root["SettlementID"]=rsp_position->pInvestorPosition->SettlementID;
+            root["SettlementPrice"]=rsp_position->pInvestorPosition->SettlementPrice;
+            root["ShortFozen"]=rsp_position->pInvestorPosition->ShortFrozen;
+            root["ShortFrozenAmount"]=rsp_position->pInvestorPosition->ShortFrozenAmount;
+            root["TodayPosition"]=rsp_position->pInvestorPosition->TodayPosition;
+            root["TradingDay"]=rsp_position->pInvestorPosition->TradingDay;
+            root["UseMargin"]=rsp_position->pInvestorPosition->UseMargin;
+            root["YdPosition"]=rsp_position->pInvestorPosition->YdPosition;
+            strmsg=root.toStyledString();
+            break;
+        case TOnRspOrderInsert:
+            rsp_insert=msg.data;
+            root["type"]=msg.type;
+            root["subtype"]=0;
+            root["reqid"]=rsp_insert->nRequestID;
+            root["bIsLast"]=rsp_insert->bIsLast;
+
+            req_order=new(TReqOrderInsert_t);
+            msg.data=req_order;
+            msg.len=sizeof(TReqOrderInsert_t);
+            msg.type=TReqOrderInsert;
+            strcpy(req_order->instn,root["instn"].asString().c_str());
+            req_order->dir=root["instn"].asInt();
+            req_order->price=root["price"].asFloat();
+            req_order->vol=root["vol"].asInt();
+            req_order->sid=root["sid"].asInt();
+            break;
+        case TOnRspOrderAction:
+            req_action=new(ReqOrderAction_t);
+            req_action->exchangeid=root["exchangeid"].asString();
+            req_action->ordersysid=root["ordersysid"].asString();
+            req_action->sid=root["sid"].asInt();
+            msg.data=req_order;
+            msg.len=sizeof(ReqOrderAction_t);
+            msg.type=TReqOrderAction;
+            break;
+        case TOnRspOrderInsert:
+            break;
+        case TOnRtnOrder:
+            break;
+        case TOnRtnTrade:
             break;
 		default:
 			/*todo*/

@@ -280,6 +280,7 @@ int CtpTradeSpi::ReqQryTradingAccount(int sid)
 
 
 void CtpTradeSpi::OnRspQryTradingAccount(
+OnRspQryTradingAccount(
     CThostFtdcTradingAccountField *pTradingAccount, 
    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 { 

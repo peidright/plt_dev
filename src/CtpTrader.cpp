@@ -49,6 +49,11 @@ void CtpTrader::trade_stm(msg_t &msg)
     TOnRtnTrade_t *OnRtnTrade;
     position_t *pposition;
     struct CThostFtdcInvestorPositionField  *pposition_field;
+    TOnRspOrderAction_t  *OnRspOrderAction;
+    TOnRspOrderInsert_t *OnRspOrderInsert;
+    TOnRspQryTradingAccount_t *OnRspQryTradingAccount;
+
+
 
     int orderref;
     int requestid;
@@ -178,8 +183,13 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryTradingAccount:
+                /*todo ok?*/
+                OnRspQryTradingAccount=msg.data;
+                snprintf(reqid,sizeof(reqid),"%d_%d",OnRspQryTradingAccount->nRequestID);,
                 LOG_DEBUG<<"CurrMargin:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.CurrMargin<<
                            " Available:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.Available<<std::endl;
+                sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TReqQryInvestorPosition:
@@ -189,8 +199,6 @@ void CtpTrader::trade_stm(msg_t &msg)
                 if(this->position.find(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID)
                         ==this->position.end()) {
                     pposition=new (position_t);
-#define THOST_FTDC_PD_Long '2'
-#define THOST_FTDC_PD_Short '3'
 
                     if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
                         pposition_field=&pposition->bbase;
@@ -226,6 +234,11 @@ void CtpTrader::trade_stm(msg_t &msg)
 			case TOnRspOrderInsert:
                 /*reqid2req map, status
                  * */
+                OnRspOrderInsert=msg.data;
+                snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderInsert->pInputOrder->RequestID,
+                            OnRspOrderInsert->pInputOrder->OrderRef);
+                sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TReqOrderAction:
@@ -234,8 +247,13 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnRspOrderAction:
-                /*fix status
+                /*fix status,todo use req_id, or ordid
                  * */
+                OnRspOrderAction=msg.data;;
+                snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderAction->pInputOrderAction->RequestID,
+                         OnRspOrderAction->pInputOrderAction->OrderRef);
+                sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TOnRtnOrder:

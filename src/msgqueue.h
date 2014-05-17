@@ -142,11 +142,26 @@ typedef struct {
 }TOnRspQryInvestorPosition_t;
 
 typedef struct {
+    TThostFtdcInstrumentIDType instn;
+    TThostFtdcDirectionType dir;
+    char kpp,
+    TThostFtdcPriceType price;
+    TThostFtdcVolumeType vol;
+    int sid;
+}TReqOrderInsert_t:
+
+typedef struct {
     	CThostFtdcInputOrderField pInputOrder;
 	CThostFtdcRspInfoField *pRspInfo;
 	int nRequestID;
 	bool bIsLast;
 }TOnRspOrderInsert_t;
+
+typedef struct {
+    string exchangeid;
+    string ordersysid;
+    int sid;
+}TReqOrderAction_t;
 
 typedef struct {
 	  CThostFtdcInputOrderActionField pInputOrderAction;
