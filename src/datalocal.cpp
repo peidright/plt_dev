@@ -1,5 +1,5 @@
 #include "datalocal.h"
-#include "sqlite3.h"
+#include <sqlite/sqlite3.h>
 #include "config.h"
 #include "assert.h"
 #include <map>

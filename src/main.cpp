@@ -3,7 +3,7 @@
 #include "CSem.h"
 #include <algorithm>
 #include <vector>
-#include "sqlite3.h"
+#include <sqlite/sqlite3.h>
 #include "CtpTrader.h"
 #include "CtpQuoter.h"
 #include "config.h"

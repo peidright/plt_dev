@@ -117,6 +117,8 @@ public:
     int ReqOrderInsert(TThostFtdcInstrumentIDType instId,
         TThostFtdcDirectionType dir, char kpp,
         TThostFtdcPriceType price,TThostFtdcVolumeType vol, int sid);
+
+
 	///报单操作请求
     int ReqOrderAction(string exchangeid,string ordersysid,int sid);
 	//void ReqOrderAction(TThostFtdcSequenceNoType orderSeq, int sid);

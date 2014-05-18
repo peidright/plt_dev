@@ -184,8 +184,8 @@ void CtpTrader::trade_stm(msg_t &msg)
 				break;
 			case TOnRspQryTradingAccount:
                 /*todo ok?*/
-                OnRspQryTradingAccount=msg.data;
-                snprintf(reqid,sizeof(reqid),"%d_%d",OnRspQryTradingAccount->nRequestID);,
+                OnRspQryTradingAccount=(TOnRspQryTradingAccount_t*)msg.data;
+                snprintf(reqid,sizeof(reqid),"%d",OnRspQryTradingAccount->nRequestID);
                 LOG_DEBUG<<"CurrMargin:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.CurrMargin<<
                            " Available:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.Available<<std::endl;
                 sframe_put_msg(&msg, this->reqid2sid[reqid]);
@@ -228,17 +228,17 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TReqOrderInsert:
-                //CThostFtdcInputOrderField *pInputOrder, 
+				//CThostFtdcInputOrderField *pInputOrder, 
 				msg.type=TSTOP;
 				break;
 			case TOnRspOrderInsert:
-                /*reqid2req map, status
-                 * */
-                OnRspOrderInsert=msg.data;
-                snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderInsert->pInputOrder->RequestID,
-                            OnRspOrderInsert->pInputOrder->OrderRef);
-                sframe_put_msg(&msg, this->reqid2sid[reqid]);
-                msg.data=NULL;
+				/*reqid2req map, status
+				 * */
+				OnRspOrderInsert=(TOnRspOrderInsert_t*)msg.data;
+				snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderInsert->pInputOrder.RequestID,
+						OnRspOrderInsert->pInputOrder.OrderRef);
+				sframe_put_msg(&msg, this->reqid2sid[reqid]);
+				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TReqOrderAction:
@@ -247,38 +247,38 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.type=TSTOP;
 				break;
 			case TOnRspOrderAction:
-                /*fix status,todo use req_id, or ordid
-                 * */
-                OnRspOrderAction=msg.data;;
-                snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderAction->pInputOrderAction->RequestID,
-                         OnRspOrderAction->pInputOrderAction->OrderRef);
-                sframe_put_msg(&msg, this->reqid2sid[reqid]);
-                msg.data=NULL;
+				/*fix status,todo use req_id, or ordid
+				 * */
+				OnRspOrderAction=(TOnRspOrderAction_t*)msg.data;;
+				snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderAction->pInputOrderAction.RequestID,
+						OnRspOrderAction->pInputOrderAction.OrderRef);
+				sframe_put_msg(&msg, this->reqid2sid[reqid]);
+				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TOnRtnOrder:
                 //TOnRtnOrder_t;
-                OnRtnOrder=(TOnRtnOrder_t*)msg.data;
-                orderref=atoi(OnRtnOrder->pOrder.OrderRef);
-                requestid=OnRtnOrder->pOrder.RequestID;
-                snprintf(reqid,sizeof(reqid),"%d_%d",requestid,orderref);
-                snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnOrder->pOrder.ExchangeID, OnRtnOrder->pOrder.OrderSysID);
+				OnRtnOrder=(TOnRtnOrder_t*)msg.data;
+				orderref=atoi(OnRtnOrder->pOrder.OrderRef);
+				requestid=OnRtnOrder->pOrder.RequestID;
+				snprintf(reqid,sizeof(reqid),"%d_%d",requestid,orderref);
+				snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnOrder->pOrder.ExchangeID, OnRtnOrder->pOrder.OrderSysID);
 
-                if(this->orderid2order.find(orderid)!=this->orderid2order.end()) {
-                    memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
-                    this->orderid2order[orderid]->uptime=time(NULL);
-                } else {
-                    this->orderid2order[reqid]=new (order_t);
-                    memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
-                    this->orderid2order[orderid]->uptime=time(NULL);
-                    //assert(0);
-                }
-                /*todo err check*/
-                this->orderid2reqid[orderid]=reqid;
-                this->reqid2orderid[reqid]=orderid;
-                /*if reqid not existed*/
-                sframe_put_msg(&msg, this->reqid2sid[reqid]);
-                msg.data=NULL;
+				if(this->orderid2order.find(orderid)!=this->orderid2order.end()) {
+					memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
+					this->orderid2order[orderid]->uptime=time(NULL);
+				} else {
+					this->orderid2order[reqid]=new (order_t);
+					memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
+					this->orderid2order[orderid]->uptime=time(NULL);
+					//assert(0);
+				}
+				/*todo err check*/
+				this->orderid2reqid[orderid]=reqid;
+				this->reqid2orderid[reqid]=orderid;
+				/*if reqid not existed*/
+				sframe_put_msg(&msg, this->reqid2sid[reqid]);
+				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
             case TOnRtnTrade:

@@ -131,7 +131,7 @@ typedef struct {
 }TOnRspQryTradingAccount_t;
 
 typedef struct {
-	int TThostFtdcInstrumentIDType instn;
+     TThostFtdcInstrumentIDType instn;
     int sid;
 }TReqQryInvestorPosition_t;
 typedef struct {
@@ -144,11 +144,11 @@ typedef struct {
 typedef struct {
     TThostFtdcInstrumentIDType instn;
     TThostFtdcDirectionType dir;
-    char kpp,
+    char kpp;
     TThostFtdcPriceType price;
     TThostFtdcVolumeType vol;
     int sid;
-}TReqOrderInsert_t:
+}TReqOrderInsert_t;
 
 typedef struct {
     	CThostFtdcInputOrderField pInputOrder;

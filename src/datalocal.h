@@ -1,6 +1,6 @@
 #ifndef DATALOCAL_H_
 #define DATALOCAL_H_
-#include "sqlite3.h"
+#include <sqlite/sqlite3.h>
 #include <string>
 #include <map>
 #include <vector>

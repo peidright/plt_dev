@@ -1,6 +1,6 @@
 #ifndef STRATEGY_FRAME_H_
 #define STRATEGY_FRAME_H_
-#include "json/json.h"
+#include <json/json.h>
 #include "boosthelp.h"
 #include "msgqueue.h"
 #include "strategy_config.h"
