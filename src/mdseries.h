@@ -78,6 +78,7 @@ public:
 			/**/
 			it->second->update(o,c,h,l,sec,msec,is_new);
 		}
+		return 0;
 	}
 	int update_timer();
 	int kline_update();

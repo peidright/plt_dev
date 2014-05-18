@@ -107,16 +107,15 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 		 * 1.lock todo
 		 * 2.syn
 		 * 3.iterator it to flush
-		 * */
-		/*
+		*/
 		int last_sec,last_msec;
 		char sqlbuf[1024];
 		snprintf(sqlbuf,1024,"select sec,msec from kdata_%s order by sec desc limit 1",instn.c_str());
-		assert(high.cdix==low.cidx);
+		assert(high.cidx==low.cidx);
 		assert(open.cidx==close.cidx);
 		assert(open.cidx==high.cidx);
 		vector<map<string,string> > result;
-		this->pdmgr->db_map["kdata"]->exe_cmd("sqlbuf", result);
+		pdmgr->db_map["kdata"]->exe_cmd("sqlbuf", result);
 		if(result.size()==0) {
 			last_sec=0;
 			last_msec=0;
@@ -125,11 +124,6 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 			last_msec=atoi(result[0]["msec"].c_str());
 		}
 
-		/*lock
-		 * */
-
-		/*iterator
-		 * */
 		int iterator_idx=0;
 		int open,close,high,low,mnum;
 		kdata_t *pkdata;
@@ -215,7 +209,7 @@ update_status mdseries::get_update_status(int b1,int b2,int e1,int e2,int n1,int
 		 *    ignore
 		 * */
 
-		int t=get_time();
+		//get_time();
 
 		/*
 		if(this->md_uptime!=0) {
@@ -420,6 +414,7 @@ int md::kline_update()
 		assert(0);
 	}
 
+	return 0;
 }
 int md::update_timer()
 {

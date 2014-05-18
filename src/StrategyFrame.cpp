@@ -577,7 +577,7 @@ BOOST_PYTHON_MODULE(sframe_agent)
 
 int sframe_agent_loop(strategy_config_t &config) {
 	cout<<"sframe_agent loop"<<std::endl;
-	PyObject *pName,*pModule,*pDict,*pFunc,*pArgs;
+	//PyObject *pName,*pModule,*pDict,*pFunc,*pArgs;
 	
 	Py_Initialize();
 	if (!Py_IsInitialized()){

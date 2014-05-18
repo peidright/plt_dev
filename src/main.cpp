@@ -100,6 +100,7 @@ int ctp_quote_init(string quotedir)
 		g_quote_tg.add_thread(new boost::thread(quote_loop,g_ctp_quoter));
 		g_ctp_quoter->start();
 		g_io_tg.add_thread(new boost::thread(quote_io_work));
+		return 0;
 }
 
 int ctp_db_init()

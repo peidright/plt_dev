@@ -16,6 +16,6 @@ all: $(objects)
 
 
 $(objects): %.o: %.cpp
-	g++ -g -c -Wall   $(CFLAGS) $< -o $@ 
+	g++ -g -c -Wall    $(CFLAGS) $< -o $@ 
 clean:
 	rm -rf *.o

@@ -104,6 +104,7 @@ int datalocal::create_tdata_table(string contract)
 	char sqlbuf[256];
 	sprintf(sqlbuf,"create table tdata_%s(open real,close real,high real,low real,uprice real,lprice real,bid1 real,bid2 real,bid3 real, bid4 real, bid5 real,ask1 real,ask2 real,ask3 real,ask4 real,ask5 real,lastprice real,sec integer,msec integer,vol integer)",contract.c_str());
 	this->exe_cmd(sqlbuf);
+	return 0;
 }
 #if 0
 int datalocal::create_inst_tdata(string instn){
@@ -184,8 +185,8 @@ int datalocal::create_inst_kdata(string instn){
 
 int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 {
-	int ret;
-	char *errmsg;
+	int ret=0;
+	//char *errmsg;
 	int size=tdataq.size();
 	char sqlbuf[2048];
 
@@ -214,7 +215,7 @@ int datalocal::update_tdata(string contract, deque<struct tdata_s*> &tdataq)
 	if(size > 10) {
 		this->exe_cmd("COMMIT;");
 	}
-	return 0;
+	return ret;
 }
 int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
 {
@@ -244,6 +245,7 @@ int datalocal::update_kdata(string contract,deque<struct kdata_s*> &kdataq)
 
 int datalocal::create_kdata_table(string contract)
 {
+	return 0;
 }
 
 

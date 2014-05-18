@@ -39,7 +39,7 @@ int between(time_t start, time_t end,time_t t)
 		    tm begin;
 			tm end;
 			time_t tt1,tt2,tbegin,tend;
-			tm *pbegin,*pend;
+			//tm *pbegin,*pend;
 			//tm *pend=gmtime((time_t*)&e1);
 		    //tm *pbegin=gmtime((time_t*)&b1);
 			pbegin=&begin;
