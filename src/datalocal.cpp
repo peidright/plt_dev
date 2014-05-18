@@ -272,7 +272,7 @@ int general_callback(void *arg, int count, char **row, char **titles)
 void datalocal:: get_product_list(vector<string> &product_list)
 {
 	//int ret;
-	char                  *error = 0;
+	//char                  *error = 0;
 	vector< map<string,string> > rows;
 	vector< map<string,string> >::iterator rows_it;
 	//ret=sqlite3_exec(this->db,"select name, product, status,ctime from instrument",general_callback,&rows,&error);

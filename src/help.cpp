@@ -11,7 +11,7 @@ int between(time_t start, time_t end,time_t t)
 		int _start=(int)start;
 		int _end=(int)end;
 		int _t = (int)t;
-		if((t>_start-300) && (t<_end+300))
+		if(_(t>_start-300) && (_t<_end+300))
 			return 1;
 		else
 			return 0;
@@ -42,8 +42,8 @@ int between(time_t start, time_t end,time_t t)
 			//tm *pbegin,*pend;
 			//tm *pend=gmtime((time_t*)&e1);
 		    //tm *pbegin=gmtime((time_t*)&b1);
-			pbegin=&begin;
-			pend=&end;
+			//pbegin=&begin;
+			//pend=&end;
 			tt1=mktime(t1);
 			tt2=mktime(t2);
 			if(tt1<=tt2) {

@@ -1,4 +1,4 @@
-#include "Python.h"
+#include <python/Python.h>
 #include "StrategyFrame.h"
 
 void printDict(PyObject* obj) {

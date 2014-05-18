@@ -1,6 +1,9 @@
+//#include <python/Python.h>
+#include <boost/python.hpp>
 #include "StrategyFrame.h"
-#include "Python.h"
 
+
+using namespace boost::python;
 class sframe g_sframe;
 
 extern int sframe_agent_loop(strategy_config_t &config);
@@ -19,6 +22,7 @@ again:
         LOG_DEBUG<<"lockerr put_msg again"<<std::endl;
         goto again;
 	}
+    return 0;
 };
 
 msg_t sframe::get_msg(int key) {
@@ -598,6 +602,7 @@ int sframe_agent_loop(strategy_config_t &config) {
 	FILE *f = PyFile_AsFile(pyfile); 
 	PyRun_AnyFileEx(f,"test.py",0);
 	cout<<"step3...."<<std::endl;
+    return 0;
 }
 
 int sframe_put_msg(msg_t *msg, int key)

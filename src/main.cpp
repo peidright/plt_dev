@@ -1,3 +1,4 @@
+#include <python/Python.h>
 #include <iostream>
 #include "CtpTraderSpi.h"
 #include "CSem.h"
@@ -20,7 +21,6 @@
 #include "boosthelp.h"
 
 #include "StrategyFrame.h" 
-#include "Python.h"
 #include "demo.h"
 
 #include "quote_io.h"

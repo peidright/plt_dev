@@ -46,8 +46,6 @@ again:
 void quote_io::quote_kdata_work()
 {
 	/*将数据入库*/
-	int now=(int)time(NULL);
-
 }
 
 void quote_io::quote_tdata_work()
