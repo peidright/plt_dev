@@ -16,7 +16,8 @@ void printDict(PyObject* obj) {
 int python_demo()
 {
 
-	PyObject *pName,*pModule,*pDict,*pFunc,*pArgs;
+	PyObject *pName,*pModule;
+    //*pDict,*pFunc,*pArgs;
 	// 载入名为pytest的脚本
 	
 	Py_Initialize();

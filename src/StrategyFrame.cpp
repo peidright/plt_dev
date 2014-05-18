@@ -64,6 +64,7 @@ again:
 	return key;
 };
 int sframe::dispatch(){
+    return 0;
 };
 
 int sframe::init(CtpQuoter *ctpquoter, CtpTrader *ctptrader)
@@ -79,7 +80,7 @@ msg_t sframe::dispatchsynret(msg_t msg)
     SRegMdInst_t *pSRegMdInst;
     SRegMdPeriod_t *pSRegMdPeriod;
     SRegMdStrategy_t *pSRegMdStrategy;
-    SRegRspCommon_t  *pSRegRspCommon;
+    //SRegRspCommon_t  *pSRegRspCommon;
 
     TReqQryInstrument_t *req_inst=NULL;
     TReqQryTradingAccount_t *req_account=NULL;
@@ -219,7 +220,6 @@ msg_t sframe_agent::pystr2msg(string str) {
 	Json::Value root;
 
     string instn;
-    int sid;
 	msg_t msg;
     memset(&msg,0x0,sizeof(msg_t));
 	KChange_t *kchange=NULL;
@@ -300,7 +300,7 @@ msg_t sframe_agent::pystr2msg(string str) {
                 req_action->exchangeid=root["exchangeid"].asString();
                 req_action->ordersysid=root["ordersysid"].asString();
                 req_action->sid=root["sid"].asInt();
-                msg.data=req_order;
+                msg.data=req_action;
                 msg.len=sizeof(TReqOrderAction_t);
                 msg.type=TReqOrderAction;
                 break;
@@ -549,9 +549,8 @@ string sframe_agent::msg2pystr(msg_t msg) {
             rsp_action=(TOnRspOrderAction_t*)msg.data;
             root["type"]=msg.type;
             root["subtype"]=0;
-            root["reqid"]=rsp_insert->nRequestID;
-            root["bIsLast"]=rsp_insert->bIsLast;
-            
+            root["reqid"]=rsp_action->nRequestID;
+            root["bIsLast"]=rsp_action->bIsLast;
             break;
         case TOnRtnOrder:
             break;

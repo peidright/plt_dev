@@ -7,15 +7,15 @@ using namespace boost::gregorian;
 	
 
 int between(time_t start, time_t end,time_t t)
-	{
-		int _start=(int)start;
-		int _end=(int)end;
-		int _t = (int)t;
-		if(_(t>_start-300) && (_t<_end+300))
-			return 1;
-		else
-			return 0;
-	}
+{
+    int _start=(int)start;
+    int _end=(int)end;
+    int _t = (int)t;
+    if((_t>_start-300) && (_t<_end+300))
+        return 1;
+    else
+        return 0;
+}
 	int between(time_t start, time_t end,time_t t1,time_t t2)
 	{
 		int _start = (int)start;
