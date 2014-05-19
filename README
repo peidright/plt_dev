@@ -1,0 +1,6 @@
+1.change python
+./configure --prefix=/home/dev/plt_dev/third/ --enable-shared
+ln -s /home/lv/plt_dev/third/bin/python /usr/bin/python
+
+
+2.build boost  with new python  --with-python-root
