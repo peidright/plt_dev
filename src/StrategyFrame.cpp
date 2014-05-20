@@ -5,6 +5,9 @@
 
 using namespace boost::python;
 class sframe g_sframe;
+static map<string,int> type2valmap;
+static map<int,string> val2typemap;
+
 
 extern int sframe_agent_loop(strategy_config_t &config);
 
@@ -275,7 +278,6 @@ msg_t sframe_agent::pystr2msg(string str) {
                 msg.type=TReqQryTradingAccount;
                 req_account->sid=root["sid"].asInt();
                 break;
-
             case TReqQryInvestorPosition:
                 req_position=new(TReqQryInvestorPosition_t);
                 msg.data=new(TReqQryInvestorPosition_t);
@@ -752,4 +754,125 @@ int sframe_quote_tchange(float v, int sec, int msec,int subtype, int key)
 }
 
 
+void typeval_init()
+{
+    type2valmap["MSG_NULL"]=0;
+    val2typemap[0]="MSG_NULL";
 
+    type2valmap["TChange"]=6;
+    val2typemap[6]="TChange";
+
+    type2valmap["KChange"]=7;
+    val2typemap[7]="KChange";
+
+    type2valmap["TMessage"]=8;
+    val2typemap[8]="TMessage";
+
+    type2valmap["TSTOP"]=9;
+    val2typemap[9]="TSTOP";
+
+    type2valmap["TSTART"]=10;
+    val2typemap[10]="TSTART";
+
+    type2valmap["OnFrontConnected"]=11;
+    val2typemap[11]="OnFrontConnected";
+
+    type2valmap["ReqUserLogin"]=12;
+    val2typemap[12]="ReqUserLogin";
+    type2valmap["OnRspUserLogin"]=13;
+    val2typemap[13]="OnRspUserLogin";
+    type2valmap["ReqSettlementInfoConfirm"]=14;
+    val2typemap[14]="ReqSettlementInfoConfirm";
+    type2valmap["OnRspSettlementInfoConfirm"]=15;
+    val2typemap[15]="OnRspSettlementInfoConfirm";
+    type2valmap["ReqQryInstrument"]=16;
+    val2typemap[16]="ReqQryInstrument";
+    type2valmap["OnRspQryInstrument"]=17;
+    val2typemap[17]="OnRspQryInstrument";
+    type2valmap["ReqQryTradingAccount"]=18;
+    val2typemap[18]="ReqQryTradingAccount";
+    type2valmap["OnRspQryTradingAccount"]=19;
+    val2typemap[19]="OnRspQryTradingAccount";
+    type2valmap["ReqQryInvestorPosition"]=20;
+    val2typemap[20]="ReqQryInvestorPosition";
+    type2valmap["OnRspQryInvestorPosition"]=21;
+    val2typemap[21]="OnRspQryInvestorPosition";
+
+    type2valmap["TReqOrderInsert"]=22;
+    val2typemap[22]="TReqOrderInsert";
+    type2valmap["OnRspOrderInsert"]=23;
+    val2typemap[23]="OnRspOrderInsert";
+    type2valmap["ReqOrderAction"]=24;
+    val2typemap["24"]="ReqOrderAction";
+    type2valmap["OnRspOrderAction"]=25;
+    val2typemap[25]="OnRspOrderAction";;
+    type2valmap["OnRtnInstrumentStatus"]=26;
+    val2typemap[26]="OnRtnInstrumentStatus";;
+    type2valmap["OnRtnOrder"]=27;
+    val2typemap[27]=OnRtnOrder;
+
+    type2valmap["OnRtnTrade"]=28;
+    val2typemap[28]="OnRtnTrade";
+
+    type2valmap["TOnFrontDisconnected"]=29;
+    val2typemap[29]="TOnFrontDisconnected";;
+    type2valmap["TOnHeartBeatWarning"]=30;
+    val2typemap[30]="TOnHeartBeatWarning";
+    type2valmap["TOnRspError"]=31;
+    val2typemap[31]="TOnRspError";
+    type2valmap["TRADE_QUOTE"]=64;
+    val2typemap[64]="TRADE_QUOTE";
+    type2valmap["QSTOP"]=65;
+    val2typemap[65]="QSTOP";
+    type2valmap["QSTART"]=66;
+    val2typemap[66]="QSTART";
+    type2valmap["OnFrontConnected"]=67;
+    val2typemap[67]="OnFrontConnected";
+
+    type2valmap["QOnFrontDisconnected"]=68;
+    val2typemap[68]="QOnFrontDisconnected";
+    type2valmap["QOnHeartBeatWarning"]=69;
+    val2typemap[69]="QOnHeartBeatWarning";
+    type2valmap["QOnRspError"]=70;
+    val2typemap[70]="QOnRspError";
+    type2valmap["QReqSubScribeMarketData"]=71;
+    val2typemap[71]="QReqSubScribeMarketData";
+    type2valmap["QOnRspSubMarketData"]=72;
+    val2typemap[72]="QOnRspSubMarketData";
+    type2valmap["QOnRspUnSubMarketData"]=73;
+    val2typemap[73]="QOnRspUnSubMarketData";
+    type2valmap["QReqUserLogin"]=74;
+    val2typemap[74]="QReqUserLogin";
+    type2valmap["QOnRspUserLogin"]=75;
+    val2typemap[75]="QOnRspUserLogin";
+    type2valmap["QOnRspUserLogout"]=76;
+    val2typemap[76]="QOnRspUserLogout";
+    type2valmap["QOnRtnDepthMarketData"]=77;
+    val2typemap[77]="QOnRtnDepthMarketData";
+    type2valmap["TRADE_STRATEGY"]=128;
+    val2typemap[128]="TRADE_STRATEGY";
+    type2valmap["SRegMdInst"]=129;
+    val2typemap[129]="SRegMdInst";
+    type2valmap["SRegMdPeriod"]=130;
+    val2typemap[130]="SRegMdPeriod";
+    type2valmap["SRegMdStratgy"]=131;
+    val2typemap[131]="SRegMdStratgy";
+    type2valmap["SRegRspCommon"]=196;
+    val2typemap[196]="SRegRspCommon";
+}
+int type2val(string t)
+{
+    if(type2valmap.find(t)!=type2valmap.end()){
+        return type2valmap[t];
+    }else {
+        return -1;
+    }
+}
+string val2type(int val)
+{
+    if(val2typemap.find(val)!=val2typemap.end()) {
+        return val2typemap[val];
+    }else {
+        return "error";
+    }
+}
