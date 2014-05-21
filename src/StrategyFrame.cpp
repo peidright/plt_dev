@@ -10,6 +10,9 @@ static map<int,string> val2typemap;
 
 
 extern int sframe_agent_loop(strategy_config_t &config);
+int type2val(string t);
+string val2type(int val);
+
 
 
 
@@ -238,7 +241,7 @@ msg_t sframe_agent::pystr2msg(string str) {
     cout<<"str is:"<<str<<std::endl;
 	if (reader.parse(str, root))  
 	{
-		int type=root["type"].asInt();    
+		int type=type2val(root["type"].asString());    
 		/*
 		   int type = root["type"].asString();  
 		   int code = root["code"].asInt();    
@@ -374,7 +377,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
 	switch(msg.type) {
 		case TChange:
 			tchange=(TChange_t*)msg.data;
-			root["type"]=TChange;
+			root["type"]=val2type(TChange);
 			root["subtype"]=tchange->subtype;
 			root["v"]=tchange->v;
             LOG_DEBUG<<"root v:"<<root["v"]<<"tchange->v"<<tchange->v<<std::endl;
@@ -382,7 +385,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
 			break;
 		case KChange:
 			kchange=(KChange_t*)msg.data;
-			root["type"]=KChange;
+			root["type"]=val2type(KChange);
 			root["subtype"]=kchange->subtype;
 			root["o"]=kchange->o;
 			root["c"]=kchange->c;
@@ -393,13 +396,13 @@ string sframe_agent::msg2pystr(msg_t msg) {
         case SRegRspCommon:
             pSRegRspCommon=(SRegRspCommon_t*)msg.data;
             root["ret"]=pSRegRspCommon->ret;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
         	strmsg=root.toStyledString();
             break;
         case TOnRspQryInstrument:
             /*todo rspinfo, and string*/
             rsp_inst=(TOnRspQryInstrument_t*)msg.data;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             root["reqid"]=rsp_inst->nRequestID;
             root["bIsLast"]=rsp_inst->bIsLast;
@@ -434,7 +437,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
         case TOnRspQryTradingAccount:
             rsp_account=(TOnRspQryTradingAccount_t*)msg.data;
             root["bIsLast"]=rsp_account->bIsLast;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             root["reqid"]=rsp_account->nRequestID;
             root["AccountID"]=rsp_account->pTradingAccount.AccountID;
@@ -472,7 +475,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             break;
         case TOnRspQryInvestorPosition:
             rsp_position=(TOnRspQryInvestorPosition_t*)msg.data;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             root["reqid"]=rsp_position->nRequestID;
             root["bIsLast"]=rsp_position->bIsLast;
@@ -520,7 +523,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             break;
         case TOnRspOrderInsert:
             rsp_insert=(TOnRspOrderInsert_t*)msg.data;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             root["reqid"]=rsp_insert->nRequestID;
             root["bIsLast"]=rsp_insert->bIsLast;
@@ -551,7 +554,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             break;
         case TOnRspOrderAction:
             rsp_action=(TOnRspOrderAction_t*)msg.data;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             root["reqid"]=rsp_action->nRequestID;
             root["bIsLast"]=rsp_action->bIsLast;
@@ -572,70 +575,70 @@ string sframe_agent::msg2pystr(msg_t msg) {
             break;
         case TOnRtnOrder:
             rtn_order=(TOnRtnOrder_t*)msg.data;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             root["reqid"]=rtn_order->pOrder.RequestID;
-            root["ActiveTime"]=rtn_order->pOrder->ActiveTime;
-            root["ActiveTraderID"]=rtn_order->pOrder->ActiveTraderID;
-            root["ActiveUserID"]=rtn_order->pOrder->ActiveUserID;
-            root["BrokerID"]=rtn_order->pOrder->BrokerID;
-            root["BrokerOrderSeq"]=rtn_order->pOrder->BrokerOrderSeq;
-            root["BusinessUnit"]=rtn_order->pOrder->BusinessUnit;
-            root["CancelTime"]=rtn_order->pOrder->CancelTime;
-            root["ClearingPartID"]=rtn_order->pOrder->ClearingPartID;
-            root["ClientID"]=rtn_order->pOrder->ClientID;
-            root["CombHedgeFlag"]=rtn_order->pOrder->CombHedgeFlag;
-            root["CombOffsetFlag"]=rtn_order->pOrder->CombOffsetFlag;
-            root["ContingentCondition"]=rtn_order->pOrder->ContingentCondition;
-            root["Direction"]=rtn_order->pOrder->Direction;
-            root["ExchangeID"]=rtn_order->pOrder->ExchangeID;
-            root["ExchangeInstID"]=rtn_order->pOrder->ExchangeInstID;
-            root["ForceCloseReason"]=rtn_order->pOrder->ForceCloseReason;
-            root["FrontID"]=rtn_order->pOrder->FrontID;
-            root["GTDDate"]=rtn_order->pOrder->GTDDate;
-            root["InsertDate"]=rtn_order->pOrder->InsertDate;
-            root["InsertTime"]=rtn_order->pOrder->InsertTime;
-            root["InstallID"]=rtn_order->pOrder->InstallID;
-            root["InstrumentID"]=rtn_order->pOrder->InstrumentID;
-            root["InvestorID"]=rtn_order->pOrder->InvestorID;
-            root["IsAutoSuspend"]=rtn_order->pOrder->IsAutoSuspend;
-            root["IsSwapOrder"]=rtn_order->pOrder->IsSwapOrder;
-            root["LimitPrice"]=rtn_order->pOrder->LimitPrice;
-            root["MinVolume"]=rtn_order->pOrder->MinVolume;
-            root["NotifySequence"]=rtn_order->pOrder->NotifySequence;
-            root["OrderLocalID"]=rtn_order->pOrder->OrderLocalID;
-            root["OrderPriceType"]=rtn_order->pOrder->OrderPriceType;
-            root["OrderRef"]=rtn_order->pOrder->OrderRef;
-            root["OrderSource"]=rtn_order->pOrder->OrderSource;
-            root["OrderStatus"]=rtn_order->pOrder->OrderStatus;
-            root["OrderSubmitStatus"]=rtn_order->pOrder->OrderSubmitStatus;
-            root["OrderSysID"]=rtn_order->pOrder->OrderSysID;
-            root["OrderType"]=rtn_order->pOrder->OrderType;
-            root["ParticipantID"]=rtn_order->pOrder->ParticipantID;
-            root["RelativeOrderSysID"]=rtn_order->pOrder->RelativeOrderSysID;
-            root["RequestID"]=rtn_order->pOrder->RequestID;
-            root["SequenceNo"]=rtn_order->pOrder->SequenceNo;
-            root["SessionID"]=rtn_order->pOrder->SessionID;
-            root["SettlementID"]=rtn_order->pOrder->SettlementID;
-            root["StatusMsg"]=rtn_order->pOrder->StatusMsg;
-            root["StopPrice"]=rtn_order->pOrder->StopPrice;
-            root["SuspendTime"]=rtn_order->pOrder->SuspendTime;
-            root["TimeCondition"]=rtn_order->pOrder->TimeCondition;
-            root["TraderID"]=rtn_order->pOrder->TraderID;
-            root["TradingDay"]=rtn_order->pOrder->TradingDay;
-            root["UpdateTime"]=rtn_order->pOrder->UpdateTime;
-            root["UserForceClose"]=rtn_order->pOrder->UserForceClose;
-            root["UserID"]=rtn_order->pOrder->UserID;
-            root["UserProductInfo"]=rtn_order->pOrder->UserProductInfo;
-            root["VolumeCondition"]=rtn_order->pOrder->VolumeCondition;
-            root["VolumeTotal"]=rtn_order->pOrder->VolumeTotal;
-            root["VolumeTotalOriginal"]=rtn_order->pOrder->VolumeTotalOriginal;
-            root["VolumeTraded"]=rtn_order->pOrder->VolumeTraded;
-            root["ZCETotalTradedVolume"]=rtn_order->pOrder->ZCETotalTradedVolume;
+            root["ActiveTime"]=rtn_order->pOrder.ActiveTime;
+            root["ActiveTraderID"]=rtn_order->pOrder.ActiveTraderID;
+            root["ActiveUserID"]=rtn_order->pOrder.ActiveUserID;
+            root["BrokerID"]=rtn_order->pOrder.BrokerID;
+            root["BrokerOrderSeq"]=rtn_order->pOrder.BrokerOrderSeq;
+            root["BusinessUnit"]=rtn_order->pOrder.BusinessUnit;
+            root["CancelTime"]=rtn_order->pOrder.CancelTime;
+            root["ClearingPartID"]=rtn_order->pOrder.ClearingPartID;
+            root["ClientID"]=rtn_order->pOrder.ClientID;
+            root["CombHedgeFlag"]=rtn_order->pOrder.CombHedgeFlag;
+            root["CombOffsetFlag"]=rtn_order->pOrder.CombOffsetFlag;
+            root["ContingentCondition"]=rtn_order->pOrder.ContingentCondition;
+            root["Direction"]=rtn_order->pOrder.Direction;
+            root["ExchangeID"]=rtn_order->pOrder.ExchangeID;
+            root["ExchangeInstID"]=rtn_order->pOrder.ExchangeInstID;
+            root["ForceCloseReason"]=rtn_order->pOrder.ForceCloseReason;
+            root["FrontID"]=rtn_order->pOrder.FrontID;
+            root["GTDDate"]=rtn_order->pOrder.GTDDate;
+            root["InsertDate"]=rtn_order->pOrder.InsertDate;
+            root["InsertTime"]=rtn_order->pOrder.InsertTime;
+            root["InstallID"]=rtn_order->pOrder.InstallID;
+            root["InstrumentID"]=rtn_order->pOrder.InstrumentID;
+            root["InvestorID"]=rtn_order->pOrder.InvestorID;
+            root["IsAutoSuspend"]=rtn_order->pOrder.IsAutoSuspend;
+            root["IsSwapOrder"]=rtn_order->pOrder.IsSwapOrder;
+            root["LimitPrice"]=rtn_order->pOrder.LimitPrice;
+            root["MinVolume"]=rtn_order->pOrder.MinVolume;
+            root["NotifySequence"]=rtn_order->pOrder.NotifySequence;
+            root["OrderLocalID"]=rtn_order->pOrder.OrderLocalID;
+            root["OrderPriceType"]=rtn_order->pOrder.OrderPriceType;
+            root["OrderRef"]=rtn_order->pOrder.OrderRef;
+            root["OrderSource"]=rtn_order->pOrder.OrderSource;
+            root["OrderStatus"]=rtn_order->pOrder.OrderStatus;
+            root["OrderSubmitStatus"]=rtn_order->pOrder.OrderSubmitStatus;
+            root["OrderSysID"]=rtn_order->pOrder.OrderSysID;
+            root["OrderType"]=rtn_order->pOrder.OrderType;
+            root["ParticipantID"]=rtn_order->pOrder.ParticipantID;
+            root["RelativeOrderSysID"]=rtn_order->pOrder.RelativeOrderSysID;
+            root["RequestID"]=rtn_order->pOrder.RequestID;
+            root["SequenceNo"]=rtn_order->pOrder.SequenceNo;
+            root["SessionID"]=rtn_order->pOrder.SessionID;
+            root["SettlementID"]=rtn_order->pOrder.SettlementID;
+            root["StatusMsg"]=rtn_order->pOrder.StatusMsg;
+            root["StopPrice"]=rtn_order->pOrder.StopPrice;
+            root["SuspendTime"]=rtn_order->pOrder.SuspendTime;
+            root["TimeCondition"]=rtn_order->pOrder.TimeCondition;
+            root["TraderID"]=rtn_order->pOrder.TraderID;
+            root["TradingDay"]=rtn_order->pOrder.TradingDay;
+            root["UpdateTime"]=rtn_order->pOrder.UpdateTime;
+            root["UserForceClose"]=rtn_order->pOrder.UserForceClose;
+            root["UserID"]=rtn_order->pOrder.UserID;
+            root["UserProductInfo"]=rtn_order->pOrder.UserProductInfo;
+            root["VolumeCondition"]=rtn_order->pOrder.VolumeCondition;
+            root["VolumeTotal"]=rtn_order->pOrder.VolumeTotal;
+            root["VolumeTotalOriginal"]=rtn_order->pOrder.VolumeTotalOriginal;
+            root["VolumeTraded"]=rtn_order->pOrder.VolumeTraded;
+            root["ZCETotalTradedVolume"]=rtn_order->pOrder.ZCETotalTradedVolume;
             break;
         case TOnRtnTrade:
             rtn_trade=(TOnRtnTrade_t*)msg.data;
-            root["type"]=msg.type;
+            root["type"]=val2type(msg.type);
             root["subtype"]=0;
             //root["reqid"]=0;
             root["BrokerID"]=rtn_trade->pTrade.BrokerID;
@@ -676,8 +679,6 @@ string sframe_agent::msg2pystr(msg_t msg) {
     LOG_DEBUG<<"strmsg is :"<<strmsg<<std::endl;
 	return strmsg;
 };
-
-
 
 BOOST_PYTHON_MODULE(sframe_agent)
 {
@@ -774,45 +775,44 @@ void typeval_init()
     type2valmap["TSTART"]=10;
     val2typemap[10]="TSTART";
 
-    type2valmap["OnFrontConnected"]=11;
-    val2typemap[11]="OnFrontConnected";
+    type2valmap["TOnFrontConnected"]=11;
+    val2typemap[11]="TOnFrontConnected";
 
-    type2valmap["ReqUserLogin"]=12;
-    val2typemap[12]="ReqUserLogin";
-    type2valmap["OnRspUserLogin"]=13;
-    val2typemap[13]="OnRspUserLogin";
-    type2valmap["ReqSettlementInfoConfirm"]=14;
-    val2typemap[14]="ReqSettlementInfoConfirm";
-    type2valmap["OnRspSettlementInfoConfirm"]=15;
-    val2typemap[15]="OnRspSettlementInfoConfirm";
-    type2valmap["ReqQryInstrument"]=16;
-    val2typemap[16]="ReqQryInstrument";
-    type2valmap["OnRspQryInstrument"]=17;
-    val2typemap[17]="OnRspQryInstrument";
-    type2valmap["ReqQryTradingAccount"]=18;
-    val2typemap[18]="ReqQryTradingAccount";
-    type2valmap["OnRspQryTradingAccount"]=19;
-    val2typemap[19]="OnRspQryTradingAccount";
-    type2valmap["ReqQryInvestorPosition"]=20;
-    val2typemap[20]="ReqQryInvestorPosition";
-    type2valmap["OnRspQryInvestorPosition"]=21;
-    val2typemap[21]="OnRspQryInvestorPosition";
-
+    type2valmap["TReqUserLogin"]=12;
+    val2typemap[12]="TReqUserLogin";
+    type2valmap["TOnRspUserLogin"]=13;
+    val2typemap[13]="TOnRspUserLogin";
+    type2valmap["TReqSettlementInfoConfirm"]=14;
+    val2typemap[14]="TReqSettlementInfoConfirm";
+    type2valmap["TOnRspSettlementInfoConfirm"]=15;
+    val2typemap[15]="TOnRspSettlementInfoConfirm";
+    type2valmap["TReqQryInstrument"]=16;
+    val2typemap[16]="TReqQryInstrument";
+    type2valmap["TOnRspQryInstrument"]=17;
+    val2typemap[17]="TOnRspQryInstrument";
+    type2valmap["TReqQryTradingAccount"]=18;
+    val2typemap[18]="TReqQryTradingAccount";
+    type2valmap["TOnRspQryTradingAccount"]=19;
+    val2typemap[19]="TOnRspQryTradingAccount";
+    type2valmap["TReqQryInvestorPosition"]=20;
+    val2typemap[20]="TReqQryInvestorPosition";
+    type2valmap["TOnRspQryInvestorPosition"]=21;
+    val2typemap[21]="TOnRspQryInvestorPosition";
     type2valmap["TReqOrderInsert"]=22;
     val2typemap[22]="TReqOrderInsert";
-    type2valmap["OnRspOrderInsert"]=23;
-    val2typemap[23]="OnRspOrderInsert";
-    type2valmap["ReqOrderAction"]=24;
-    val2typemap["24"]="ReqOrderAction";
-    type2valmap["OnRspOrderAction"]=25;
-    val2typemap[25]="OnRspOrderAction";;
-    type2valmap["OnRtnInstrumentStatus"]=26;
-    val2typemap[26]="OnRtnInstrumentStatus";;
-    type2valmap["OnRtnOrder"]=27;
-    val2typemap[27]=OnRtnOrder;
+    type2valmap["TOnRspOrderInsert"]=23;
+    val2typemap[23]="TOnRspOrderInsert";
+    type2valmap["TReqOrderAction"]=24;
+    val2typemap[24]="TReqOrderAction";
+    type2valmap["TOnRspOrderAction"]=25;
+    val2typemap[25]="TOnRspOrderAction";;
+    type2valmap["TOnRtnInstrumentStatus"]=26;
+    val2typemap[26]="TOnRtnInstrumentStatus";;
+    type2valmap["TOnRtnOrder"]=27;
+    val2typemap[27]="TOnRtnOrder";
 
-    type2valmap["OnRtnTrade"]=28;
-    val2typemap[28]="OnRtnTrade";
+    type2valmap["TOnRtnTrade"]=28;
+    val2typemap[28]="TOnRtnTrade";
 
     type2valmap["TOnFrontDisconnected"]=29;
     val2typemap[29]="TOnFrontDisconnected";;
