@@ -247,25 +247,6 @@ msg_t sframe_agent::pystr2msg(string str) {
 		   int code = root["code"].asInt();    
 		   */
 		switch(type) {
-			case TChange:
-				tchange=new (TChange_t);
-				msg.data=tchange;
-				msg.len=sizeof(TChange_t);
-				msg.type=TChange;
-				tchange->subtype=root["subtype"].asInt();
-				tchange->v=root["v"].asFloat();
-				break;
-			case KChange:
-				kchange=new (KChange_t);
-				msg.data=kchange;
-				msg.len=sizeof(KChange_t);
-				msg.type=KChange;
-				kchange->subtype=root["subtype"].asInt();
-				kchange->o=root["o"].asFloat();
-				kchange->c=root["c"].asFloat();
-				kchange->h=root["h"].asFloat();
-				kchange->l=root["l"].asFloat();
-				break; 
             case TReqQryInstrument:
                 req_inst=new(TReqQryInstrument_t);
                 msg.data=req_inst;

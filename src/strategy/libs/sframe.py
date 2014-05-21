@@ -6,16 +6,16 @@ import thread
 import time
 
 op2req={
-        "TReqAuthenticate":{},
-        "TReqUserLogin":{},
-        "TReqUserLogout":{},
-        "TReqUserLogout":{},
-        "TReqQryInstrument":{"instn":"","sid":-1},
-        "TReqQryTradingAccount":{"sid":-1},
-        "TReqQryInvestorPosition":{"instn":"","sid":-1},
-        "TReqOrderInsert":{"instn":"","dir":-1,"price":0,"vol":0,"sid":-1},
-        "TReqOrderAction":{"exchangeid":-1,"ordersysid":-1,"sid":-1},
-        "SRegMdStrategy":{},
+        "ReqAuthenticate":{},
+        "ReqUserLogin":{},
+        "ReqUserLogout":{},
+        "ReqUserLogout":{},
+        "ReqQryInstrument":{"instn":"","sid":-1,"type":"TReqQryInstrument"},
+        "ReqQryTradingAccount":{"sid":-1,"type":"TReqQryTradingAccount"},
+        "ReqQryInvestorPosition":{"instn":"","sid":-1,"type":"TReqQryInvestorPosition"},
+        "ReqOrderInsert":{"instn":"","dir":-1,"price":0,"vol":0,"sid":-1,"type":"TReqOrderInsert"},
+        "ReqOrderAction":{"exchangeid":-1,"ordersysid":-1,"sid":-1,"type":"TReqOrderAction"},
+        "RegMdStrategy":{"type":"SRegMdStrategy"},
 }
 
 def sframe_callback(arg):
@@ -54,12 +54,53 @@ class sframe:
         return msg;
     def run(self):
         print "in run";
+        self.strategy.run_init();
         try:
-            while True:
+            while self.strategy.is_running():
                 msg=self.wait();
                 self.strategy.rsp(msg);
                 #break;
                 pass
+            self.strategy.run_clear();
         except Exception,e:
             print "exp happen",e;
+            self.strategy.run_except();
             pass
+    def req(self,msg):
+        pass
+
+    def ReqQryInstrument(self, instn):
+        #req=op2req.get
+        func_name=sys._getframe().f_code.co_name
+        req=op2req.get(func_name,{});
+        req["instn"]=instn;
+        pass
+    def ReqQryTradingAccount(self):
+        func_name=sys._getframe().f_code.co_name
+        req=op2req.get(func_name,{});
+        pass
+    def ReqQryInvestorPosition(self, instn):
+        func_name=sys._getframe().f_code.co_name
+        req=op2req.get(func_name,{});
+        req["instn"]=instn;
+        pass
+    def ReqOrderInsert(self, instn, dir, price, vol):
+        func_name=sys._getframe().f_code.co_name
+        req=op2req.get(func_name,{});
+        req["instn"]=instn;
+        req["dir"]=dir;
+        req["price"]=price;
+        req["vol"]=vol;
+        pass
+    def ReqOrderAction(self, exchangeid, ordersysid):
+        func_name=sys._getframe().f_code.co_name
+        req=op2req.get(func_name,{});
+        req["exchangeid"]=exchangeid;
+        req["ordersysid"]=ordersysid;
+        pass
+    def RegMdStrategy(self, instn, period):
+        func_name=sys._getframe().f_code.co_name
+        req=op2req.get(func_name,{});
+        req["instn"]=instn;
+        req["period"]=period;
+        pass
