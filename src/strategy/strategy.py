@@ -26,8 +26,12 @@ class sbase(object):
     def rsp_default(self,msg):
         #exp,run sbase rsp
         pass
+    def profit_stat(self,msg):
+        pass
     def run(self):
         self.sf.run();
+    def expand(self):
+        pass
 #s=sbase();
 #s.init();
 #s.run();
