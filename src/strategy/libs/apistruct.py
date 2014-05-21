@@ -39,15 +39,15 @@ class CThostFtdcReqUserLoginField:
     def __init__(self,TradingDay="",BrokerID="",UserID="",Password="",UserProductInfo="",InterfaceProductInfo="",
             ProtocolInfo="", MacAddress="",OneTimePassword="",ClientIPAddress=""):
         self.TradingDay=TradingDay;
-	    self.BrokerID=BrokerID;
-	    self.UserID=UserID;
-	    self.Password=Password;
-	    self.UserProductInfo=UserProductInfo;
-	    self.InterfaceProductInfo=InterfaceProductInfo;
-	    self.ProtocolInfo=ProtocolInfo;
-	    self.MacAddress=MacAddress;
-	    self.OneTimePassword=OneTimePassword;
-	    self.ClientIPAddress=ClientIPAddress;
+        self.BrokerID=BrokerID;
+        self.UserID=UserID;
+        self.Password=Password;
+        self.UserProductInfo=UserProductInfo;
+        self.InterfaceProductInfo=InterfaceProductInfo;
+        self.ProtocolInfo=ProtocolInfo;
+        self.MacAddress=MacAddress;
+        self.OneTimePassword=OneTimePassword;
+        self.ClientIPAddress=ClientIPAddress;
 
 class CThostFtdcUserLogoutField:
     def __init__(self, BrokerID="",UserID=""):
@@ -71,11 +71,11 @@ class CThostFtdcTradingAccountPasswordUpdateField:
 
 class CThostFtdcInputOrderField:
     def __init__(self,BrokerID="",InvestorID="",InstrumentID="",OrderRef="", UserID="", OrderPriceType=0,
-                 Direction=0, CombOffsetFlag="", LimitPrice=0.0, VolumeTotalOriginal=0, TimeCondition=0,
-                 GTDDate="", VolumeCondition=0, MinVolume=0,ContingentCondition=0,StopPrice=0.0,
-                 ForceCloseReason=0,IsAutoSuspend=0,BusinessUnit=0,RequestID=0,UserForceClose=0,
-                 IsSwapOrder=0
-                 ):
+            Direction=0, CombOffsetFlag="", LimitPrice=0.0, VolumeTotalOriginal=0, TimeCondition=0,
+            GTDDate="", VolumeCondition=0, MinVolume=0,ContingentCondition=0,StopPrice=0.0,
+            ForceCloseReason=0,IsAutoSuspend=0,BusinessUnit=0,RequestID=0,UserForceClose=0,
+            IsSwapOrder=0
+            ):
         self.BrokerID=BrokerID;
         self.InvestorID=InvestorID;
         self.InstrumentID=InstrumentID;
@@ -101,11 +101,11 @@ class CThostFtdcInputOrderField:
 
 class CThostFtdcParkedOrderField:
     def __init__(self,BrokerID="",InvestorID="",InstrumentID="",OrderRef="", UserID="", OrderPriceType=0,
-                 Direction=0, CombOffsetFlag="",CombHedgeFlag="", LimitPrice=0.0, VolumeTotalOriginal=0, 
-                 TimeCondition=0,GTDDate="", VolumeCondition=0, MinVolume=0,ContingentCondition=0,
-                 StopPrice=0.0,ForceCloseReason=0,IsAutoSuspend=0,BusinessUnit=0,RequestID=0,UserForceClose=0,
-                 ExchangeID="",ParkedOrderID="",UserType=0,Status=0,ErrorID=0,ErrorMsg="",IsSwapOrder=0
-                 ):
+            Direction=0, CombOffsetFlag="",CombHedgeFlag="", LimitPrice=0.0, VolumeTotalOriginal=0, 
+            TimeCondition=0,GTDDate="", VolumeCondition=0, MinVolume=0,ContingentCondition=0,
+            StopPrice=0.0,ForceCloseReason=0,IsAutoSuspend=0,BusinessUnit=0,RequestID=0,UserForceClose=0,
+            ExchangeID="",ParkedOrderID="",UserType=0,Status=0,ErrorID=0,ErrorMsg="",IsSwapOrder=0
+            ):
         self.BrokerID=BrokerID;
         self.InvestorID=InvestorID;
         self.InstrumentID=InstrumentID;
@@ -136,11 +136,11 @@ class CThostFtdcParkedOrderField:
         self.ErrorMsg=ErrorMsg;
         self.IsSwapOrder=IsSwapOrder;
 
-class CThostFtdcParkedOrderActionField
+class CThostFtdcParkedOrderActionField:
     def __init__(self,BrokerID="",InvestorID="",OrderActionRef=0,OrderRef="",RequestID=0,FrontID=0,
-                      SessionID=0,ExchangeID="",OrderSysID="",ActionFlag=0,LimitPrice=0.0,
-                      VolumeChange=0,UserID="",InstrumentID="",ParkedOrderActionID="",UserType=0,
-                      Status=0,ErrorID=0,ErrorMsg=""):
+            SessionID=0,ExchangeID="",OrderSysID="",ActionFlag=0,LimitPrice=0.0,
+            VolumeChange=0,UserID="",InstrumentID="",ParkedOrderActionID="",UserType=0,
+            Status=0,ErrorID=0,ErrorMsg=""):
         self.BrokerID=BrokerID;
         self.InvestorID=InvestorID;
         self.OrderActionRef=OrderActionRef;
@@ -163,8 +163,8 @@ class CThostFtdcParkedOrderActionField
 
 class CThostFtdcInputOrderActionField:
     def __init__(self,BrokerID="",InvestorID="",OrderActionRef=0,OrderRef="",RequestID=0,
-                      FrontID=0,SessionID=0,ExchangeID="",OrderSysID="",ActionFlag=0,
-                      LimitPrice=0,VolumeChange=0,UserID="",InstrumentID=""):
+            FrontID=0,SessionID=0,ExchangeID="",OrderSysID="",ActionFlag=0,
+            LimitPrice=0,VolumeChange=0,UserID="",InstrumentID=""):
         self.BrokerID=BrokerID;
         self.InvestorID=InvestorID;
         self.OrderActionRef=OrderActionRef;
@@ -182,7 +182,7 @@ class CThostFtdcInputOrderActionField:
 
 class CThostFtdcQueryMaxOrderVolumeField:
     def __init__(self,BrokerID="",InvestorID="",InstrumentID="",Direction=0,
-                        OffsetFlag=0,HedgeFlag=0,MaxVolume=0):
+            OffsetFlag=0,HedgeFlag=0,MaxVolume=0):
         self.Direction=Direction;
         self.OffsetFlag=OffsetFlag;
         self.HedgeFlag=HedgeFlag;
@@ -190,22 +190,22 @@ class CThostFtdcQueryMaxOrderVolumeField:
 
 class CThostFtdcSettlementInfoConfirmField:
     def __init__(self,BrokerID="",InvestorID="",ConfirmDate="",ConfirmTime=""):
-        this->BrokerID=BrokerID;
-        this->InvestorID=InvestorID;
-        this->ConfirmDate=ConfirmDate;
-        this->ConfirmTime=ConfirmTime;
+        self.BrokerID=BrokerID;
+        self.InvestorID=InvestorID;
+        self.ConfirmDate=ConfirmDate;
+        self.ConfirmTime=ConfirmTime;
 
 class CThostFtdcRemoveParkedOrderField:
     def __init__(self,BrokerID="",InvestorID="",ParkedOrderID=""):
-        this->BrokerID=BrokerID;
-        this->InvestorID=InvestorID;
-        this->ParkedOrderID=ParkedOrderID;
+        self.BrokerID=BrokerID;
+        self.InvestorID=InvestorID;
+        self.ParkedOrderID=ParkedOrderID;
 
 class CThostFtdcRemoveParkedOrderActionField:
     def __init__(self,BrokerID="",InvestorID="",ParkedOrderActionID=""):
-        this->BrokerID=BrokerID;
-        this->InvestorID=InvestorID;
-        this->ParkedOrderActionID=ParkedOrderActionID;
+        self.BrokerID=BrokerID;
+        self.InvestorID=InvestorID;
+        self.ParkedOrderActionID=ParkedOrderActionID;
 
 class CThostFtdcQryOrderField:
     def __init__(self,BrokerID="",InvestorID="",InstrumentID="",ExchangeID="",
@@ -220,7 +220,7 @@ class CThostFtdcQryOrderField:
 
 class CThostFtdcQryTradeField:
     def __init__(self,BrokerID="",InvestorID="",InstrumentID="",ExchangeID="",
-                      TradeID="",TradeTimeStart="",TradeTimeEnd=""):
+            TradeID="",TradeTimeStart="",TradeTimeEnd=""):
         self.BrokerID=BrokerID;
         self.InvestorID=InvestorID;
         self.InstrumentID=InstrumentID;
@@ -253,7 +253,7 @@ class CThostFtdcQryTradingCodeField:
         self.ExchangeID=ExchangeID;
         self.ClientID=ClientID;
         self.ClientIDType=ClientIDType;
-        
+
 class CThostFtdcQryInstrumentMarginRateField:
     def __init__(self,BrokerID="",InvestorID="",InstrumentID="",HedgeFlag=0):
         self.BrokerID=BrokerID;
@@ -368,7 +368,7 @@ class CThostFtdcQryTransferSerialField:
 class CThostFtdcQryAccountregisterField:
     def __init__(self,BrokerID="",AccountID="",BankID=""):
         self.BrokerID=BrokerID;
-        self.AccountID=AccountID:
+        self.AccountID=AccountID;
         self.BankID=BankID;
         pass
 
@@ -380,7 +380,7 @@ class CThostFtdcQryContractBankField:
         pass
 
 class CThostFtdcQryParkedOrderField:
-    def __init__(self,BrokerID="",InvestorID="",InstrumentID="".ExchangeID):
+    def __init__(self,BrokerID="",InvestorID="",InstrumentID="",ExchangeID=""):
         self.BrokerID=BrokerID;
         self.InvestorID=InvestorID;
         self.InstrumentID=InstrumentID;
@@ -415,14 +415,14 @@ class CThostFtdcQryBrokerTradingAlgosField:
 
 class CThostFtdcReqTransferField:
     def __init__(self,TradeCode="",BankID="",BankBranchID="",BrokerID="",BrokerBranchID="",
-                      TradeDate="",TradeTime="",BankSerial="",TradingDay="",PlateSerial=0,
-                      LastFragment=0,SessionID=0,CustomerName="",IdCardType=0,IdentifiedCardNo="",
-                      CustType=0,BankAccount="",BankPassWord="",AccountID="",Password="",InstallID="",
-                      FutureSerial=0,UserID="",VerifyCertNoFlag=0,CurrencyID="",TradeAmount=0.0,
-                      FutureFetchAmount=0.0,FeePayFlag=0,CustFee=0.0,BrokerFee=0.0,Message="",
-                      Digest="",BankAccType=0,DeviceID="",BankSecuAccType=0,BrokerIDByBank="",
-                      BankSecuAcc="",BankPwdFlag=0,SecuPwdFlag=0,OperNo="",RequestID=0,
-                      TID=0,TransferStatus=0):
+            TradeDate="",TradeTime="",BankSerial="",TradingDay="",PlateSerial=0,
+            LastFragment=0,SessionID=0,CustomerName="",IdCardType=0,IdentifiedCardNo="",
+            CustType=0,BankAccount="",BankPassWord="",AccountID="",Password="",InstallID="",
+            FutureSerial=0,UserID="",VerifyCertNoFlag=0,CurrencyID="",TradeAmount=0.0,
+            FutureFetchAmount=0.0,FeePayFlag=0,CustFee=0.0,BrokerFee=0.0,Message="",
+            Digest="",BankAccType=0,DeviceID="",BankSecuAccType=0,BrokerIDByBank="",
+            BankSecuAcc="",BankPwdFlag=0,SecuPwdFlag=0,OperNo="",RequestID=0,
+            TID=0,TransferStatus=0):
         self.TradeCode=TradeCode;
         self.BankID=BankID;
         self.BankBranchID=BankBranchID;
@@ -467,16 +467,16 @@ class CThostFtdcReqTransferField:
         self.TID=TID;
         self.TransferStatus=TransferStatus;
         pass
-    
+
 class CThostFtdcReqQueryAccountField:
     def __init__(self,TradeCode="",BankID="",BankBranchID="",BrokerID="",BrokerBranchID="",
-                      TradeDate="",TradeTime="",BankSerial="",TradingDay="",PlateSerial=0,
-                      LastFragment=0,SessionID=0,CustomerName="",IdCardType=0,IdentifiedCardNo="",
-                      CustType=0,BankAccount="",BankPassWord="",AccountID="",Password="",InstallID="",
-                      FutureSerial=0,UserID="",VerifyCertNoFlag=0,CurrencyID="",
-                      Digest="",BankAccType=0,DeviceID="",BankSecuAccType=0,BrokerIDByBank="",
-                      BankSecuAcc="",BankPwdFlag=0,SecuPwdFlag=0,OperNo="",RequestID=0,
-                      TID=0):
+            TradeDate="",TradeTime="",BankSerial="",TradingDay="",PlateSerial=0,
+            LastFragment=0,SessionID=0,CustomerName="",IdCardType=0,IdentifiedCardNo="",
+            CustType=0,BankAccount="",BankPassWord="",AccountID="",Password="",InstallID="",
+            FutureSerial=0,UserID="",VerifyCertNoFlag=0,CurrencyID="",
+            Digest="",BankAccType=0,DeviceID="",BankSecuAccType=0,BrokerIDByBank="",
+            BankSecuAcc="",BankPwdFlag=0,SecuPwdFlag=0,OperNo="",RequestID=0,
+            TID=0):
         self.TradeCode=TradeCode;
         self.BankID=BankID;
         self.BankBranchID=BankBranchID;

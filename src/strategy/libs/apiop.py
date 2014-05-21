@@ -3,67 +3,65 @@ import sframe_agent
 import apiop
 import apistruct
 
-type2valmap=
-{
-    "MSG_NULL":0,
-    "TChange":6,
-    "KChange":7,
-    "TMessage":8,
-    "TSTOP":9,
-    "TSTART":10,
-    "TOnFrontConnected":11,
-    "TReqUserLogin":12,
-    "TOnRspUserLogin":13,
+type2valmap={
+        "MSG_NULL":0,
+        "TChange":6,
+        "KChange":7,
+        "TMessage":8,
+        "TSTOP":9,
+        "TSTART":10,
+        "TOnFrontConnected":11,
+        "TReqUserLogin":12,
+        "TOnRspUserLogin":13,
 
-    "TReqSettlementInfoConfirm":14,
-    "TOnRspSettlementInfoConfirm":15,
-	
-    "TReqQryInstrument":16,
-    "TOnRspQryInstrument":17,
-	
-    "TReqQryTradingAccount":18,
-    "TOnRspQryTradingAccount":19,
+        "TReqSettlementInfoConfirm":14,
+        "TOnRspSettlementInfoConfirm":15,
 
-    "TReqQryInvestorPosition":20,
-    "TOnRspQryInvestorPosition":21,
+        "TReqQryInstrument":16,
+        "TOnRspQryInstrument":17,
 
-    "TReqOrderInsert":22,
-    "TOnRspOrderInsert":23,
+        "TReqQryTradingAccount":18,
+        "TOnRspQryTradingAccount":19,
 
-    "TReqOrderAction":24,
-    "TOnRspOrderAction":25,
-    "TOnRtnInstrumentStatus":26,
+        "TReqQryInvestorPosition":20,
+        "TOnRspQryInvestorPosition":21,
 
-    "TOnRtnOrder":27,
-    "TOnRtnTrade":28,
-    "TOnFrontDisconnected":=29,
-    "TOnHeartBeatWarning":=30,
-    "TOnRspError":31,
+        "TReqOrderInsert":22,
+        "TOnRspOrderInsert":23,
 
-    "TRADE_QUOTE":64,
-    "QSTOP":65,
-    "QSTART":66,
-    "QOnFrontConnected":67,
-    "QOnFrontDisconnected":68,
-    "QOnHeartBeatWarning":69,
-    "QOnRspError":70,
-    "QReqSubscribeMarketData":71,
-    "QOnRspSubMarketData":72,
-    "QOnRspUnSubMarketData":73,
-    "QReqUserLogin":74,
-    "QOnRspUserLogin":75,
-    "QOnRspUserLogout":76,
-    "QOnRtnDepthMarketData":77,
+        "TReqOrderAction":24,
+        "TOnRspOrderAction":25,
+        "TOnRtnInstrumentStatus":26,
 
-    "TRADE_STRATEGY":128,
+        "TOnRtnOrder":27,
+        "TOnRtnTrade":28,
+        "TOnFrontDisconnected":29,
+        "TOnHeartBeatWarning":30,
+        "TOnRspError":31,
+
+        "TRADE_QUOTE":64,
+        "QSTOP":65,
+        "QSTART":66,
+        "QOnFrontConnected":67,
+        "QOnFrontDisconnected":68,
+        "QOnHeartBeatWarning":69,
+        "QOnRspError":70,
+        "QReqSubscribeMarketData":71,
+        "QOnRspSubMarketData":72,
+        "QOnRspUnSubMarketData":73,
+        "QReqUserLogin":74,
+        "QOnRspUserLogin":75,
+        "QOnRspUserLogout":76,
+        "QOnRtnDepthMarketData":77,
+
+"TRADE_STRATEGY":128,
 
     "SRegMdInst":129,
     "SRegMdPeriod":130,
     "SRegMdStrategy":131,
     "SRegRspCommon":196,
 }
-op2req=
-{
+op2req={
         "TReqAuthenticate":{},
         "TReqUserLogin":{},
         "TReqUserLogout":{},
@@ -79,26 +77,6 @@ op2req=
 class apiop:
     agent=None;
     sid  =None;
-    def __init__(self):
-        self.op_vec=[];
-        self.op_map={};
-        self.agent=sframe_agent.sframe_agent();
-        self.sid=self.agent.init();
-
-    def send_req(self, t, req):
-        /*get arg
-          call method to arg
-          fix req
-          send req
-        */
-        _req=op2reg.get(t,{});
-        _req["type"]=type2valmap.get(t,-1);
-        .dispatchsynret(req);
-
-    def get_msg(self,req):
-        pass
-        
-
     def ReqAuthenticate(self,req):
         #CThostFtdcReqAuthenticateField 
         return {"retmsg":"not implement"};

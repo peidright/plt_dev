@@ -10,5 +10,6 @@ class sframe_agent(object):
         return json.dumps(self.ret);
         pass
     def get_msg(self):
+        print "agent return msg";
         return json.dumps(self.ret);
         pass

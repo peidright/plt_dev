@@ -5,8 +5,7 @@ import apistruct
 import thread
 import time
 
-op2req=
-{
+op2req={
         "TReqAuthenticate":{},
         "TReqUserLogin":{},
         "TReqUserLogout":{},
@@ -49,15 +48,18 @@ class sframe:
         thread.start_new_thread(sframe_callback,arg);
         pass
     def wait(self):
+        print "in wait";
         msg=self.agent.get_msg();
         msg=json.loads(msg);
         return msg;
-    def run():
+    def run(self):
+        print "in run";
         try:
             while True:
-                msg=self.sf.wait();
+                msg=self.wait();
                 self.strategy.rsp(msg);
                 #break;
                 pass
-        except Exception:
+        except Exception,e:
+            print "exp happen",e;
             pass

@@ -1,7 +1,7 @@
 import sys
 import json
 import time
-from strategy import strategy
+from strategy.strategy import sbase
 
 
 class strategy1(sbase):
