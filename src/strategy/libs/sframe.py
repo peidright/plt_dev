@@ -66,6 +66,14 @@ class sframe:
             print "exp happen",e;
             self.strategy.run_except();
             pass
+    def buy(self,instn,price,lots,off):
+        ret=self.ReqOrderInsert(instn, 'B', price, lots):
+        return {"retmsg":"not implement"};
+        pass
+    def sell(self,instn,price,lots,off):
+        ret=self.ReqOrderInsert(instn, 'C', price, lots):
+        return {"retmsg":"not implement"};
+        pass
     def req(self,msg):
         pass
 
@@ -74,33 +82,44 @@ class sframe:
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
         req["instn"]=instn;
+        req["sid"]=self.sid;
         pass
     def ReqQryTradingAccount(self):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
+        req["sid"]=self.sid;
         pass
     def ReqQryInvestorPosition(self, instn):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
         req["instn"]=instn;
+        req["sid"]=self.sid;
+
         pass
     def ReqOrderInsert(self, instn, dir, price, vol):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
         req["instn"]=instn;
-        req["dir"]=dir;
+        req["dir"]=ord(dir);
+        #str(unichr(97))
         req["price"]=price;
         req["vol"]=vol;
+        req["sid"]=self.sid;
+
         pass
     def ReqOrderAction(self, exchangeid, ordersysid):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
         req["exchangeid"]=exchangeid;
         req["ordersysid"]=ordersysid;
+        req["sid"]=self.sid;
+
         pass
     def RegMdStrategy(self, instn, period):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
         req["instn"]=instn;
         req["period"]=period;
+        req["sid"]=self.sid;
         pass
+

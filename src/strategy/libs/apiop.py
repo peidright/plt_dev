@@ -298,21 +298,15 @@ class apiop:
     def ReqQueryBankAccountMoneyByFuture(self,req):
         #CThostFtdcReqQueryAccountField 
         return {"retmsg":"not implement"};
-
         pass
     def buy(self,lots,price,type):
-        #
         return {"retmsg":"not implement"};
         pass
     def sell(self,lots,price,type):
-        #
         return {"retmsg":"not implement"};
-
         pass
     def buycover(self,lots,price,type):
-        #
         return {"retmsg":"not implement"};
-
         pass
     def sellcover(self,lots,price,type):
         return {"retmsg":"not implement"};
