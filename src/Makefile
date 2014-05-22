@@ -12,7 +12,7 @@ all: $(objects)
 
 	#todo bug,$(PYTHON_LDIR)
 	cp ctp_client ../build/
-	cp -udPR  strategy ../build/
+	#cp -udPR  strategy ../build/
 
 
 $(objects): %.o: %.cpp

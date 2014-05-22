@@ -698,7 +698,7 @@ int sframe_agent_loop(strategy_config_t &config) {
 	//pModule = PyImport_Import(pName);
 	PyObject *pyfile = PyFile_FromString((char*)config.scrip_name.c_str(),"r"); 
 	FILE *f = PyFile_AsFile(pyfile); 
-	PyRun_AnyFileEx(f,"test.py",0);
+	PyRun_AnyFileEx(f,config.scrip_name.c_str(),0);
 	cout<<"step3...."<<std::endl;
     return 0;
 }

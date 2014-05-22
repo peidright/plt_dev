@@ -427,7 +427,7 @@ int md::update_timer()
 };
 
 int mdservice::regmd_strategy(string instn, int sid, int period){
-    ret=-1;
+    int ret=-1;
     if(mds.find(instn)==mds.end()) {
         return ret;
     }

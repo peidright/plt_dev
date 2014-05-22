@@ -1,6 +1,7 @@
 import sys
 import json
 import time
+import types
 from strategy.strategy import sbase
 
 
@@ -14,12 +15,12 @@ class strategy1(sbase):
             #todo err
             pass
         else:
-            func_inst(self,msg);
+            func_inst(msg);
             pass
     def is_running(self):
         return True;
     def run_init(self):
-        ret=self.sf.RegMdStrategy("ag1412", period);
+        ret=self.sf.RegMdStrategy("ag1412", 0);
         self.sf.log("run_init: "+json.dumps(ret));
         #ReqQryInstrument(self, instn)
         #ReqQryTradingAccount(self)
@@ -27,7 +28,7 @@ class strategy1(sbase):
         #ReqOrderInsert(self, instn, dir,kpp, price, vol)
         #ReqOrderAction(self, exchangeid, ordersysid)
         #RegMdStrategy(self, instn, period)
-    def run_clear():
+    def run_clear(self):
         pass
     def config(self):
         print "config";
@@ -46,11 +47,11 @@ class strategy1(sbase):
         };
         print sys._getframe().f_code.co_name,"ssss"
         pass
-    def rsp_trade(self):
+    def rsp_trade(self,msg):
         pass
-    def rsp_quote(self):
+    def rsp_quote(self,msg):
         pass
-    def rsp_default(self):
+    def rsp_default(self,msg):
         pass
 if __name__=="__main__":
     s=strategy1();

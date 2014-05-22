@@ -1,3 +1,4 @@
+import sys
 import json
 import sframe_agent
 import apiop
@@ -46,6 +47,7 @@ class sframe:
     def wait(self):
         print "in wait";
         msg=self.agent.get_msg();
+        self.log("msg: "+msg+"\n");
         msg=json.loads(msg);
         return msg;
     def run(self):
@@ -73,9 +75,9 @@ class sframe:
     def req(self,msg):
         #_req=op2reg.get(t,{});
         #_req["type"]=type2valmap.get(t,-1);
-        return json.loads(self.agent.dispatchsynret(_req));
+        self.log("req: "+json.dumps(msg)+"\n");
+        return json.loads(self.agent.dispatchsynret(msg));
         pass
-
     def ReqQryInstrument(self, instn):
         #req=op2req.get
         func_name=sys._getframe().f_code.co_name
