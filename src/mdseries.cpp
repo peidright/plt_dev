@@ -427,10 +427,13 @@ int md::update_timer()
 };
 
 int mdservice::regmd_strategy(string instn, int sid, int period){
+    ret=-1;
     if(mds.find(instn)==mds.end()) {
-        return -1;
+        return ret;
     }
-    return mds[instn]->reg_strategy(sid, period);
+    ret=mds[instn]->reg_strategy(sid, period);
+    LOG_DEBUG<<"regmd_strategy:sid"<<sid<<" ret:"<<ret<<std::endl;
+    return ret;
 };
 
 int mdservice::mmd(string contract,int period, int bar){

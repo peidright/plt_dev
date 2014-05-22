@@ -14,6 +14,9 @@ int type2val(string t);
 string val2type(int val);
 
 
+sframe::sframe(){
+    this->base_key=1;
+};
 
 
 int sframe::put_msg(msg_t *msg,int key) {
@@ -280,6 +283,7 @@ msg_t sframe_agent::pystr2msg(string str) {
                 req_order->price=root["price"].asFloat();
                 req_order->vol=root["vol"].asInt();
                 req_order->sid=root["sid"].asInt();
+                req_order->kpp=root["kpp"].asInt();
                 break;
             case TReqOrderAction:
                 req_action=new(TReqOrderAction_t);

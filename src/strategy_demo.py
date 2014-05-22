@@ -18,6 +18,17 @@ class strategy1(sbase):
             pass
     def is_running(self):
         return True;
+    def run_init(self):
+        ret=self.sf.RegMdStrategy("ag1412", period);
+        self.sf.log("run_init: "+json.dumps(ret));
+        #ReqQryInstrument(self, instn)
+        #ReqQryTradingAccount(self)
+        #ReqQryInvestorPosition(self, instn)
+        #ReqOrderInsert(self, instn, dir,kpp, price, vol)
+        #ReqOrderAction(self, exchangeid, ordersysid)
+        #RegMdStrategy(self, instn, period)
+    def run_clear():
+        pass
     def config(self):
         print "config";
         self.msg2rsp={
@@ -44,7 +55,7 @@ class strategy1(sbase):
 if __name__=="__main__":
     s=strategy1();
     s.config();
-    sys.exit(0);
+    #sys.exit(0);
     s.init();
     s.run();
 #(isinstance(getattr(Test, 'foo'), types.FunctionType))

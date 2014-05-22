@@ -29,7 +29,9 @@ class sbase(object):
     def profit_stat(self,msg):
         pass
     def run(self):
+        self.run_init();
         self.sf.run();
+        self.run_clear();
     def expand(self):
         pass
 #s=sbase();

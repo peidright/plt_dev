@@ -13,7 +13,7 @@ op2req={
         "ReqQryInstrument":{"instn":"","sid":-1,"type":"TReqQryInstrument"},
         "ReqQryTradingAccount":{"sid":-1,"type":"TReqQryTradingAccount"},
         "ReqQryInvestorPosition":{"instn":"","sid":-1,"type":"TReqQryInvestorPosition"},
-        "ReqOrderInsert":{"instn":"","dir":-1,"price":0,"vol":0,"sid":-1,"type":"TReqOrderInsert"},
+        "ReqOrderInsert":{"instn":"","dir":-1,"price":0,"vol":0,"sid":-1,"kpp":0,"type":"TReqOrderInsert"},
         "ReqOrderAction":{"exchangeid":-1,"ordersysid":-1,"sid":-1,"type":"TReqOrderAction"},
         "RegMdStrategy":{"type":"SRegMdStrategy"},
 }
@@ -40,10 +40,6 @@ class sframe:
         fh.write(msg+"\n");
         fh.close();
         pass
-    def req(self, t, req):
-        _req=op2reg.get(t,{});
-        _req["type"]=type2valmap.get(t,-1);
-        return self.agent.dispatchsynret(_req);
     def test(self):
         thread.start_new_thread(sframe_callback,arg);
         pass
@@ -66,60 +62,66 @@ class sframe:
             print "exp happen",e;
             self.strategy.run_except();
             pass
-    def buy(self,instn,price,lots,off):
-        ret=self.ReqOrderInsert(instn, 'B', price, lots):
+    def buy(self,instn,kpp,price,lots,off):
+        ret=self.ReqOrderInsert(instn, 'B',kpp, price, lots)
         return {"retmsg":"not implement"};
         pass
     def sell(self,instn,price,lots,off):
-        ret=self.ReqOrderInsert(instn, 'C', price, lots):
+        ret=self.ReqOrderInsert(instn, 'S',kpp ,price, lots)
         return {"retmsg":"not implement"};
         pass
     def req(self,msg):
+        #_req=op2reg.get(t,{});
+        #_req["type"]=type2valmap.get(t,-1);
+        return json.loads(self.agent.dispatchsynret(_req));
         pass
 
     def ReqQryInstrument(self, instn):
         #req=op2req.get
         func_name=sys._getframe().f_code.co_name
-        req=op2req.get(func_name,{});
-        req["instn"]=instn;
-        req["sid"]=self.sid;
+        req_body=op2req.get(func_name,{});
+        req_body["instn"]=instn;
+        req_body["sid"]=self.sid;
+        self.req(req_body);
         pass
     def ReqQryTradingAccount(self):
         func_name=sys._getframe().f_code.co_name
-        req=op2req.get(func_name,{});
-        req["sid"]=self.sid;
+        req_body=op2req.get(func_name,{});
+        req_body["sid"]=self.sid;
+        self.req(req_body);
         pass
     def ReqQryInvestorPosition(self, instn):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
-        req["instn"]=instn;
-        req["sid"]=self.sid;
-
+        req_body["instn"]=instn;
+        req_body["sid"]=self.sid;
+        self.req(req_body)
         pass
-    def ReqOrderInsert(self, instn, dir, price, vol):
+    def ReqOrderInsert(self, instn, dir,kpp, price, vol):
         func_name=sys._getframe().f_code.co_name
-        req=op2req.get(func_name,{});
-        req["instn"]=instn;
-        req["dir"]=ord(dir);
+        req_body=op2req.get(func_name,{});
+        req_body["instn"]=instn;
+        req_body["dir"]=ord(dir);
+        req_body["kpp"]=ord(kpp);
         #str(unichr(97))
-        req["price"]=price;
-        req["vol"]=vol;
-        req["sid"]=self.sid;
-
+        req_body["price"]=price;
+        req_body["vol"]=vol;
+        req_body["sid"]=self.sid;
+        self.req(req_body)
         pass
     def ReqOrderAction(self, exchangeid, ordersysid):
         func_name=sys._getframe().f_code.co_name
-        req=op2req.get(func_name,{});
-        req["exchangeid"]=exchangeid;
-        req["ordersysid"]=ordersysid;
-        req["sid"]=self.sid;
-
+        req_body=op2req.get(func_name,{});
+        req_body["exchangeid"]=exchangeid;
+        req_body["ordersysid"]=ordersysid;
+        req_body["sid"]=self.sid;
+        self.req(req_body)
         pass
     def RegMdStrategy(self, instn, period):
         func_name=sys._getframe().f_code.co_name
-        req=op2req.get(func_name,{});
-        req["instn"]=instn;
-        req["period"]=period;
-        req["sid"]=self.sid;
+        req_body=op2req.get(func_name,{});
+        req_body["instn"]=instn;
+        req_body["period"]=period;
+        req_body["sid"]=self.sid;
+        self.req(req_body)
         pass
-

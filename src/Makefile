@@ -10,10 +10,9 @@ all: $(objects)
 	-L$(ROOT_DIR)/$(THIRD_LDIR) $(PYTHON_LLIB) \
 	$(SQLITE_LLIB) $(BOOST_LLIB) $(JSON_LLIB) 
 
-
-
 	#todo bug,$(PYTHON_LDIR)
 	cp ctp_client ../build/
+	cp -udPR  strategy ../build/
 
 
 $(objects): %.o: %.cpp

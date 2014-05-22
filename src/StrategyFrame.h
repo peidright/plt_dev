@@ -70,6 +70,7 @@ class sframe {
 	int reg_agent_key();
 	int dispatch();
     int dispatchsyn(msg_t msg);
+    sframe();
     msg_t dispatchsynret(msg_t msg);
 
 	int test(int key);
