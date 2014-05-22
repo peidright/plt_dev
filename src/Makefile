@@ -7,7 +7,8 @@ objects = CSem.o account.o  CtpTrade.o CtpTrader.o boosthelp.o config.o log.o\
 all: $(objects) 
 	g++ -o ctp_client $(objects) -L$(ROOT_DIR)/$(THIRD_LDIR) $(LUAJIT_LLIB) \
 	-L$(API_LDIR) $(API_LLIB) -lpthread -lrt \
-	 $(PYTHON_LLIB) $(SQLITE_LLIB) $(BOOST_LLIB) $(JSON_LLIB) 
+	-L$(ROOT_DIR)/$(THIRD_LDIR) $(PYTHON_LLIB) \
+	$(SQLITE_LLIB) $(BOOST_LLIB) $(JSON_LLIB) 
 
 
 

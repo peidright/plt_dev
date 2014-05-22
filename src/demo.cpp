@@ -103,7 +103,7 @@ int strategy_demo()
 {
 
 	strategy_config_t sconfig;
-	sconfig.scrip_name="test.py";
+	sconfig.scrip_name="strategy_demo";
 	g_sframe.run(sconfig);	
 	return 0;
 }

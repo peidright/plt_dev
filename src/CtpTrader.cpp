@@ -268,7 +268,7 @@ void CtpTrader::trade_stm(msg_t &msg)
 					memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
 					this->orderid2order[orderid]->uptime=time(NULL);
 				} else {
-					this->orderid2order[reqid]=new (order_t);
+					this->orderid2order[orderid]=new (order_t);
 					memcpy(&this->orderid2order[orderid]->base, &OnRtnOrder->pOrder, sizeof(CThostFtdcOrderField));
 					this->orderid2order[orderid]->uptime=time(NULL);
 					//assert(0);
@@ -277,7 +277,11 @@ void CtpTrader::trade_stm(msg_t &msg)
 				this->orderid2reqid[orderid]=reqid;
 				this->reqid2orderid[reqid]=orderid;
 				/*if reqid not existed*/
-				sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                if( this->reqid2sid.find(reqid)!=this->reqid2sid.end()) {
+				    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                }else {
+                    cout<<"not find reqid:"<<reqid<<std::endl;
+                }
 				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
@@ -312,7 +316,11 @@ void CtpTrader::trade_stm(msg_t &msg)
 				}else {
 					this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
 				}
-				sframe_put_msg(&msg, this->orderid2sid[orderid]);
+                if(this->orderid2sid.find(orderid)!=this->orderid2sid.end()){
+				    sframe_put_msg(&msg, this->orderid2sid[orderid]);
+                }else {
+                    cout<<"null orderid:"<<orderid<<std::endl;
+                }
 				msg.data=NULL;
 				msg.type=TSTOP;
 				break;

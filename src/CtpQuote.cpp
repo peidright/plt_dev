@@ -297,7 +297,7 @@ typedef struct {
 }QOnRtnDepthMarketData_t;
 */
 	//cout<<"Depth market Data post msg"<<endl;
-	//dump_depthmarketdata(pDepthMarketData);
+	dump_depthmarketdata(pDepthMarketData);
 	msg_t *msg=new(msg_t);
 	QOnRtnDepthMarketData_t  *data=new(QOnRtnDepthMarketData_t);
 
