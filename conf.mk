@@ -8,6 +8,8 @@ LUAJIT_LLIB=-lluajit-5.1
 
 PYTHON_LLIB=-lpython2.7
 
+GA_LLIB=-lga
+
 JSON_LLIB=-ljson_linux-gcc-4.7_libmt -ldl -lutil
 
 API_DIR=$(ROOT_DIR)/api/linux/ctp131204/ 

@@ -471,6 +471,7 @@ int dseries::update_meo(float v, int sec, int msec,period_type ptype, int period
                         this->tmsec[cidx]=msec;
                         this->tsec[cidx]=sec;
                     } else {
+                        LOG_DEBUG<<"err, curr_slot:"<<curr_slot<<" start_slot:"<<start_slot<<std::endl;
                         assert(curr_slot <= start_slot+2);
                     }
                 }else {

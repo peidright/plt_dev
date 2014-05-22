@@ -214,17 +214,18 @@ int CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid)
     int request_id=this->get_request_id();
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-    strcpy(req.InstrumentID, instId);//为空表示查询所有合约
+    //strcpy(req.InstrumentID, instId);//为空表示查询所有合约
 	int ret = this->api->ReqQryInstrument(&req, request_id);
-	assert(ret==0);
-    char id_buf[64];
-    snprintf(id_buf,64,"%d",request_id);
+    if(ret ==0) {
+        char id_buf[64];
+        snprintf(id_buf,64,"%d",request_id);
 
-    if(sid>0) {
-        /*update map reqid->sid, not use session id for network change
-         *??
-         * */
-         this->ctptrader->reqid2sid[id_buf]=sid;
+        if(sid>0) {
+            /*update map reqid->sid, not use session id for network change
+             *??
+             * */
+            this->ctptrader->reqid2sid[id_buf]=sid;
+        }
     }
     return ret;
 }
@@ -271,9 +272,10 @@ int CtpTradeSpi::ReqQryTradingAccount(int sid)
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
 	int ret = this->api->ReqQryTradingAccount(&req, request_id);
-    assert(ret==0);
-    if(sid>0) {
-        this->ctptrader->reqid2sid[id_buf]=sid;
+    if(ret==0) {
+        if(sid>0) {
+            this->ctptrader->reqid2sid[id_buf]=sid;
+        }
     }
     return ret;
 }

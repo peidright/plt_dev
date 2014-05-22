@@ -33,7 +33,7 @@ int inst::is_trading(){
 
 instmgr::instmgr(dmgr *pdmgr) {
     this->pdmgr=pdmgr;
-    this->need_inst["IF1404"]="IF1404";
+    this->need_inst["IF1406"]="IF1406";
     //this->need_inst["cu1407"]="cu1407";
     this->need_inst["ag1412"]="ag1412";
     last=0;

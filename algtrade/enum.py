@@ -1,0 +1,3 @@
+
+def enum(input):
+    pass

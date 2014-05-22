@@ -37,8 +37,9 @@ class sframe:
         self.strategy=strategy;
         self.lfile="strategy_"+str(self.sid)+".log";
     def log(self,msg):
+
         fh=open(self.lfile,"a+");
-        fh.write(msg+"\n");
+        fh.write("[time:" +str(time.time())+"] "+msg+"\n");
         fh.close();
         pass
     def test(self):
@@ -84,20 +85,20 @@ class sframe:
         req_body=op2req.get(func_name,{});
         req_body["instn"]=instn;
         req_body["sid"]=self.sid;
-        self.req(req_body);
+        return self.req(req_body);
         pass
     def ReqQryTradingAccount(self):
         func_name=sys._getframe().f_code.co_name
         req_body=op2req.get(func_name,{});
         req_body["sid"]=self.sid;
-        self.req(req_body);
+        return self.req(req_body);
         pass
     def ReqQryInvestorPosition(self, instn):
         func_name=sys._getframe().f_code.co_name
         req=op2req.get(func_name,{});
         req_body["instn"]=instn;
         req_body["sid"]=self.sid;
-        self.req(req_body)
+        return self.req(req_body)
         pass
     def ReqOrderInsert(self, instn, dir,kpp, price, vol):
         func_name=sys._getframe().f_code.co_name
@@ -109,7 +110,7 @@ class sframe:
         req_body["price"]=price;
         req_body["vol"]=vol;
         req_body["sid"]=self.sid;
-        self.req(req_body)
+        return self.req(req_body)
         pass
     def ReqOrderAction(self, exchangeid, ordersysid):
         func_name=sys._getframe().f_code.co_name
@@ -117,7 +118,7 @@ class sframe:
         req_body["exchangeid"]=exchangeid;
         req_body["ordersysid"]=ordersysid;
         req_body["sid"]=self.sid;
-        self.req(req_body)
+        return self.req(req_body)
         pass
     def RegMdStrategy(self, instn, period):
         func_name=sys._getframe().f_code.co_name
@@ -125,5 +126,5 @@ class sframe:
         req_body["instn"]=instn;
         req_body["period"]=period;
         req_body["sid"]=self.sid;
-        self.req(req_body)
+        return self.req(req_body)
         pass

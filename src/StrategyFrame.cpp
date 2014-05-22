@@ -150,6 +150,9 @@ msg_t sframe::dispatchsynret(msg_t msg)
     return msg1;
 retcommon:
     /*todo free msg?*/
+    msg1.type=SRegRspCommon;
+    msg1.data=new(SRegRspCommon_t);
+    ((SRegRspCommon_t*)msg1.data)->ret=ret;
     return msg1;
 }
 int sframe::dispatchsyn(msg_t msg){
@@ -332,7 +335,7 @@ string sframe_agent::dispatchsynret(string msg){
     msg_t msg2=this->psframe->dispatchsynret(msg1);
     free(msg1.data);
     ret=this->msg2pystr(msg2);
-    free(msg2.data);
+    //free(msg2.data);
     return ret;
 }
 
@@ -358,8 +361,11 @@ string sframe_agent::msg2pystr(msg_t msg) {
 	Json::FastWriter writer;
 	std::string out2 = writer.write(root);
 	*/
-    if(msg.type==MSG_NULL)
+    if(msg.type==MSG_NULL){
+        if(msg.data)
+            free(msg.data);
         return root.toStyledString();
+    }
 
 	switch(msg.type) {
 		case TChange:
@@ -369,8 +375,10 @@ string sframe_agent::msg2pystr(msg_t msg) {
 			root["v"]=tchange->v;
             LOG_DEBUG<<"root v:"<<root["v"]<<"tchange->v"<<tchange->v<<std::endl;
 			strmsg=root.toStyledString();
+            LOG_DEBUG<<"TChange"<<std::endl;
 			break;
 		case KChange:
+            LOG_DEBUG<<"KChange"<<std::endl;
 			kchange=(KChange_t*)msg.data;
 			root["type"]=val2type(KChange);
 			root["subtype"]=kchange->subtype;
@@ -381,12 +389,14 @@ string sframe_agent::msg2pystr(msg_t msg) {
 			strmsg=root.toStyledString();
 			break; 
         case SRegRspCommon:
+            LOG_DEBUG<<"RspCommon"<<std::endl;
             pSRegRspCommon=(SRegRspCommon_t*)msg.data;
             root["ret"]=pSRegRspCommon->ret;
             root["type"]=val2type(msg.type);
         	strmsg=root.toStyledString();
             break;
         case TOnRspQryInstrument:
+            LOG_DEBUG<<"RspQryInst"<<std::endl;
             /*todo rspinfo, and string*/
             rsp_inst=(TOnRspQryInstrument_t*)msg.data;
             root["type"]=val2type(msg.type);
@@ -422,6 +432,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             strmsg=root.toStyledString();
             break;
         case TOnRspQryTradingAccount:
+            LOG_DEBUG<<"RspQryTrad"<<std::endl;
             rsp_account=(TOnRspQryTradingAccount_t*)msg.data;
             root["bIsLast"]=rsp_account->bIsLast;
             root["type"]=val2type(msg.type);
@@ -461,6 +472,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             strmsg=root.toStyledString();
             break;
         case TOnRspQryInvestorPosition:
+            LOG_DEBUG<<"RspQryInvest"<<std::endl;
             rsp_position=(TOnRspQryInvestorPosition_t*)msg.data;
             root["type"]=val2type(msg.type);
             root["subtype"]=0;
@@ -509,6 +521,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             strmsg=root.toStyledString();
             break;
         case TOnRspOrderInsert:
+            LOG_DEBUG<<"RspOrderInsert"<<std::endl;
             rsp_insert=(TOnRspOrderInsert_t*)msg.data;
             root["type"]=val2type(msg.type);
             root["subtype"]=0;
@@ -540,6 +553,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             strmsg=root.toStyledString();
             break;
         case TOnRspOrderAction:
+            LOG_DEBUG<<"RspOrderAction"<<std::endl;
             rsp_action=(TOnRspOrderAction_t*)msg.data;
             root["type"]=val2type(msg.type);
             root["subtype"]=0;
@@ -561,6 +575,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["VolumeChange"]=rsp_action->pInputOrderAction.VolumeChange;
             break;
         case TOnRtnOrder:
+            LOG_DEBUG<<"RspRtnOrder"<<std::endl;
             rtn_order=(TOnRtnOrder_t*)msg.data;
             root["type"]=val2type(msg.type);
             root["subtype"]=0;
@@ -624,6 +639,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["ZCETotalTradedVolume"]=rtn_order->pOrder.ZCETotalTradedVolume;
             break;
         case TOnRtnTrade:
+            LOG_DEBUG<<"RspRtnTrade"<<std::endl;
             rtn_trade=(TOnRtnTrade_t*)msg.data;
             root["type"]=val2type(msg.type);
             root["subtype"]=0;
@@ -661,8 +677,14 @@ string sframe_agent::msg2pystr(msg_t msg) {
             break;
 		default:
 			/*todo*/
+            LOG_DEBUG<<"default"<<std::endl;
 			break;
 	}
+    if(msg.data){
+        LOG_DEBUG<<"free msg.data,point:"<<msg.data<<std::endl;
+        free(msg.data);
+        msg.data=NULL;
+    }
     LOG_DEBUG<<"strmsg is :"<<strmsg<<std::endl;
 	return strmsg;
 };
@@ -682,26 +704,19 @@ BOOST_PYTHON_MODULE(sframe_agent)
 int sframe_agent_loop(strategy_config_t &config) {
 	cout<<"sframe_agent loop"<<std::endl;
 	//PyObject *pName,*pModule,*pDict,*pFunc,*pArgs;
-	
 	Py_Initialize();
 	if (!Py_IsInitialized()){
-		cout<<"-1...."<<std::endl;
 		return -1;
 	}
 	PyRun_SimpleString("import sys");
 	initsframe_agent();
-	cout<<"step2...."<<std::endl;
-
 	PyRun_SimpleString("import sframe_agent");
 	PyRun_SimpleString("sys.path.append('./')");
-	PyRun_SimpleString("print 'aaa'");
-	//PyRun_SimpleString("import test");
 	//pName = PyString_FromString("test");
 	//pModule = PyImport_Import(pName);
 	PyObject *pyfile = PyFile_FromString((char*)config.scrip_name.c_str(),"r"); 
 	FILE *f = PyFile_AsFile(pyfile); 
 	PyRun_AnyFileEx(f,config.scrip_name.c_str(),0);
-	cout<<"step3...."<<std::endl;
     return 0;
 }
 
