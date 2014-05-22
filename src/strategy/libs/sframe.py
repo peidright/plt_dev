@@ -76,7 +76,7 @@ class sframe:
         #_req=op2reg.get(t,{});
         #_req["type"]=type2valmap.get(t,-1);
         self.log("req: "+json.dumps(msg)+"\n");
-        return json.loads(self.agent.dispatchsynret(msg));
+        return json.loads(self.agent.dispatchsynret(json.dumps(msg)));
         pass
     def ReqQryInstrument(self, instn):
         #req=op2req.get

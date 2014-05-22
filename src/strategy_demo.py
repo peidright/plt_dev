@@ -7,7 +7,6 @@ from strategy.strategy import sbase
 
 class strategy1(sbase):
     def rsp(self,msg):
-        print "rsp";
         t=msg.get("type","default");
         func_name=self.msg2rsp.get(t,"rsp_default");
         func_inst=getattr(self,func_name);

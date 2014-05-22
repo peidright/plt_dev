@@ -99,6 +99,7 @@ msg_t sframe::dispatchsynret(msg_t msg)
 
     msg_t msg1;
     memset(&msg1,0x0,sizeof(msg_t));
+    cout<<"msg.type"<<msg.type<<std::endl;
 
     switch(msg.type) {
         case SRegMdInst:
@@ -245,6 +246,7 @@ msg_t sframe_agent::pystr2msg(string str) {
 	if (reader.parse(str, root))  
 	{
 		int type=type2val(root["type"].asString());    
+        cout<<"type:"<<root["type"].asString()<<" val:"<<type<<std::endl;
 		/*
 		   int type = root["type"].asString();  
 		   int code = root["code"].asInt();    
@@ -840,11 +842,12 @@ void typeval_init()
     val2typemap[129]="SRegMdInst";
     type2valmap["SRegMdPeriod"]=130;
     val2typemap[130]="SRegMdPeriod";
-    type2valmap["SRegMdStratgy"]=131;
+    type2valmap["SRegMdStrategy"]=131;
     val2typemap[131]="SRegMdStratgy";
     type2valmap["SRegRspCommon"]=196;
     val2typemap[196]="SRegRspCommon";
 }
+
 int type2val(string t)
 {
     if(type2valmap.find(t)!=type2valmap.end()){

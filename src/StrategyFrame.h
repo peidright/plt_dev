@@ -101,6 +101,7 @@ class sframe_agent{
 int sframe_put_msg(msg_t *msg, int key);
 int sframe_quote_kchange(float o,float c, float h, float l, int sec,int msec,int subtype, int key);
 int sframe_quote_tchange(float v, int sec, int msec, int subtype, int key);
-
+extern void typeval_init();
 extern "C" void initsframe_agent();
+
 #endif

@@ -220,7 +220,7 @@ int  ctp_work()
 
 
 int main(int argc, char * argv[]){
-
+    typeval_init();
 	//ctp_wait_loop();
 	//python_demo();
 	//exit(0);
