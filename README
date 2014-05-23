@@ -1,0 +1,4 @@
+build:
+	change  ROOT_DIR to the right path, and cd src, type make
+		ROOT_DIR=/home/lv/plt_dev/
+
