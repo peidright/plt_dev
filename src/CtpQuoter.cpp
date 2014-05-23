@@ -74,10 +74,6 @@ void CtpQuoter::start()
 
 void CtpQuoter::post_msg(msg_t *msg, string contract)
 {
-	/*lock
-	*/
-	int i=my_hash(contract);
-	
 again:
 	boost::unique_lock<boost::timed_mutex> lk(*(this->qmutex_map[my_hash(contract)]),boost::chrono::milliseconds(1));
 	if(lk) {
@@ -131,7 +127,6 @@ int CtpQuoter::SubscribeMarketData()
 void CtpQuoter::quote_stm(msg_t &msg)
 {
 	/*负责从队列中取数据，进行处理*/
-	msg_t *mmsg;
 	int ret;
 	while(msg.type!=QSTOP) {
 		switch(msg.type) {
@@ -325,7 +320,6 @@ int CtpQuoter::DepthMarketProcess(msg_t &msg)
 
 void quote_loop(CtpQuoter *ctpquoter)
 {
-loop:
 	while(ctpquoter->running) {
 		ctpquoter->qsem.wait();
 		boost::unique_lock<boost::timed_mutex> lk(ctpquoter->qmutex,boost::chrono::milliseconds(1));

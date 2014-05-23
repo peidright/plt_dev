@@ -4,11 +4,9 @@
 #include "boosthelp.h"
 #include "msgqueue.h"
 #include "strategy_config.h"
-#include <boost/python.hpp>
 #include "CtpTrader.h"
 #include "CtpQuoter.h"
 
-using namespace boost::python;
 using namespace std;
 
 

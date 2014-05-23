@@ -119,12 +119,12 @@ int dseries::update_meh(float v, int sec, int msec,period_type ptype, int period
 		if is not continue,save space, update next
 		if is the data before, igore  the data
 	  */	
-	int start,mstart,cidx,now,start_slot,curr_slot,bar_slot,last_bar_slot;
+	int start,mstart,cidx,start_slot,curr_slot,bar_slot,last_bar_slot;
 	float result;
 	start=this->tsec[this->cidx];
 	mstart=this->tmsec[this->cidx];
 	cidx=this->cidx;
-	now=60*(sec/60);
+	//now=60*(sec/60);
 	start_slot = get_period_slot(start,mstart, ptype,period);
 	curr_slot=get_period_slot(sec,msec,ptype,period);
     LOG_DEBUG<<"ptype:"<<ptype<<" period:"<<period<<std::endl;
@@ -276,11 +276,11 @@ int dseries::update_mel(float v, int sec, int msec,period_type ptype, int period
 			  如果不是连续的，紧接着更新。
 			  如果是之前的数据，忽略此数据..
 			*/	
-		    int start,mstart,cidx,now,start_slot,curr_slot;
+		    int start,mstart,cidx,start_slot,curr_slot;
 			start=this->tsec[this->cidx];
 			mstart=this->tmsec[this->cidx];
 			cidx=this->cidx;
-			now=60*(sec/60);
+			//now=60*(sec/60);
 			start_slot = get_period_slot(start,mstart, ptype,period);
 			curr_slot=get_period_slot(sec,msec,ptype,period);
 			if(start_slot==0 && cidx==0) {
@@ -359,13 +359,12 @@ int dseries::update_meo(float v, int sec, int msec,period_type ptype, int period
 			  如果不是连续的，紧接着更新。
 			  如果是之前的数据，忽略此数据..
 			*/	
-		    int start,mstart,cidx,now,start_slot,curr_slot;
+		    int start,mstart,cidx,start_slot,curr_slot;
 			
 			start=this->tsec[this->cidx];
 			mstart=this->tmsec[this->cidx];
 			cidx=this->cidx;
-			now=60*(sec/60);
-
+			//now=60*(sec/60);
 			start_slot = get_period_slot(start,mstart, ptype,period);
 			curr_slot=get_period_slot(sec,msec,ptype,period);
             LOG_DEBUG<<"meo start_slot:curr_slot  "<<start_slot<<":"<<curr_slot<<std::endl;
@@ -495,11 +494,11 @@ int dseries::update_mec(float v, int sec, int msec,period_type ptype, int period
 			  如果不是连续的，紧接着更新。
 			  如果是之前的数据，忽略此数据..
 			*/	
-		    int start,mstart,cidx,now,start_slot,curr_slot;
+		    int start,mstart,cidx,start_slot,curr_slot;
 			start=this->tsec[this->cidx];
 			mstart=this->tmsec[this->cidx];
 			cidx=this->cidx;
-			now=60*(sec/60);
+			//now=60*(sec/60);
 
 			start_slot = get_period_slot(start,mstart, ptype,period);
 			curr_slot=get_period_slot(sec,msec,ptype,period);
@@ -599,7 +598,7 @@ again:
 }
 
 int dseries::callback(float v,int sec, int msec){
-	int ret;
+	int ret=0;
 again:
 		boost::unique_lock<boost::timed_mutex> lk(this->dmutex,boost::chrono::milliseconds(1));
 		if(lk) {
@@ -608,7 +607,7 @@ again:
 			ret=this->cb(v,sec,msec);
 			goto again;
 		}
-	return 0;
+	return ret;
 }
 
 int dseries::kline_update(kdata_type ktype, int t)

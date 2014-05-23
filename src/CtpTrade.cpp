@@ -382,7 +382,7 @@ int CtpTradeSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
     int ret; 
     int orderref,requestid;
     char reqid[64];
-    ordreq_t ordreq;
+    //ordreq_t ordreq;
     CThostFtdcInputOrderField req;
     memset(&req, 0, sizeof(req));	
     req.CombHedgeFlag[0]=THOST_FTDC_HF_Speculation;

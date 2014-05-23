@@ -4,7 +4,7 @@
 #include <deque>
 #include "help.h"
 
-#include "instmgr.h";
+#include "instmgr.h"
 
 CtpTrader::CtpTrader(Trader *trader,dmgr *pdmgr,instmgr *pinstmgr, string localdir):qsem(0)
 {
@@ -38,25 +38,25 @@ int CtpTrader::start()
 
 void CtpTrader::trade_stm(msg_t &msg)
 {
-	msg_t *mmsg;
-	inst_t *pinst;
+	//msg_t *mmsg;
+	//inst_t *pinst;
 	inst   *ppinst;
 	TThostFtdcInstrumentIDType instId;
 	int ret;
-    char reqid[64];
-    char orderid[64];
-    TOnRtnOrder_t *OnRtnOrder;
-    TOnRtnTrade_t *OnRtnTrade;
-    position_t *pposition;
-    struct CThostFtdcInvestorPositionField  *pposition_field;
-    TOnRspOrderAction_t  *OnRspOrderAction;
-    TOnRspOrderInsert_t *OnRspOrderInsert;
-    TOnRspQryTradingAccount_t *OnRspQryTradingAccount;
+	char reqid[64];
+	char orderid[64];
+	TOnRtnOrder_t *OnRtnOrder;
+	TOnRtnTrade_t *OnRtnTrade;
+	position_t *pposition;
+	struct CThostFtdcInvestorPositionField  *pposition_field;
+	TOnRspOrderAction_t  *OnRspOrderAction;
+	TOnRspOrderInsert_t *OnRspOrderInsert;
+	TOnRspQryTradingAccount_t *OnRspQryTradingAccount;
 
 
 
-    int orderref;
-    int requestid;
+	int orderref;
+	int requestid;
 
 
 	while(msg.type!=TSTOP) {
@@ -75,12 +75,12 @@ void CtpTrader::trade_stm(msg_t &msg)
 				break;
 			case TOnHeartBeatWarning:
 				/*todo err process
-				*/
+				 */
 				msg.type=TSTOP;
 				break;
 			case TOnRspError:
 				/*todo err process
-				*/
+				 */
 				msg.type=TSTOP;
 				break;
 			case TReqSettlementInfoConfirm:
@@ -103,16 +103,16 @@ void CtpTrader::trade_stm(msg_t &msg)
 			case TReqUserLogin:
 				/**/
 				LOG_DEBUG<<"trade login stm"<<std::endl;
-				 this->trade_spi->ReqUserLogin((char*)this->trader->brokerid.c_str(),
-					(char*)this->trader->username.c_str(),
-				(char*)this->trader->password.c_str(),0);
+				ret= this->trade_spi->ReqUserLogin((char*)this->trader->brokerid.c_str(),
+						(char*)this->trader->username.c_str(),
+						(char*)this->trader->password.c_str(),0);
 				if(ret==0) {
 					//LOG_DEBUG<<"trade_stm login msg sended\n" <<std::endl;
 					msg.type=TSTOP;
 				}else {
 					LOG_DEBUG<<"trade_stm login msg sended fail\n" <<std::endl;
 					/*err process					
-					*/
+					 */
 				}
 				msg.type=TSTOP;
 				break;
@@ -142,23 +142,23 @@ void CtpTrader::trade_stm(msg_t &msg)
 				if(!this->trade_spi->IsErrorRspInfo(((( TOnRspQryInstrument_t*)msg.data)->pRspInfo))) {
 					//LOG_DEBUG<<"OnRspInstrument inst:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
 
-                    /*update it into pinstmgr
-                     *todo merge pinstmgr to pdmgr
-                     * */
-                    if((( TOnRspQryInstrument_t*)msg.data)->pInstrument.ProductClass==THOST_FTDC_PC_Futures){
+					/*update it into pinstmgr
+					 *todo merge pinstmgr to pdmgr
+					 * */
+					if((( TOnRspQryInstrument_t*)msg.data)->pInstrument.ProductClass==THOST_FTDC_PC_Futures){
 
-                        ppinst=new inst();
-                        ppinst->ignore=1;
-                        memcpy(&ppinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
-                        this->pinstmgr->update_inst(ppinst->base.InstrumentID, ppinst);
+						ppinst=new inst();
+						ppinst->ignore=1;
+						memcpy(&ppinst->base,&(( TOnRspQryInstrument_t*)msg.data)->pInstrument,sizeof( CThostFtdcInstrumentField ));
+						this->pinstmgr->update_inst(ppinst->base.InstrumentID, ppinst);
 
-                        if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
-                            LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
-                            this->pinstmgr->set_last(1);
-                        }
-                    }else {
-                        LOG_DEBUG<<"Not Futures:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
-                    }
+						if((( TOnRspQryInstrument_t*)msg.data)->bIsLast) {
+							LOG_DEBUG<<"OnRspInstrument isLast"<<std::endl;
+							this->pinstmgr->set_last(1);
+						}
+					}else {
+						LOG_DEBUG<<"Not Futures:"<<(( TOnRspQryInstrument_t*)msg.data)->pInstrument.InstrumentID<<std::endl;
+					}
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}
@@ -167,64 +167,64 @@ void CtpTrader::trade_stm(msg_t &msg)
 			case TOnRtnInstrumentStatus:
 				//(TOnRtnInstrumentStatus_t);
 				LOG_DEBUG<<"trade rtn_Instrument stm"<<std::endl;
-                /*
-				LOG_DEBUG<<"OnRtnInstrumentStatus enter "<<
-				" time: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterTime<<
-				" inst: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID<<
-				" reason: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterReason<<
-				" status: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus<<std::endl;
-                */
+				/*
+				   LOG_DEBUG<<"OnRtnInstrumentStatus enter "<<
+				   " time: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterTime<<
+				   " inst: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID<<
+				   " reason: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.EnterReason<<
+				   " status: "<<((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus<<std::endl;
+				 */
 				this->pinstmgr->update_inst_status(((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentID,  
-						                   ((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus);
+						((TOnRtnInstrumentStatus_t*)msg.data)->pInstrumentStatus.InstrumentStatus);
 				msg.type=TSTOP;
 				break;
 			case TReqQryTradingAccount:
-                //TReqQryTradingAccount_t
+				//TReqQryTradingAccount_t
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryTradingAccount:
-                /*todo ok?*/
-                OnRspQryTradingAccount=(TOnRspQryTradingAccount_t*)msg.data;
-                snprintf(reqid,sizeof(reqid),"%d",OnRspQryTradingAccount->nRequestID);
-                LOG_DEBUG<<"CurrMargin:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.CurrMargin<<
-                           " Available:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.Available<<std::endl;
-                sframe_put_msg(&msg, this->reqid2sid[reqid]);
-                msg.data=NULL;
+				/*todo ok?*/
+				OnRspQryTradingAccount=(TOnRspQryTradingAccount_t*)msg.data;
+				snprintf(reqid,sizeof(reqid),"%d",OnRspQryTradingAccount->nRequestID);
+				LOG_DEBUG<<"CurrMargin:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.CurrMargin<<
+					" Available:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.Available<<std::endl;
+				sframe_put_msg(&msg, this->reqid2sid[reqid]);
+				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TReqQryInvestorPosition:
 				msg.type=TSTOP;
 				break;
 			case TOnRspQryInvestorPosition:
-                if(this->position.find(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID)
-                        ==this->position.end()) {
-                    pposition=new (position_t);
+				if(this->position.find(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID)
+						==this->position.end()) {
+					pposition=new (position_t);
 
-                    if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
-                        pposition_field=&pposition->bbase;
-                    }else if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Short){
-                        pposition_field=&pposition->sbase;
-                    }else {
-                        assert(0);
-                    }
-                    memcpy(pposition_field, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
-                            sizeof(struct CThostFtdcInvestorPositionField));
-                    position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]=pposition;
-                }else {
-                    if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
-                        pposition_field=&position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]->bbase;
-                    }else if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Short){
-                        pposition_field=&position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]->sbase;
-                    }else {
-                        assert(0);
-                    }
-                    memcpy(&pposition_field, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
-                            sizeof(struct CThostFtdcInvestorPositionField));
-                }
-                LOG_DEBUG<<"Inst position:"<<((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID<<" yp:"<<
-                        ((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.YdPosition<<" p:"<<
-                        ((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.Position<<std::endl;
-                            
+					if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
+						pposition_field=&pposition->bbase;
+					}else if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Short){
+						pposition_field=&pposition->sbase;
+					}else {
+						assert(0);
+					}
+					memcpy(pposition_field, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
+							sizeof(struct CThostFtdcInvestorPositionField));
+					position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]=pposition;
+				}else {
+					if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Long) {
+						pposition_field=&position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]->bbase;
+					}else if(((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.PosiDirection==THOST_FTDC_PD_Short){
+						pposition_field=&position[((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID]->sbase;
+					}else {
+						assert(0);
+					}
+					memcpy(&pposition_field, &((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition, 
+							sizeof(struct CThostFtdcInvestorPositionField));
+				}
+				LOG_DEBUG<<"Inst position:"<<((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.InstrumentID<<" yp:"<<
+					((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.YdPosition<<" p:"<<
+					((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.Position<<std::endl;
+
 				msg.type=TSTOP;
 				break;
 			case TReqOrderInsert:
@@ -235,29 +235,29 @@ void CtpTrader::trade_stm(msg_t &msg)
 				/*reqid2req map, status
 				 * */
 				OnRspOrderInsert=(TOnRspOrderInsert_t*)msg.data;
-				snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderInsert->pInputOrder.RequestID,
+				snprintf(reqid,sizeof(reqid),"%d_%s",OnRspOrderInsert->pInputOrder.RequestID,
 						OnRspOrderInsert->pInputOrder.OrderRef);
 				sframe_put_msg(&msg, this->reqid2sid[reqid]);
 				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TReqOrderAction:
-                /*
-                 * */
+				/*
+				 * */
 				msg.type=TSTOP;
 				break;
 			case TOnRspOrderAction:
 				/*fix status,todo use req_id, or ordid
 				 * */
 				OnRspOrderAction=(TOnRspOrderAction_t*)msg.data;;
-				snprintf(reqid,sizeof(reqid),"%d_%d",OnRspOrderAction->pInputOrderAction.RequestID,
+				snprintf(reqid,sizeof(reqid),"%d_%s",OnRspOrderAction->pInputOrderAction.RequestID,
 						OnRspOrderAction->pInputOrderAction.OrderRef);
 				sframe_put_msg(&msg, this->reqid2sid[reqid]);
 				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TOnRtnOrder:
-                //TOnRtnOrder_t;
+				//TOnRtnOrder_t;
 				OnRtnOrder=(TOnRtnOrder_t*)msg.data;
 				orderref=atoi(OnRtnOrder->pOrder.OrderRef);
 				requestid=OnRtnOrder->pOrder.RequestID;
@@ -281,41 +281,41 @@ void CtpTrader::trade_stm(msg_t &msg)
 				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
-            case TOnRtnTrade:
-                //TOnRtnTrade_t;
-                //update req
-                //update Order
-                //update position
-                //append Trade to position for recheck
-                OnRtnTrade=(TOnRtnTrade_t*)msg.data;
-                snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnTrade->pTrade.ExchangeID,OnRtnTrade->pTrade.OrderSysID);
-                if(this->orderid2reqid.find(orderid)!=this->orderid2reqid.end()) {
-                    if(this->reqid2req.find(this->orderid2reqid[orderid])!=this->reqid2req.end()) {
-                        //this->reqid2req[this->orderid2reqid[orderid]]->base.
-                    }else {
-                    }
-                }else {
-                    //todo some check
-                }
-                if(this->orderid2order.find(orderid)!=this->orderid2order.end()) {
-                    //this->orderid2order[orderid]->
-                }else {
-                }
-                if(this->position.find(OnRtnTrade->pTrade.InstrumentID)!=this->position.end()){
-                    /*
-                     * todo if existed in vector
-                     * */
-                    //position_t *position;
-                    //CThostFtdcInvestorPositionField base;
-                    //OnRtnTrade->pTrade.
-                    
-                }else {
-                    this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
-                }
-                sframe_put_msg(&msg, this->orderid2sid[orderid]);
-                msg.data=NULL;
-                msg.type=TSTOP;
-                break;
+			case TOnRtnTrade:
+				//TOnRtnTrade_t;
+				//update req
+				//update Order
+				//update position
+				//append Trade to position for recheck
+				OnRtnTrade=(TOnRtnTrade_t*)msg.data;
+				snprintf(orderid,sizeof(orderid),"%s_%s",OnRtnTrade->pTrade.ExchangeID,OnRtnTrade->pTrade.OrderSysID);
+				if(this->orderid2reqid.find(orderid)!=this->orderid2reqid.end()) {
+					if(this->reqid2req.find(this->orderid2reqid[orderid])!=this->reqid2req.end()) {
+						//this->reqid2req[this->orderid2reqid[orderid]]->base.
+					}else {
+					}
+				}else {
+					//todo some check
+				}
+				if(this->orderid2order.find(orderid)!=this->orderid2order.end()) {
+					//this->orderid2order[orderid]->
+				}else {
+				}
+				if(this->position.find(OnRtnTrade->pTrade.InstrumentID)!=this->position.end()){
+					/*
+					 * todo if existed in vector
+					 * */
+					//position_t *position;
+					//CThostFtdcInvestorPositionField base;
+					//OnRtnTrade->pTrade.
+
+				}else {
+					this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
+				}
+				sframe_put_msg(&msg, this->orderid2sid[orderid]);
+				msg.data=NULL;
+				msg.type=TSTOP;
+				break;
 			default:
 				msg.type=TSTOP;
 				break;

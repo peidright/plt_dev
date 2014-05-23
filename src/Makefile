@@ -1,7 +1,7 @@
 include ../conf.mk
 
 objects = CSem.o account.o  CtpTrade.o CtpTrader.o boosthelp.o config.o log.o\
-	main.o Quote.o  Quote.o market.o quote_io.o datalocal.o\
+	main.o market.o quote_io.o datalocal.o\
 	CtpQuote.o dseries.o mdseries.o StrategyFrame.o CtpQuoter.o\
         help.o msgqueue.o trader.o tm.o demo.o instmgr.o
 all: $(objects) 
@@ -16,6 +16,6 @@ all: $(objects)
 
 
 $(objects): %.o: %.cpp
-	g++ -g -c -Wall   $(CFLAGS) $< -o $@ 
+	g++ -g -c -Wall    $(CFLAGS) $< -o $@ 
 clean:
 	rm -rf *.o
