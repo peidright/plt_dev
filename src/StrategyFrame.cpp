@@ -23,7 +23,6 @@ int sframe::put_msg(msg_t *msg,int key) {
 again:
 	boost::unique_lock<boost::timed_mutex> lk(this->pipemap[key]->qmutex,boost::chrono::milliseconds(1));
 	if(lk) {
-        LOG_DEBUG<<"real sframe put_msg"<<((TChange_t*)msg->data)->v<<std::endl;
 		pipemap[key]->msgqueue.push_back(*msg);
 		pipemap[key]->qsem.post();
 	}else {
@@ -261,6 +260,7 @@ msg_t sframe_agent::pystr2msg(string str) {
                 msg.len=sizeof(TReqQryInstrument_t);
                 msg.type=TReqQryInstrument;
                 strcpy(req_inst->instn,root["instn"].asString().c_str());
+                LOG_DEBUG<<"instn is:"<<req_inst->instn<<std::endl;
                 req_inst->sid=root["sid"].asInt();
                 break;
             case TReqQryTradingAccount:
@@ -355,6 +355,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
     TOnRtnOrder_t *rtn_order;
     TOnRtnTrade_t *rtn_trade;
 
+    LOG_DEBUG<<"msg2pystr ,msg.type is:"<<msg.type<<std::endl;
 	string strmsg="";
 	/*
 	std::string out = root.toStyledString();
@@ -396,7 +397,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
         	strmsg=root.toStyledString();
             break;
         case TOnRspQryInstrument:
-            LOG_DEBUG<<"RspQryInst"<<std::endl;
+            LOG_DEBUG<<"msg2pystr RspQryInst"<<std::endl;
             /*todo rspinfo, and string*/
             rsp_inst=(TOnRspQryInstrument_t*)msg.data;
             root["type"]=val2type(msg.type);
@@ -573,6 +574,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["SessionID"]=rsp_action->pInputOrderAction.SessionID;
             root["UserID"]=rsp_action->pInputOrderAction.UserID;
             root["VolumeChange"]=rsp_action->pInputOrderAction.VolumeChange;
+            strmsg=root.toStyledString();
             break;
         case TOnRtnOrder:
             LOG_DEBUG<<"RspRtnOrder"<<std::endl;
@@ -637,6 +639,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["VolumeTotalOriginal"]=rtn_order->pOrder.VolumeTotalOriginal;
             root["VolumeTraded"]=rtn_order->pOrder.VolumeTraded;
             root["ZCETotalTradedVolume"]=rtn_order->pOrder.ZCETotalTradedVolume;
+            strmsg=root.toStyledString();
             break;
         case TOnRtnTrade:
             LOG_DEBUG<<"RspRtnTrade"<<std::endl;
@@ -674,6 +677,7 @@ string sframe_agent::msg2pystr(msg_t msg) {
             root["TradingRole"]=rtn_trade->pTrade.TradingRole;
             root["UserID"]=rtn_trade->pTrade.UserID;
             root["Volume"]=rtn_trade->pTrade.Volume;
+            strmsg=root.toStyledString();
             break;
 		default:
 			/*todo*/

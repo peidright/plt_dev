@@ -1,9 +1,11 @@
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import json
 import time
 import types
 from strategy.strategy import sbase
-
 
 class strategy1(sbase):
     def rsp(self,msg):
@@ -19,8 +21,14 @@ class strategy1(sbase):
     def is_running(self):
         return True;
     def run_init(self):
-        ret=self.sf.RegMdStrategy("ag1412", 0);
-        self.sf.log("run_init: "+json.dumps(ret));
+        #ret=self.sf.RegMdStrategy("ag1412", 0);
+        #ret=self.sf.RegMdStrategy("IF1406", 0);
+        #self.sf.log("RspRegMdStrategy: "+json.dumps(ret));
+        ret=self.sf.ReqQryInstrument("ag1412")
+        self.sf.log("RspReqQryInstrument: "+json.dumps(ret));
+        #time.sleep(10);
+        #ret=self.sf.ReqQryTradingAccount();
+        #self.sf.log("RspQryTradingAccount: "+json.dumps(ret));
         #ReqQryInstrument(self, instn)
         #ReqQryTradingAccount(self)
         #ReqQryInvestorPosition(self, instn)

@@ -135,7 +135,6 @@ void CtpTrader::trade_stm(msg_t &msg)
 				/*1.update it into dmgr
 				 *2.if is last,..
 				 * */
-				msg.type=TSTOP;
 				LOG_DEBUG<<"trade rsp_qryInstrument stm"<<std::endl;
 				//CThostFtdcInstrumentField pInstrument;
 				//TOnRspQryInstrument_t;
@@ -162,6 +161,19 @@ void CtpTrader::trade_stm(msg_t &msg)
 				} else {
 					LOG_DEBUG<<"OnRspInstrument err"<<std::endl;
 				}
+
+                char reqid[64];
+                //char orderid[64];
+                //char id_buf[64];
+                snprintf(reqid,64,"%d",((TOnRspQryInstrument_t*)msg.data)->nRequestID);
+                if( this->reqid2sid.find(reqid)!=this->reqid2sid.end()) {
+
+				    LOG_DEBUG<<"trade rsp_qryInstrument stm requestid:"<<((TOnRspQryInstrument_t*)msg.data)->nRequestID <<std::endl;
+                    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                    msg.data=NULL;
+                }else {
+                    LOG_DEBUG<<"trade rsp_qryInstrument can not find requestid"<<((TOnRspQryInstrument_t*)msg.data)->nRequestID <<std::endl;
+                }
 				msg.type=TSTOP;
 				break;
 			case TOnRtnInstrumentStatus:
@@ -279,10 +291,10 @@ void CtpTrader::trade_stm(msg_t &msg)
 				/*if reqid not existed*/
                 if( this->reqid2sid.find(reqid)!=this->reqid2sid.end()) {
 				    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+				    msg.data=NULL;
                 }else {
                     cout<<"not find reqid:"<<reqid<<std::endl;
                 }
-				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			case TOnRtnTrade:
@@ -318,10 +330,10 @@ void CtpTrader::trade_stm(msg_t &msg)
 				}
                 if(this->orderid2sid.find(orderid)!=this->orderid2sid.end()){
 				    sframe_put_msg(&msg, this->orderid2sid[orderid]);
+				    msg.data=NULL;
                 }else {
                     cout<<"null orderid:"<<orderid<<std::endl;
                 }
-				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
 			default:

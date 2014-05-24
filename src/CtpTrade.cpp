@@ -214,7 +214,7 @@ int CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid)
     int request_id=this->get_request_id();
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-    //strcpy(req.InstrumentID, instId);//为空表示查询所有合约
+    strcpy(req.InstrumentID, instId);//为空表示查询所有合约
 	int ret = this->api->ReqQryInstrument(&req, request_id);
     if(ret ==0) {
         char id_buf[64];
@@ -227,6 +227,7 @@ int CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId, int sid)
             this->ctptrader->reqid2sid[id_buf]=sid;
         }
     }
+    LOG_DEBUG<<"ReqQryInstrument requestid:"<<request_id<<std::endl;
     return ret;
 }
 

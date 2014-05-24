@@ -28,6 +28,7 @@ def sframe_callback(arg):
 class sframe:
     agent=None;
     sid  =None;
+    encoding="GB18030"
     def __init__(self,strategy):
         self.op_vec=[];
         self.op_map={};
@@ -49,7 +50,7 @@ class sframe:
         print "in wait";
         msg=self.agent.get_msg();
         self.log("msg: "+msg+"\n");
-        msg=json.loads(msg);
+        msg=json.loads(msg,encoding=self.encoding);
         return msg;
     def run(self):
         print "in run";
@@ -76,8 +77,9 @@ class sframe:
     def req(self,msg):
         #_req=op2reg.get(t,{});
         #_req["type"]=type2valmap.get(t,-1);
-        self.log("req: "+json.dumps(msg)+"\n");
-        return json.loads(self.agent.dispatchsynret(json.dumps(msg)));
+        self.log("req: "+json.dumps(msg,encoding=self.encoding)+"\n");
+
+        return json.loads(self.agent.dispatchsynret(json.dumps(msg,encoding=self.encoding)),encoding=self.encoding);
         pass
     def ReqQryInstrument(self, instn):
         #req=op2req.get
