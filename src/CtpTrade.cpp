@@ -331,7 +331,7 @@ int CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId,int si
 	memset(&req, 0, sizeof(req));
 	strcpy(req.BrokerID, this->ctptrader->trader->brokerid.c_str());
 	strcpy(req.InvestorID, this->ctptrader->trader->username.c_str());
-	strcpy(req.InstrumentID, this->ctptrader->trader->username.c_str());	
+	strcpy(req.InstrumentID, instId);	
 	int ret = this->api->ReqQryInvestorPosition(&req, request_id);
     assert(ret==0);
     if(sid>0) {
