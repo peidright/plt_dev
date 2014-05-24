@@ -24,14 +24,15 @@ class strategy1(sbase):
         #ret=self.sf.RegMdStrategy("ag1412", 0);
         #ret=self.sf.RegMdStrategy("IF1406", 0);
         #self.sf.log("RspRegMdStrategy: "+json.dumps(ret));
-        ret=self.sf.ReqQryInstrument("ag1412")
-        self.sf.log("RspReqQryInstrument: "+json.dumps(ret));
+        #ret=self.sf.ReqQryInstrument("ag1412")
+        #self.sf.log("RspReqQryInstrument: "+json.dumps(ret));
         #time.sleep(10);
         #ret=self.sf.ReqQryTradingAccount();
         #self.sf.log("RspQryTradingAccount: "+json.dumps(ret));
         #ReqQryInstrument(self, instn)
         #ReqQryTradingAccount(self)
-        #ReqQryInvestorPosition(self, instn)
+        ret=self.sf.ReqQryInvestorPosition("j1409");
+        self.sf.log("RspQryInvestorPosition: "+json.dumps(ret));
         #ReqOrderInsert(self, instn, dir,kpp, price, vol)
         #ReqOrderAction(self, exchangeid, ordersysid)
         #RegMdStrategy(self, instn, period)
@@ -61,6 +62,7 @@ class strategy1(sbase):
     def rsp_default(self,msg):
         pass
 if __name__=="__main__":
+    time.sleep(10);
     s=strategy1();
     s.config();
     #sys.exit(0);

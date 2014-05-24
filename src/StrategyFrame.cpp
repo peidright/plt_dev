@@ -272,11 +272,11 @@ msg_t sframe_agent::pystr2msg(string str) {
                 break;
             case TReqQryInvestorPosition:
                 req_position=new(TReqQryInvestorPosition_t);
-                msg.data=new(TReqQryInvestorPosition_t);
+                msg.data=req_position;
                 msg.len=sizeof(TReqQryInvestorPosition_t);
                 msg.type=TReqQryInvestorPosition;
                 req_position->sid=root["sid"].asInt();
-                strcpy(req_inst->instn,root["instn"].asString().c_str());
+                strcpy(req_position->instn,root["instn"].asString().c_str());
                 break;
             case TReqOrderInsert:
                 req_order=new(TReqOrderInsert_t);

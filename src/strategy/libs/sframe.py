@@ -97,7 +97,7 @@ class sframe:
         pass
     def ReqQryInvestorPosition(self, instn):
         func_name=sys._getframe().f_code.co_name
-        req=op2req.get(func_name,{});
+        req_body=op2req.get(func_name,{});
         req_body["instn"]=instn;
         req_body["sid"]=self.sid;
         return self.req(req_body)

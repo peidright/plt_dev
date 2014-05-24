@@ -200,7 +200,14 @@ void CtpTrader::trade_stm(msg_t &msg)
 				snprintf(reqid,sizeof(reqid),"%d",OnRspQryTradingAccount->nRequestID);
 				LOG_DEBUG<<"CurrMargin:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.CurrMargin<<
 					" Available:"<<((TOnRspQryTradingAccount_t*)msg.data)->pTradingAccount.Available<<std::endl;
-				sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                if( this->reqid2sid.find(reqid)!=this->reqid2sid.end()) {
+
+				    LOG_DEBUG<<"trade rsp_qryTradingAccount stm requestid:"<<((TOnRspQryTradingAccount_t*)msg.data)->nRequestID<<std::endl;
+                    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                    msg.data=NULL;
+                }else {
+                    LOG_DEBUG<<"trade rsp_qryTradingAccount can not find requestid"<<((TOnRspQryTradingAccount_t*)msg.data)->nRequestID <<std::endl;
+                }
 				msg.data=NULL;
 				msg.type=TSTOP;
 				break;
@@ -237,6 +244,15 @@ void CtpTrader::trade_stm(msg_t &msg)
 					((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.YdPosition<<" p:"<<
 					((TOnRspQryInvestorPosition_t*)msg.data)->pInvestorPosition.Position<<std::endl;
 
+				snprintf(reqid,sizeof(reqid),"%d",((TOnRspQryInvestorPosition_t*)msg.data)->nRequestID);
+                if( this->reqid2sid.find(reqid)!=this->reqid2sid.end()) {
+
+				    LOG_DEBUG<<"trade rsp_qryInvestorPosition stm requestid:"<<reqid<<std::endl;
+                    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                    msg.data=NULL;
+                }else {
+                    LOG_DEBUG<<"trade rsp_qryInvestorPosition can not find requestid"<<reqid <<std::endl;
+                }
 				msg.type=TSTOP;
 				break;
 			case TReqOrderInsert:
@@ -249,8 +265,13 @@ void CtpTrader::trade_stm(msg_t &msg)
 				OnRspOrderInsert=(TOnRspOrderInsert_t*)msg.data;
 				snprintf(reqid,sizeof(reqid),"%d_%s",OnRspOrderInsert->pInputOrder.RequestID,
 						OnRspOrderInsert->pInputOrder.OrderRef);
-				sframe_put_msg(&msg, this->reqid2sid[reqid]);
-				msg.data=NULL;
+                if(this->reqid2sid.find(reqid)!=this->reqid2sid.end()){
+                    LOG_DEBUG<<"trade rsp_qryOrderInsert stm requestid:"<<reqid <<std::endl;
+				    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+                    msg.data=NULL;
+                }else {
+                    LOG_DEBUG<<"trade rsp_qryOrderInsert can not find requestid"<<reqid <<std::endl;
+                }
 				msg.type=TSTOP;
 				break;
 			case TReqOrderAction:
@@ -264,8 +285,13 @@ void CtpTrader::trade_stm(msg_t &msg)
 				OnRspOrderAction=(TOnRspOrderAction_t*)msg.data;;
 				snprintf(reqid,sizeof(reqid),"%d_%s",OnRspOrderAction->pInputOrderAction.RequestID,
 						OnRspOrderAction->pInputOrderAction.OrderRef);
-				sframe_put_msg(&msg, this->reqid2sid[reqid]);
-				msg.data=NULL;
+                if(this->reqid2sid.find(reqid)!=this->reqid2sid.end()){
+                    LOG_DEBUG<<"trade rsp_qryOrderInsert stm requestid:"<<reqid <<std::endl;
+				    sframe_put_msg(&msg, this->reqid2sid[reqid]);
+				    msg.data=NULL;
+                }else {
+                    LOG_DEBUG<<"trade rsp_qryOrderInsert can not find requestid"<<reqid <<std::endl;
+                }
 				msg.type=TSTOP;
 				break;
 			case TOnRtnOrder:
@@ -290,10 +316,12 @@ void CtpTrader::trade_stm(msg_t &msg)
 				this->reqid2orderid[reqid]=orderid;
 				/*if reqid not existed*/
                 if( this->reqid2sid.find(reqid)!=this->reqid2sid.end()) {
+                    LOG_DEBUG<<"trade rsp_qryRtnOrder stm  requestid:"<<reqid<<std::endl;
 				    sframe_put_msg(&msg, this->reqid2sid[reqid]);
 				    msg.data=NULL;
                 }else {
                     cout<<"not find reqid:"<<reqid<<std::endl;
+                    LOG_DEBUG<<"trade rsp_qryRtnOrder stm requestid"<<reqid<<std::endl;
                 }
 				msg.type=TSTOP;
 				break;
@@ -329,10 +357,11 @@ void CtpTrader::trade_stm(msg_t &msg)
 					this->position[OnRtnTrade->pTrade.InstrumentID]=new (position_t);
 				}
                 if(this->orderid2sid.find(orderid)!=this->orderid2sid.end()){
+                    LOG_DEBUG<<"trade rsp_qryRtnTrade stm  orderid:"<<orderid <<std::endl;
 				    sframe_put_msg(&msg, this->orderid2sid[orderid]);
 				    msg.data=NULL;
                 }else {
-                    cout<<"null orderid:"<<orderid<<std::endl;
+                    LOG_DEBUG<<"trade rsp_qryRtnTrade can not find orderid"<<orderid <<std::endl;
                 }
 				msg.type=TSTOP;
 				break;
