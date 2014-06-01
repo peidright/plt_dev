@@ -21,7 +21,7 @@ int ga_fea_init()
     vector<fea *> g_vfea;
     for(int i=0;i<10;i++) {
         //new fea(FEA_NULL,i);
-        vfea.push_back(new fea(FEA_NULL,i));
+        g_vfea.push_back(new fea());
     }
     return 0;
 }
@@ -65,3 +65,8 @@ fea_ListInitializer(GAGenome & c)
     child.swap(GARandomInt(0,n-1), GARandomInt(0,n-1));
   */
 }
+
+float fea_objective(GAGenome &)
+{
+    return 0;
+};
