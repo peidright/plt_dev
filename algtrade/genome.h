@@ -4,11 +4,11 @@
 #include "op.h"
 
 typedef struct genome_meta{
-    uint8_t genes[10];
-    uint8_t cases[10];
-    uint8_t envids[3];
-    uint8_t gnum;
-}genome_meta_t;
+    uint8_t  *gene_cell_feas;
+    uint8_t   gene_cells[10];
+    uint16_t  cell_num;
+    uint16_t  gene_num;
+} genome_meta_t;
 
 typedef struct genome_op
 {

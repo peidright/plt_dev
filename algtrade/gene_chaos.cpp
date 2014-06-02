@@ -1,5 +1,6 @@
 #include "gene.h"
 #include "gene_chaos.h"
+#include "gene_cell.h"
 
 /*
 typedef void (*init_func)(void *,void *);
@@ -10,7 +11,7 @@ typedef bool    (*crossover_func)(void *, void *, void **, void **);
 typedef void*    (*copy_func)(void *);
 */
 
-gene_op_t g_gene_chaos[3]={
+gene_cell_op_t g_gene_chaos[3]={
         {"tick1",
           init_func_tick1,
           clear_func_tick1,
