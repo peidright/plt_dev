@@ -16,11 +16,10 @@ class container
         int clr(int idx);
         int size();
         int iterator(call_back func);
-
+        int total;
     private:
         char *bits;
         T    *arrs;
-        int total;
         int csize;
         int cidx;
 };

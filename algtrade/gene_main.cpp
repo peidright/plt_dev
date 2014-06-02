@@ -20,5 +20,6 @@ struct gene_op gop;
 int main()
 {
     gop.init=NULL;
+    global_init();
     return 0;
 }

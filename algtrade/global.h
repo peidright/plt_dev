@@ -15,4 +15,6 @@ extern container<genome_meta_t> g_genome_meta_pool;
 extern container<population_meta_t> g_population_meta_pool;
 extern container<gene_data_t> g_gene_data_pool;
 extern populations_t g_populations;
+
+int global_init();
 #endif
