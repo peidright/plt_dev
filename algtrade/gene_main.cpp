@@ -3,6 +3,7 @@
 #include "population.h"
 #include "container.h"
 #include "global.h"
+#include "log.h"
 /*
 container<gene_op_t> g_gene_op_pool(256);
 container<gene_meta_t> g_gene_meta_pool(256);
@@ -20,6 +21,7 @@ struct gene_op gop;
 int main()
 {
     gop.init=NULL;
+	log_init();
     global_init();
     return 0;
 }

@@ -33,7 +33,7 @@ int global_init()
     ret = global_gene_cell_init();
 
     //init genome
-    ret = global_gene_init();
+    //ret = global_gene_init();
 
     //init population
     return 0;
@@ -84,12 +84,10 @@ void gene_generate(vector< vector<gene_cell_meta_t> >::iterator begin ,
             assert(0);
         }
     } else {
-        for(int i=0; i<begin->size();i++) {
-            /*
-            dest.push_back(begin[i]);
-            gene_generate(begin+1;end; dest, gene_meta_pool);
-            dest.erase(dest::end()-1);
-            */
+        for(int i=0; i<begin[0].size();i++) {
+            dest.push_back(begin[0][i]);
+            gene_generate(begin+1,end, dest, gene_meta_pool);
+            dest.erase(dest.end()-1);
         }
     }
 }

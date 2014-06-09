@@ -45,7 +45,7 @@ T* container<T>::get(int idx)
             if(this->bits[i]!=0xFF) {
                 for(int j=7;j>=0;j--) {
                     if(!(this->bits[i] & (1<<j))) {
-                        this->bits[i] | (1<<j);
+                        //this->bits[i] | (1<<j);
                         this->cidx=i*8+7-j;
                         this->csize++;
                         return &this->arrs[this->cidx];
@@ -57,7 +57,7 @@ T* container<T>::get(int idx)
             if(this->bits[i]!=0xFF) {
                 for(int j=7;j>=0;j--) {
                     if(!(this->bits[i] & (1<<j))) {
-                        this->bits[i] | (1<<j);
+                        //this->bits[i] | (1<<j);
                         this->cidx=i*8+7-j;
                         this->csize++;
                         return &this->arrs[this->cidx];
@@ -86,7 +86,7 @@ int container<T>::put(T item)
         if(this->bits[i]!=0xFF) {
             for(int j=7;j>=0;j--) {
                 if(!(this->bits[i] & (1<<j))) {
-                    this->bits[i] | (1<<j);
+                    //this->bits[i] | (1<<j);
                     this->cidx=i*8+7-j;
                     this->csize++;
                     this->arrs[this->cidx]=item;
@@ -100,7 +100,7 @@ int container<T>::put(T item)
         if(this->bits[i]!=0xFF) {
             for(int j=7;j>=0;j--) {
                 if(!(this->bits[i] & (1<<j))) {
-                    this->bits[i] | (1<<j);
+                    //this->bits[i] | (1<<j);
                     this->cidx=i*8+7-j;
                     this->csize++;
                     this->arrs[this->cidx]=item;
