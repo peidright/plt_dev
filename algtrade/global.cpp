@@ -2,6 +2,7 @@
 #include "gene_cell.h"
 #include <assert.h>
 #include <vector>
+#include "log.h"
 
 container<gene_cell_meta_t> g_gene_cell_meta_pool(256);
 container<gene_cell_op_t> g_gene_cell_op_pool(1024);
@@ -33,7 +34,7 @@ int global_init()
     ret = global_gene_cell_init();
 
     //init genome
-    //ret = global_gene_init();
+    ret = global_gene_init();
 
     //init population
     return 0;
@@ -64,6 +65,7 @@ void gene_generate(vector< vector<gene_cell_meta_t> >::iterator begin ,
         if(gene_meta) {
             memset(gene_meta,0x0,sizeof(gene_meta_t));
             gene_meta->cnums=dest.size();
+            LOG_DEBUG<<"dest.size:"<<dest.size()<<std::endl;
 
             for(int i=0;i<dest.size();i++) {
                 if(i<10){
@@ -96,9 +98,11 @@ void gene_generate(vector< vector<gene_cell_meta_t> >::iterator begin ,
 int global_gene_init()
 {
     //gene init
+    int op_total=g_gene_cell_meta_pool.size();
     vector< vector<gene_cell_meta_t> > gene_cell_meta_vv;
     vector< gene_cell_meta_t> dest;
-    for(int i=0;i<g_gene_cell_meta_pool.total;i++) {
+    LOG_DEBUG<<"op_total:"<<op_total<<std::endl;
+    for(int i=0;i<op_total;i++) {
         gene_cell_meta_t *pgene_cell_meta=g_gene_cell_meta_pool.get(i);
         if(pgene_cell_meta) {
             vector<gene_cell_meta_t> gene_cell_meta_v;
@@ -118,8 +122,10 @@ int global_gene_init()
                 gene_cell_meta_v.push_back(gene_cell_meta);
                 int meta_idx=g_gene_cell_meta_pool.put(gene_cell_meta);
             }
+            LOG_DEBUG<<"gene_cell_meta_v.size: "<<gene_cell_meta_v.size()<<std::endl;
             gene_cell_meta_vv.push_back(gene_cell_meta_v);
         }
+        LOG_DEBUG<<"gene_cell_meta_vv.size: "<<gene_cell_meta_vv.size()<<std::endl;
     }
 
     /*gene gene_pool
@@ -129,6 +135,7 @@ int global_gene_init()
     if(gene_cell_meta_vv.size() < 6) {
         gene_generate(gene_cell_meta_vv.begin() , gene_cell_meta_vv.end(),
                         dest, g_gene_meta_pool);
+        LOG_DEBUG<<"g_gene_meta_pool.size:"<<g_gene_meta_pool.size()<<std::endl;
     }else if(gene_cell_meta_vv.size() > 10) {
         /*
         gene small
@@ -173,6 +180,7 @@ int global_gene_cell_init()
 
         typedef void* (*init_func)(void *,void *);
         pgene_cell_op->init(pgene_cell_meta,NULL);
+        LOG_DEBUG<<"op_idx:"<<op_idx<<" data_idx:"<<data_idx<<" meta_idx:"<<meta_idx<<" meta_cn:"<<(int)pgene_cell_meta->cn<<std::endl;
     }
     return 0;
 }

@@ -3,8 +3,8 @@ include ../conf.mk
 test_objs =  main.o fea.o ga_fea.o
 gene_objs =  gene.o genome.o population.o gene_main.o gene_chaos.o gene_chaos_tick1.o gene_chaos_tick2.o gene_chaos_tick3.o global.o gene_cell.o log.o
 all: $(test_objs) $(gene_objs) 
-	g++ -o test_main $(test_objs) -L$(ROOT_DIR)/$(THIRD_LDIR) $(GA_LLIB) $(BOOST_LLIB) -lpthread
-	g++ -o gene_main $(gene_objs) -L$(ROOT_DIR)/$(THIRD_LDIR) $(GA_LLIB) $(BOOST_LLIB) -lpthread
+	g++ -o test_main $(test_objs) -L$(ROOT_DIR)/$(THIRD_LDIR) $(GA_LLIB) $(BOOST_LLIB) $(PYTHON_LLIB) -lpthread
+	g++ -o gene_main $(gene_objs) -L$(ROOT_DIR)/$(THIRD_LDIR) $(GA_LLIB) $(BOOST_LLIB) $(PYTHON_LLIB) -lpthread
 
 
 	#$(LUAJIT_LLIB) \

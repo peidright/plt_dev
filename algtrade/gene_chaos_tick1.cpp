@@ -16,7 +16,8 @@ typedef struct tick1_data{
 
 void* init_func_tick1(void *data,void *config)
 {
-    //gene_cell_meta_t *gene_cell_meta=(gene_cell_meta_t*)data;
+    gene_cell_meta_t *gene_cell_meta=(gene_cell_meta_t*)data;
+    gene_cell_meta->cn=3;
     return NULL;
 
     assert(0);

@@ -28,13 +28,13 @@ gene_cell_op_t g_gene_chaos[3]={
           crossover_func_tick2,
           copy_func_tick2,
           },
-        {"tick2",
-          init_func_tick2,
-          clear_func_tick2,
-          output_func_tick2,
-          mutation_func_tick2,
-          crossover_func_tick2,
-          copy_func_tick2,
+        {"tick3",
+          init_func_tick3,
+          clear_func_tick3,
+          output_func_tick3,
+          mutation_func_tick3,
+          crossover_func_tick3,
+          copy_func_tick3,
           }
 };
 
