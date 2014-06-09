@@ -43,11 +43,37 @@ int global_init()
 int global_genome_init()
 {
     int size=g_gene_meta_pool.size();
+    int cell_num;
+    int gene_num;
     genome_meta_t *pgenome_meta=g_genome_meta_pool.get(-1);
+
+    cell_num=sizeof(g_gene_chaos)/sizeof(g_gene_chaos[0]);
+    gene_num=g_gene_meta_pool.size();
+
+    pgenome_meta->cell_num=cell_num;
+    pgenome_meta->gene_num=gene_num;
+
     for(int i=0;i<g_gene_meta_pool.total;i++) {
         gene_meta_t *pgene_meta=g_gene_meta_pool.get(i);
         if(pgene_meta) {
+                        pgene_meta->gene_cells[i]=i;
+                        pgene_meta->cell_cases[i];
+/*
+typedef struct genome_meta{
+    uint8_t  *gene_cell_feas;
+    uint8_t   gene_cells[10];
+    uint16_t  cell_num;
+    uint16_t  gene_num;
+} genome_meta_t;
 
+typedef struct gene_meta{
+    uint8_t gene_cells[10];
+    uint8_t cell_cases[10];
+    uint8_t cnums;
+    gene_action action;    
+}gene_meta_t;
+
+*/
         }
     }
     return 0;
@@ -70,11 +96,12 @@ void gene_generate(vector< vector<gene_cell_meta_t> >::iterator begin ,
             for(int i=0;i<dest.size();i++) {
                 if(i<10){
                     int did=dest[i].did;
-                    gene_data_t *gene_data=g_gene_data_pool.get(did);
-                    if(gene_data) {
+                    gene_cell_data_t *pgene_cell_data=g_gene_cell_data_pool.get(did);
+                    if(pgene_cell_data) {
                         //special case i=i
                         gene_meta->gene_cells[i]=i;
-                        gene_meta->cell_cases[i]=gene_data->cn;
+                        gene_meta->cell_cases[i]=pgene_cell_data->cn;
+
                     }else {
                         assert(0);
                     }

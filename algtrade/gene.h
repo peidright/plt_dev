@@ -20,7 +20,7 @@ typedef struct gene_meta{
 }gene_meta_t;
 
 typedef struct gene_data{
-    uint8_t  cn;
+    //uint8_t  cn;
     uint8_t  data[123];
 } gene_data_t;
 
